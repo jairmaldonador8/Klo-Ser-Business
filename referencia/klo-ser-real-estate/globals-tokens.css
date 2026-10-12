@@ -1,0 +1,320 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./calendario.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --font-logo: var(--font-logo);
+  --font-mano: var(--font-mano);
+  /* Escala «galería»: slate y white remapeados a la rampa neutra cálida del
+     rebranding B&N (negro editorial / blanco galería, docs/diseno/). Los
+     componentes existentes usan clases slate y white; este remap adopta la
+     paleta en toda la app desde un solo lugar. El único color de marca que
+     sobrevive es el ámbar #C98A3B del guion del logo y micro-acentos. */
+  --color-white: var(--galeria-white);
+  /* Blanco y negro FIJOS (2026-09-16, Jair: «en bandeja, lo que dice en el
+     recuadro negro Asignar no se lee»). `white` y `slate-*` son camaleón:
+     de noche `text-white` se vuelve carbón. Sobre lo que NO cambia con el
+     tema —fotos, el velo sobre una foto, un botón verde de WhatsApp— el
+     texto va con `text-blanco` y la placa con `bg-foto`. */
+  --color-blanco: #ffffff;
+  --color-foto: #0b0d14;
+  --color-slate-50: var(--galeria-50);
+  --color-slate-100: var(--galeria-100);
+  --color-slate-200: var(--galeria-200);
+  --color-slate-300: var(--galeria-300);
+  --color-slate-400: var(--galeria-400);
+  --color-slate-500: var(--galeria-500);
+  --color-slate-600: var(--galeria-600);
+  --color-slate-700: var(--galeria-700);
+  --color-slate-800: var(--galeria-800);
+  --color-slate-900: var(--galeria-900);
+  --color-slate-950: var(--galeria-950);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-vivo: var(--vivo);
+  --color-vivo-tinta: var(--vivo-tinta);
+  /* v0.3: la familia del azul y el sol de Klo, como utilidades
+     (bg-azul-suave, text-azul-tinta, bg-sol, bg-manda, text-manda-tinta). */
+  --color-azul-suave: var(--azul-suave);
+  --color-azul-tinta: var(--azul-tinta);
+  --color-sol: var(--sol);
+  --color-manda: var(--manda);
+  --color-manda-tinta: var(--manda-tinta);
+  /* La sombra de la tarjeta que manda (`shadow-manda`) también es camaleón:
+     azulada sobre el papel de día, un halo azul sobre el negro de noche. */
+  --shadow-manda: var(--sombra-manda);
+  /* Dorado de las noticias (2026-09-16): solo para lo que mandó la dirección. */
+  --color-noticia: var(--noticia);
+  --color-noticia-tinta: var(--noticia-tinta);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ── Kit Fintech Muro (rediseño móvil) ─────────────────────────── */
+@theme {
+  --shadow-glass: 0 10px 30px rgb(20 20 20 / 0.14);
+  --shadow-glass-sm: 0 4px 16px rgb(20 20 20 / 0.08);
+  --blur-glass: 12px;
+  --radius-hero: 1.5rem;
+}
+@custom-variant standalone (@media (display-mode: standalone));
+
+/* Tema claro «blanco galería» (rebranding B&N): fondo gris-cálido claro,
+   tarjetas blanco roto, tinta negra. Fuente: docs/diseno/rebrand-sistema.html */
+:root {
+  /* Escala galería VIVA (PLUMA 2026-08-14): las utilidades slate/white de
+     toda la app leen estas variables, así el switch de tema re-viste el
+     sistema completo sin tocar componentes. */
+  /* v0.3 «Klo azul» (2026-09-10): la rampa deja el greige y se enfría —
+     fondo casi blanco con un punto de azul, tarjetas blancas, tinta azul
+     marino. Referencia: design-propuestas/klo-ser-v03/estilos.css */
+  --galeria-white: #ffffff;
+  /* 2026-09-15 (Jair: el lienzo gris y la línea marcada «le quitan
+     profesionalismo»; quiere blanco y sin divisiones): el lienzo sube a
+     casi blanco (#f7f8fc) y la tarjeta se despega solo con sombra. */
+  --galeria-50: #f7f8fc;
+  --galeria-100: #eef1f8;
+  --galeria-200: #e6e9f2;
+  --galeria-300: #d3d8e6;
+  --galeria-400: #9aa1b9;
+  --galeria-500: #7a8199;
+  --galeria-600: #5a6079;
+  --galeria-700: #3b4159;
+  --galeria-800: #1f2438;
+  --galeria-900: #0e1220;
+  --galeria-950: #080a14;
+
+  /* Vidrio cristal PLUMA (capa global; ver reglas al final del archivo) */
+  /* Día en papel 2026-09-04 (Jair: «en blanco se pierden las líneas»):
+     el vidrio pasa de 30 % a 74 % —se lee como papel— y la línea sube a
+     20 %, con el velo del fondo un punto más gris para que despegue. */
+  /* v0.3: el vidrio se vuelve papel. Tarjeta blanca opaca, sin desenfoque
+     (lo más caro de pintar en el teléfono), línea apenas insinuada y una
+     sombra azulada que la despega del fondo frío. */
+  --cristal-fondo: rgb(255 255 255);
+  --cristal-brillo: rgb(255 255 255 / 0);
+  --cristal-linea: rgb(14 18 32 / 0.05);
+  /* 2026-09-15: la tarjeta estándar no lleva línea de día; la única
+     división es la sombra suave de abajo. De noche sí la lleva. */
+  --cristal-linea-tarjeta: transparent;
+  /* 2026-09-24 (Jair: «en computadora se puede llegar a perder la
+     información de los recuadros»): en escritorio sí lleva un filo de
+     papel, finísimo, para que la orilla no se funda con el lienzo casi
+     blanco. Ver la regla en el media query de 64rem de abajo. */
+  --cristal-modal: rgb(255 255 255 / 0.98);
+  --cristal-sombra: 0 1px 2px rgb(14 18 32 / 0.04), 0 12px 32px -12px rgb(14 18 32 / 0.14);
+  /* Cuánto del vidrio conserva el vaho diagonal en el centro de la tarjeta:
+     de día casi todo (papel parejo), de noche menos (el vidrio respira). */
+  --cristal-vaho: 100%;
+
+  /* ── Acento vivo v0.2 «salvia» ──
+     Solo pinta lo que ESTÁ PASANDO: la acción principal, un interruptor
+     encendido, una barra de avance, un punto de «en vivo». Nunca superficies,
+     nunca texto de lectura. La urgencia se sigue diciendo con tinta y peso. */
+  /* v0.3: el acento es el azul de la marca. Sigue la misma ley: pinta la
+     acción y lo que está pasando, nunca una categoría ni texto de lectura. */
+  --vivo: #1c36ee;
+  --vivo-tinta: #ffffff;
+  --vivo-cortina: #5e70f3;
+  /* Familia del azul y el sol de Klo (v0.3) */
+  --azul-hover: #1730d0;
+  --azul-suave: #e9edff;   /* fondo de lo activo, tarjeta de Klo */
+  --azul-tinta: #0c1a8a;   /* texto sobre azul suave */
+  --sol: #ffc933;          /* solo detrás de Klo */
+  --manda: #0e1220;        /* la tarjeta que manda: tinta de día, carbón azulado de noche */
+  --manda-tinta: #f4f6fb;
+  --sombra-manda: 0 18px 44px -14px rgb(14 18 32 / 0.55);
+
+  /* Colores personales del Klo Calendar (0030). La excepción documentada a
+     PLUMA: solo se ven dentro de [data-calendario] y nunca dicen estado. De
+     día bajan de luz para que la tinta se lea sobre el tinte al 20 %. */
+  --c-arena: #b8863f;
+  --c-cielo: #4a86b8;
+  --c-lavanda: #7d68b8;
+  --c-rosa: #b85a70;
+  --c-oliva: #7f9a3a;
+  --c-grafito: #6b7080;
+
+  /* Dorado de las noticias del equipo (2026-09-16). Identidad de «esto lo
+     mandó la dirección», NO estado ni color personal: solo lo usan las
+     noticias y juntas del Klo Calendar y ningún asesor lo puede elegir. Se
+     aleja del arena (ocre apagado) con más amarillo y más saturación, y en
+     el calendario va con brillo metálico y su ✦. `--noticia-tinta` es la
+     tinta que se lee SOBRE el dorado lleno. */
+  --noticia: #c9a227;
+  --noticia-brillo: #f1d77a;
+  --noticia-tinta: #2b2100;
+
+  --background: #f7f8fc;
+  --foreground: #0e1220;
+  --card: #ffffff;
+  --card-foreground: #0e1220;
+  --popover: #ffffff;
+  --popover-foreground: #0e1220;
+  /* Antes de v0.2: --primary: #141414; --primary-foreground: #FCFCFA; (tinta galería) */
+  --primary: var(--vivo);
+  --primary-foreground: var(--vivo-tinta);
+  --secondary: #eef1f8;
+  --secondary-foreground: #1f2438;
+  --muted: #f4f6fb;
+  --muted-foreground: #5a6079;
+  --accent: #e9edff;
+  --accent-foreground: #0c1a8a;
+  --destructive: #a3402e;
+  --border: rgba(14, 18, 32, 0.08);
+  --input: rgba(14, 18, 32, 0.12);
+  --ring: #1c36ee;
+  --chart-1: #1c36ee;
+  --chart-2: #9aa1b9;
+  --chart-3: #0e1220;
+  --chart-4: #d3d8e6;
+  --chart-5: #5a6079;
+  --radius: 1rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #5a6079;
+  --sidebar-primary: #1c36ee;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9edff;
+  --sidebar-accent-foreground: #0c1a8a;
+  --sidebar-border: rgba(14, 18, 32, 0.08);
+  --sidebar-ring: #1c36ee;
+}
+
+/* Modo noche «negro editorial»: negro cálido con tinta marfil (mockup
+   aprobado 2026-08-10). Queda listo para el switch de tema en Ajustes. */
+.dark {
+  /* Camaleón PLUMA: la escala se invierte — fondo negro cálido, superficies
+     carbón, tinta marfil. bg-white se vuelve tarjeta oscura; text-slate-900
+     se vuelve marfil; los botones negros se vuelven perla. */
+  /* Aclarado 2026-08-26 (revisión de Jair: «de noche es demasiado oscuro»).
+     Antes página #0B0B0C, tarjeta #151517, vidrio 21/21/23 — tres negros
+     casi iguales que se hundían juntos. Ahora hay escalones: página, tarjeta
+     y vidrio se distinguen. */
+  /* Negro mate 2026-09-04 (referencia de Jair: calendario oscuro tipo
+     Notion/Cron): página casi negra, panel carbón, tarjeta un escalón arriba.
+     Se conservan los tres escalones, solo bajan de tono y pierden el lechoso. */
+  /* v0.3 noche: azul marino profundo, tarjeta un escalón arriba, tinta
+     casi blanca. La misma rampa de la lámina (`[data-tema="noche"]`). */
+  --galeria-white: #171a23;
+  --galeria-50: #0f1117;
+  --galeria-100: #1b1f2a;
+  --galeria-200: #262a37;
+  --galeria-300: #333848;
+  --galeria-400: #6f7690;
+  --galeria-500: #8b91a8;
+  --galeria-600: #aab0c6;
+  --galeria-700: #c9cde0;
+  --galeria-800: #e2e5f1;
+  --galeria-900: #f2f3f8;
+  --galeria-950: #ffffff;
+
+  --cristal-fondo: rgb(23 26 35);
+  --cristal-brillo: rgb(255 255 255 / 0);
+  --cristal-linea: rgb(255 255 255 / 0.06);
+  --cristal-linea-tarjeta: var(--cristal-linea);
+  --cristal-modal: rgb(23 26 35 / 0.98);
+  --cristal-sombra: 0 1px 2px rgb(0 0 0 / 0.3), 0 14px 36px -14px rgb(0 0 0 / 0.6);
+  --cristal-vaho: 100%;
+
+  /* Acento vivo «salvia», versión noche (ver nota en :root) */
+  /* El azul del día da 2.5:1 sobre oscuro; de noche se aclara (4.5:1). */
+  --vivo: #5e70f3;
+  --vivo-tinta: #ffffff;
+  --vivo-cortina: #1c36ee;
+  --azul-hover: #7181f4;
+  --azul-suave: #1d2350;
+  --azul-tinta: #dfe4ff;
+  --sol: #ffc933;
+  /* La tarjeta que manda de noche (Jair, 2026-09-16: «optimizarlo al color
+     de fondo en el fondo de noche»). Antes era papel blanco (#ffffff), un
+     foco encendido en medio del negro. Ahora es un carbón azulado un
+     escalón por encima de la tarjeta (#171a23) y dos de la página
+     (#0f1117): se distingue como la que manda sin deslumbrar, y el gallo
+     azul (`text-vivo`) y la nota sol siguen leyéndose encima. La tinta es
+     marfil (13:1 sobre el carbón; a 55 % de opacidad sigue arriba de 7:1),
+     así que el botón `bg-manda-tinta text-manda` queda marfil con tinta
+     carbón. La sombra deja el negro y se vuelve un halo del azul de la marca
+     con una línea de luz al 6 %, la misma que llevan las demás tarjetas
+     de noche, para que despegue de la página. */
+  --manda: #20263a;
+  --manda-tinta: #f3f2ec;
+  --sombra-manda: 0 18px 44px -14px rgb(28 54 238 / 0.32), 0 0 0 1px rgb(255 255 255 / 0.06);
+
+  /* Colores personales del calendario, versión noche: tintes claros sobre carbón. */
+  --c-arena: #d9b98a;
+  --c-cielo: #8fb8d9;
+  --c-lavanda: #b3a3d9;
+  --c-rosa: #d99aa8;
+  --c-oliva: #b5c48a;
+  --c-grafito: #a0a4ad;
+
+  /* Dorado de las noticias, versión noche (ver nota en :root). */
+  --noticia: #e0bd4f;
+  --noticia-brillo: #f6e3a1;
+  --noticia-tinta: #1f1800;
+
+  --background: #0f1117;
+  --foreground: #f2f3f8;
+  --card: #171a23;
+  --card-foreground: #f2f3f8;
+  --popover: #1b1f2a;
+  --popover-foreground: #f2f3f8;
+  /* Antes de v0.2: --primary: #F5F4F2; --primary-foreground: #0B0B0C; (perla) */
+  --primary: var(--vivo);
+  --primary-foreground: var(--vivo-tinta);
+  --secondary: #1b1f2a;
+  --secondary-foreground: #c9cde0;
+  --muted: #1b1f2a;
+  --muted-foreground: #8b91a8;
+  --accent: #1d2350;
+  --accent-foreground: #dfe4ff;
+  --destructive: #c96a3f;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #5e70f3;
+  --chart-1: #5e70f3;
+  --chart-2: #6f7690;
+  --chart-3: #f2f3f8;
+  --chart-4: #333848;
+  --chart-5: #aab0c6;
+  --sidebar: #171a23;
