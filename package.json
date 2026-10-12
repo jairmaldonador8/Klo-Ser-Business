@@ -9,8 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:db": "supabase test db",
-    "db:tipos": "supabase gen types typescript --local > src/lib/supabase/tipos.ts"
+    "test:db": "supabase test db --linked",
+    "db:tipos": "supabase gen types typescript --linked > src/lib/supabase/tipos.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -34,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "jsdom": "^29.1.1",
+    "supabase": "2.120.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.3.4",
