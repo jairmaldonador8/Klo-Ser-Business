@@ -251,7 +251,7 @@ img{display:block}
 @media (max-width: 860px) {
 .app{grid-template-columns:minmax(0,1fr)}
 .lado{display:none}
-.principal{padding:18px 16px 120px;padding-top:max(18px, env(safe-area-inset-top))}
+.principal{padding:18px 16px 120px;padding-top:max(18px, env(safe-area-inset-top));padding-bottom:calc(120px + env(safe-area-inset-bottom))}
 .barra{flex-wrap:wrap;gap:12px;margin-bottom:20px}
 .saludo h1{font-size:24px}
 .captura{order:3;flex-basis:100%;max-width:none;margin:0}
