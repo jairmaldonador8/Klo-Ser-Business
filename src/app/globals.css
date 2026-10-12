@@ -1,26 +1,113 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./noche.css";
 
+/* «Klo-Ser Noche»: la app es siempre de noche. Los tokens de shadcn apuntan a la paleta de DISENO.md. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --radius: 1rem;
+  --background: #06071a;
+  --foreground: #f3f4fb;
+  --card: #11142d;
+  --card-foreground: #f3f4fb;
+  --popover: #181c3d;
+  --popover-foreground: #f3f4fb;
+  --primary: #1c36ee;
+  --primary-foreground: #ffffff;
+  --secondary: #181c3d;
+  --secondary-foreground: #f3f4fb;
+  --muted: #181c3d;
+  --muted-foreground: #a9aed0;
+  --accent: #181c3d;
+  --accent-foreground: #f3f4fb;
+  --destructive: #ff5f8f;
+  --border: #242a52;
+  --input: #242a52;
+  --ring: #7b4dff;
+}
+
+@theme {
+  --color-noche: #06071a;
+  --color-noche-2: #0c0e24;
+  --color-tarjeta: #11142d;
+  --color-tarjeta-alta: #181c3d;
+  --color-linea: #242a52;
+  --color-tinta: #f3f4fb;
+  --color-tinta-2: #a9aed0;
+  --color-tinta-3: #6b7199;
+  --color-azul: #1c36ee;
+  --color-azul-luz: #7181f4;
+  --color-violeta: #7b4dff;
+  --color-rosa: #ff5f8f;
+  --color-sol: #ffc933;
+  --font-sans: var(--font-poppins), system-ui, sans-serif;
+  --font-titulo: var(--font-fredoka), system-ui, sans-serif;
+  --font-mano: var(--font-caveat), cursive;
+}
+
+@utility bg-amanecer {
+  background-image: linear-gradient(100deg, #1c36ee 0%, #7b4dff 38%, #ff5f8f 70%, #ffc933 100%);
+}
+
+@utility text-amanecer {
+  background-image: linear-gradient(100deg, #7181f4 0%, #9b7bff 35%, #ff7fa6 70%, #ffd25c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

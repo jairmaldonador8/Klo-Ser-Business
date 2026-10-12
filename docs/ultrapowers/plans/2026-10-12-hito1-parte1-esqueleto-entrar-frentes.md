@@ -4,7 +4,7 @@
 
 **Goal:** Una app Next.js 16.4 con la cara «Klo-Ser Noche», en la que Jair entra con Google (solo si su correo está permitido), da de alta sus frentes la primera vez y ve el armazón navegable (Hoy, Proyectos, Semana, Clientes, Notas) en teléfono y escritorio.
 
-**Architecture:** Next.js App Router con Server Components y Server Actions sobre Supabase local (Docker). La tenencia vive en la base: `espacios` + `miembros` con RLS y la función `private.es_miembro`. La lógica que decide (navegación, saludo, rutas, atajos de frente) va en funciones puras con Vitest; la base se prueba con pgTAP. El CSS del prototipo se porta tal cual como capa de componentes de Tailwind v4.
+**Architecture:** Next.js App Router con Server Components y Server Actions sobre el proyecto **DEV de Supabase en la nube** (decisión de Jair 2026-10-12: sin Docker). La tenencia vive en la base: `espacios` + `miembros` con RLS y la función `private.es_miembro`. La lógica que decide (navegación, saludo, rutas, atajos de frente) va en funciones puras con Vitest; la base se prueba con pgTAP. El CSS del prototipo se porta tal cual como capa de componentes de Tailwind v4.
 
 **Tech Stack:** Next.js 16.4 · React 19.3 · TypeScript estricto · Tailwind 4.3 · shadcn (Base UI) · `@supabase/ssr` 0.12 · `@supabase/supabase-js` 2.117 · Supabase CLI 2.120 · Vitest 5 · pgTAP · Playwright 1.64.
 
@@ -44,7 +44,7 @@
 | `src/lib/frentes.ts` | Atajo, inicial y preparación de frentes (puro) |
 | `src/lib/supabase/{servidor,navegador}.ts`, `tipos.ts` | Clientes y tipos generados |
 | `src/proxy.ts` | Refresco de sesión y redirección a `/entrar` |
-| `supabase/config.toml` | Supabase local: auth, Google, hook |
+| `supabase/config.toml` | Config de la CLI (proyecto DEV enlazado) |
 | `supabase/migrations/0001_espacios_y_miembros.sql` | Perfiles, espacios, miembros, RLS, RPC, lista permitida |
 | `supabase/tests/000_ayudantes.sql`, `001_espacios.test.sql` | pgTAP |
 | `scripts/permitir-correo.mjs` | Agrega un correo a la lista permitida |
@@ -71,9 +71,8 @@ Expected: `main` avanza a los commits de docs; rama `v0.1/esqueleto` creada.
 
 ```bash
 node -v        # >= 20.9 (hay 24.x)
-docker info --format '{{.ServerVersion}}'
 ```
-Expected: versión de Node y versión del servidor Docker. **Si `docker info` falla, DETENTE**: Jair debe instalar/abrir Docker Desktop (WSL2). No sigas sin Docker.
+Expected: versión de Node. (Sin Docker: se desarrolla contra el proyecto DEV de Supabase en la nube.)
 
 ---
 
@@ -991,11 +990,13 @@ git push
 
 ---
 
-### Task 8: Supabase local
+### Task 8: Supabase DEV en la nube
 
 **Files:**
-- Create: `supabase/config.toml` (lo crea la CLI), `supabase/.env` (no se versiona), `.env.local` (no se versiona), `.env.example`
-- Modify: `package.json` (devDependency `supabase`)
+- Create: `supabase/config.toml` (lo crea la CLI), `.env.local` (no se versiona), `.env.example`
+- Modify: `package.json` (devDependency `supabase`, scripts `test:db` y `db:tipos`)
+
+Jair ya creó el proyecto DEV en supabase.com. **Ninguna llave secreta se escribe en el chat ni en archivos versionados.**
 
 - [ ] **Step 1: CLI e init**
 
@@ -1005,52 +1006,22 @@ npx supabase init
 ```
 Responde **N** a las preguntas de VS Code/Deno. Expected: `Finished supabase init.` y carpeta `supabase/`.
 
-- [ ] **Step 2: Credenciales de Google (las da Jair) — PASO MANUAL**
+- [ ] **Step 2: Entrar y enlazar (PASO MANUAL de Jair, interactivo)**
 
-Jair crea el cliente OAuth (se reutiliza luego para Calendar):
-1. https://console.cloud.google.com/ → proyecto nuevo «Klo-Ser Business».
-2. *APIs y servicios → Pantalla de consentimiento de OAuth*: tipo **Externo**, nombre «Klo-Ser Business», su correo de soporte. Permisos: `openid`, `email`, `profile`. Agrega su correo como usuario de prueba. (Publicarla «En producción» se hace al conectar Calendar.)
-3. *Credenciales → Crear credenciales → ID de cliente de OAuth → Aplicación web*. URI de redirección autorizado: `http://127.0.0.1:54321/auth/v1/callback`.
-4. Copia el *Client ID* y el *Client secret* a `supabase/.env`:
+Jair escribe en el prompt de Claude Code:
 ```
-SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=<client id>
-SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=<client secret>
+! npx supabase login
+! npx supabase link --project-ref <ref del proyecto DEV>
 ```
-Verifica que no se versiona: `git check-ignore supabase/.env` debe imprimir la ruta. **Si alguna llave aparece en el chat, avisa y pide rotarla.**
+El `ref` está en la URL del panel (`supabase.com/dashboard/project/<ref>`). `link` pide la contraseña de la base: la teclea Jair, no se pega en el chat. Expected: `Finished supabase link.`
 
-- [ ] **Step 3: Configurar auth en `supabase/config.toml`**
+- [ ] **Step 3: Variables de la app**
 
-Cambia `project_id = "klo-ser-business"`. En la sección `[auth]`:
-```toml
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+El agente obtiene la URL y la llave pública con las herramientas MCP de Supabase (`get_project_url`, `get_publishable_keys`) o del panel (*Project Settings → API Keys*). Jair pega **él mismo** la llave secreta **nueva** (la que se pegó en el chat se rotó) en `.env.local`:
 ```
-Sustituye la sección `[auth.external.google]` (o agrégala) por:
-```toml
-[auth.external.google]
-enabled = true
-client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
-secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
-redirect_uri = ""
-skip_nonce_check = true
-```
-Deja deshabilitado el registro por correo si existe la opción (`[auth.email] enable_signup = false`): solo se entra con Google.
-
-- [ ] **Step 4: Arrancar**
-
-```bash
-npx supabase start
-npx supabase status -o env
-```
-Expected: contenedores arriba; la salida trae `API_URL` y las llaves (`PUBLISHABLE_KEY`/`SECRET_KEY`, o `ANON_KEY`/`SERVICE_ROLE_KEY` si la CLI aún usa las viejas).
-
-- [ ] **Step 5: Variables de la app**
-
-`.env.local` (no se versiona):
-```
-NEXT_PUBLIC_SUPABASE_URL=<API_URL>
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<PUBLISHABLE_KEY o ANON_KEY>
-SUPABASE_SECRET_KEY=<SECRET_KEY o SERVICE_ROLE_KEY>
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
+SUPABASE_SECRET_KEY=<la pone Jair>
 ```
 `.env.example` (sí se versiona):
 ```
@@ -1058,15 +1029,35 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SECRET_KEY=
 ```
+Verifica: `git check-ignore .env.local` imprime la ruta.
+
+- [ ] **Step 4: Scripts para la nube**
+
+En `package.json`:
+```json
+"test:db": "supabase test db --linked",
+"db:tipos": "supabase gen types typescript --linked > src/lib/supabase/tipos.ts"
+```
+Si la CLI no acepta `--linked` en `test db`, usa `--db-url "$SUPABASE_DB_URL"` con la cadena de conexión que Jair ponga en `.env.local` (*Connect → Session pooler*), y anótalo.
+
+- [ ] **Step 5: Google como proveedor (PASO MANUAL de Jair)**
+
+1. https://console.cloud.google.com/ → proyecto nuevo «Klo-Ser Business».
+2. *APIs y servicios → Pantalla de consentimiento de OAuth*: **Externo**, nombre «Klo-Ser Business», correo de soporte; permisos `openid`, `email`, `profile`; su correo como usuario de prueba.
+3. *Credenciales → ID de cliente de OAuth → Aplicación web*. URI de redirección autorizado: `https://<ref>.supabase.co/auth/v1/callback`.
+4. En Supabase: *Authentication → Sign In / Providers → Google*: activar y pegar ahí el Client ID y el Client secret (no en el chat).
+5. *Authentication → URL Configuration*: **Site URL** `http://localhost:3000`; **Redirect URLs** agrega `http://localhost:3000/auth/callback`.
+6. *Authentication → Sign In / Providers → Email*: desactiva «Allow new users to sign up» con correo (solo se entra con Google).
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git status --short   # NO debe aparecer supabase/.env ni .env.local
+git status --short   # NO debe aparecer .env.local
 git add -A
-git commit -m "chore: Supabase local con entrada por Google
+git commit -m "chore: Supabase DEV en la nube enlazado a la CLI
 
-Las credenciales viven en supabase/.env y .env.local, fuera de git.
+Sin Docker por ahora: se desarrolla contra el proyecto DEV. Las llaves viven
+en .env.local, fuera de git.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 git push
@@ -1082,7 +1073,7 @@ git push
 
 - [ ] **Step 1: Ayudantes de prueba**
 
-`supabase/tests/000_ayudantes.sql` (sin transacción: deja los ayudantes en la base local; nunca va en una migración):
+`supabase/tests/000_ayudantes.sql` (sin transacción: deja el esquema `pruebas` en la base **DEV**; nunca va en una migración ni en PROD):
 ```sql
 create extension if not exists pgtap with schema extensions;
 
@@ -1193,7 +1184,7 @@ select * from finish();
 rollback;
 ```
 
-Run: `npx supabase test db`
+Run: `npm run test:db`
 Expected: FAIL — `001_espacios.test.sql` falla (no existen `public.perfiles`, `crear_espacio`, …).
 
 - [ ] **Step 3: La migración**
@@ -1432,24 +1423,20 @@ grant execute on function public.permitir_correo(text) to service_role;
 - [ ] **Step 4: Aplicar y correr las pruebas**
 
 ```bash
-npx supabase db reset
-npx supabase test db
+npx supabase db push
+npm run test:db
 ```
-Expected: `000_ayudantes.sql .. ok` y `001_espacios.test.sql .. ok` (24 pruebas: 1 + 23). Si alguna falla, corrige la migración (no la prueba) salvo que la prueba contradiga el spec.
+`db push` aplica la migración al proyecto DEV (es aditiva; nunca se edita una migración ya aplicada: si hay que corregir, se crea `0001a`/`0002`). Expected: `000_ayudantes.sql .. ok` y `001_espacios.test.sql .. ok` (24 pruebas: 1 + 23). Si alguna falla, corrige la migración (no la prueba) salvo que la prueba contradiga el spec.
 
-- [ ] **Step 5: Encender el hook**
+- [ ] **Step 5: Encender el hook (PASO MANUAL de Jair)**
 
-Agrega a `supabase/config.toml`:
+En Supabase: *Authentication → Hooks → Before User Created → Postgres* → función `public.hook_lista_permitida` → activar. Agrega también a `supabase/config.toml` (para cuando haya entorno local):
 ```toml
 [auth.hook.before_user_created]
 enabled = true
 uri = "pg-functions://postgres/public/hook_lista_permitida"
 ```
-```bash
-npx supabase stop && npx supabase start
-npx supabase test db
-```
-Expected: arranca sin errores y las pruebas siguen verdes. (`db reset` borra los datos; los ayudantes de `000` se vuelven a crear al correr `test db`.)
+Luego `npm run test:db`: sigue verde.
 
 - [ ] **Step 6: Tipos generados**
 
@@ -1457,7 +1444,8 @@ Expected: arranca sin errores y las pruebas siguen verdes. (`db reset` borra los
 mkdir -p src/lib/supabase
 npm run db:tipos
 ```
-Expected: `src/lib/supabase/tipos.ts` con `perfiles`, `espacios`, `miembros` y las funciones. Si la CLI avisa que el comando está deprecado, usa `supabase gen types --lang typescript --local` en el script `db:tipos`.
+(Alternativa: herramienta MCP `generate_typescript_types`.)
+Expected: `src/lib/supabase/tipos.ts` con `perfiles`, `espacios`, `miembros` y las funciones. Si la CLI avisa que el comando está deprecado, usa `supabase gen types --lang typescript --linked` en el script `db:tipos`.
 
 - [ ] **Step 7: Commit**
 
@@ -1755,7 +1743,7 @@ npm run dev
 ```
 1. `http://localhost:3000/entrar` con un correo **no** permitido → vuelve con «No pudiste entrar…».
 2. Con el correo de Jair → vuelve a `/hoy` (que hoy pinta el armazón provisional).
-3. `npx supabase db query "select email from auth.users"` (o Studio en `http://127.0.0.1:54323`) muestra solo el correo permitido: el rechazado **no** creó usuario.
+3. En Supabase *Authentication → Users* (o MCP `execute_sql`: `select email from auth.users`) aparece solo el correo permitido: el rechazado **no** creó usuario.
 
 El correo real se pasa por la terminal; no se escribe en ningún archivo del repo.
 
@@ -2081,11 +2069,9 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
 - [ ] **Step 5: Probar con Jair**
 
 ```bash
-npx supabase db reset      # base limpia (borra usuarios de prueba)
-node --env-file=.env.local scripts/permitir-correo.mjs <correo de Jair>
 npm run dev
 ```
-0. Antes de entrar, borra las cookies de `localhost` en el navegador (la sesión de la Task 11 apunta a un usuario que `db reset` ya borró).
+0. Jair ya entró en la Task 11 y todavía no tiene frentes: al entrar debe caer en `/bienvenida`.
 1. Entra con Google → cae en `/bienvenida` con su nombre de Google y las tres sugerencias.
 2. Cambia los frentes por los suyos (Klo-Ser, Top Digital, Marca personal) → «Empezar» → `/hoy`.
 3. La barra lateral muestra sus tres frentes con su inicial; el saludo dice «Buenos días/tardes/noches, <nombre>».
@@ -2175,7 +2161,7 @@ Expected: 4 pruebas PASS (2 por proyecto). Revisa `test-results/capturas/entrar-
 - [ ] **Step 4: Verificación completa (regla de `CLAUDE.md`)**
 
 ```bash
-npm test && npm run lint && npm run typecheck && npm run build && npx supabase test db && npm run e2e
+npm test && npm run lint && npm run typecheck && npm run build && npm run test:db && npm run e2e
 ```
 Expected: todo verde. **Verde no basta:** con `npm run dev`, Jair abre en su compu `http://localhost:3000` (escritorio) y, en DevTools a 390 px, revisa entrar → bienvenida → Hoy → navegar las cinco secciones. Para verlo en el iPhone en la misma red: `npm run dev -- -H 0.0.0.0` y abrir `http://<IP-de-la-compu>:3000` (la entrada con Google en el iPhone queda para cuando haya dominio; aquí basta ver el armazón tras entrar en la compu).
 
