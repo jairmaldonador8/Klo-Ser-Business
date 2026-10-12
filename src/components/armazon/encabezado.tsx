@@ -20,7 +20,7 @@ export function Encabezado({ nombre, zona, salir }: Props) {
       {/* La captura de Klo se enciende en la Parte 3. */}
       <label className="captura">
         <span className="disco-sol">
-          <Image src="/marca/azul/04-gallo-cabeza.svg" alt="" width={20} height={20} unoptimized />
+          <Image src="/marca/azul/04-gallo-cabeza.svg" alt="" width={20} height={23} unoptimized />
         </span>
         <input placeholder="Díselo a Klo: «mañana entrego los carruseles de Aurora a las 5»" disabled aria-label="Díselo a Klo" />
         <kbd>⌘ K</kbd>

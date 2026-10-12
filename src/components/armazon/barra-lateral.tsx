@@ -8,7 +8,7 @@ import { Icono } from './iconos'
 
 export type FrenteLado = { id: string; nombre: string; inicial: string }
 
-/** Alto de cada botón de la nav (44 px) + hueco (4 px): la píldora se desliza de 48 en 48. */
+/** Alto de cada enlace de la nav (11 + 22 de línea + 11 = 44 px, ver .nav a en noche.css) + hueco (4 px). */
 const PASO_PILDORA = 48
 
 export function BarraLateral({ frentes, fraseKlo }: { frentes: FrenteLado[]; fraseKlo: string }) {
@@ -18,7 +18,7 @@ export function BarraLateral({ frentes, fraseKlo }: { frentes: FrenteLado[]; fra
   return (
     <aside className="lado">
       <div className="lockup">
-        <Image src="/marca/blanco/03-wordmark.svg" alt="Klo-Ser" width={120} height={30} unoptimized preload />
+        <Image src="/marca/blanco/03-wordmark.svg" alt="Klo-Ser" width={114} height={30} unoptimized preload />
         <span>BUSINESS</span>
       </div>
 
@@ -51,7 +51,7 @@ export function BarraLateral({ frentes, fraseKlo }: { frentes: FrenteLado[]; fra
 
       <div className="klo-lado">
         <div className="disco-sol">
-          <Image src="/marca/azul/04-gallo-cabeza.svg" alt="" width={26} height={26} unoptimized />
+          <Image src="/marca/azul/04-gallo-cabeza.svg" alt="" width={26} height={30} unoptimized />
         </div>
         <p>
           <b>Klo:</b> {fraseKlo}

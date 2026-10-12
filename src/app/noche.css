@@ -60,7 +60,7 @@ img{display:block}
 .lockup img{height:30px;width:auto}
 .lockup span{font-family:var(--fredoka);font-weight:600;font-size:10.5px;letter-spacing:.46em;color:var(--tinta-2);padding-left:2px}
 .nav{display:flex;flex-direction:column;gap:4px;position:relative}
-.nav a{position:relative;display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:99px;font-size:14px;font-weight:500;color:var(--tinta-2);text-align:left;z-index:1;transition:color .2s}
+.nav a{position:relative;line-height:22px;display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:99px;font-size:14px;font-weight:500;color:var(--tinta-2);text-align:left;z-index:1;transition:color .2s}
 .nav a:hover{color:var(--tinta)}
 .nav a.activo{color:#fff;font-weight:600}
 .nav svg{width:18px;height:18px;flex:none}
@@ -242,6 +242,7 @@ img{display:block}
 .barra-tel :is(a,button).activo::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--sol);margin-top:1px}
 .barra-tel .mas{width:56px;height:56px;min-width:0;margin-top:-26px;border-radius:19px;background:var(--amanecer);color:#fff;justify-content:center;box-shadow:0 14px 30px -10px rgba(123,77,255,.85)}
 .barra-tel .mas svg{width:26px;height:26px}
+.barra-tel .mas:disabled{cursor:default}
 
 @media (max-width:1180px){ .c-4.manda-col{grid-column:span 12} }
 
