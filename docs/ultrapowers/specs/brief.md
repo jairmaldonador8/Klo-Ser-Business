@@ -9,7 +9,7 @@
 | # | Pregunta | Respuesta |
 |---|---|---|
 | 1 | ¿Qué frentes tienes hoy? | **Klo-Ser** (la startup), **Top Digital** (la agencia), **Marca personal**. Los tres para empezar; se crean como datos, no en código. |
-| 2 | ¿Cómo capturas un pendiente en la calle? | Se manda un **WhatsApp a sí mismo**. La v0.1 tiene que ser igual de rápida: la app instalada abre con la captura de Klo lista. Klo en WhatsApp viene después. |
+| 2 | ¿Cómo capturas un pendiente en la calle? | Se manda un **WhatsApp a sí mismo**. La v0.1 tiene que ser igual de rápida: la app instalada abre en Hoy con el campo de Klo visible, a un toque. Klo en WhatsApp viene después. |
 | 3 | ¿Qué quieres ver primero en la mañana? | **La tarjeta que manda: cuántas cosas te tocan hoy y cuál sigue.** A la derecha, la agenda del día (como el prototipo). Abajo: lo que está en riesgo y la meta grande. |
 | 4 | ¿La captura crea tarea, nota o decide sola? | **Klo decide** (tarea, bloque o nota), muestra lo que entendió y Jair confirma de un toque. Atajos `/` opcionales fijan el frente. Lo que Klo no entiende queda como nota. |
 | 5 | ¿Manda el calendario o la lista? | **Mixto.** Con hora → agenda; sin hora → lista del día. Arrastrar entre ambas, después. |
