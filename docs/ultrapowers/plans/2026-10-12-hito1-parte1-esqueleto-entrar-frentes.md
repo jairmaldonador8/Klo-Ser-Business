@@ -327,7 +327,7 @@ Copia todo lo que hay entre `<style>` y `</style>` de `diseno/prototipo.html` a 
 5. Sustituye `.nav button` → `.nav a` (en todas sus apariciones) y `.barra-tel button` → `.barra-tel :is(a,button)`.
 6. `.vista{display:none}` y `.vista.activa{…}` se vuelven una sola regla: `.vista{animation:vista-entra .48s var(--ease) both}`.
 7. Modo teléfono: toma **solo** las reglas cuyo selector empieza con `.app.tel` o `.tel ` y muévelas a un bloque `@media (max-width: 860px) { … }` quitando el prefijo (`.app.tel` → `.app`; `.tel .lado` → `.lado`; `.tel .barra-tel{display:flex;…}` → `.barra-tel{display:flex;…}`). **Ese bloque `@media` va al final de `@layer components`**, después de todas las demás reglas: al quitar `.tel` la especificidad queda igual y gana lo que va después (si no, `.marca-tel{display:none}` le gana al teléfono y el wordmark nunca aparece). Las reglas de esa sección que **no** empiezan con `.tel` (`.marca-tel{…}`, `.marca-tel img`, `.marca-tel span`, `.barra-tel{display:none}`, `.barra-tel :is(a,button)…`, `.barra-tel .mas…`) se quedan fuera del media, antes de él.
-8. Borra todo lo de `.ver-tel`, `.solo-escritorio` y `.marco` (solo eran del prototipo).
+8. Borra todo lo de `.ver-tel`, `.solo-escritorio` y `.marco` (solo eran del prototipo). En el selector agrupado `.tel .captura kbd,.tel .barra .btn-amanecer,.tel:not(.marco) .ver-tel.solo-escritorio{display:none}` quita la tercera parte y mueve las dos primeras (sin `.tel`) al bloque del teléfono.
 9. Zonas seguras de iPhone (la app instalada usa `viewport-fit=cover` + barra translúcida): dentro del `@media` del teléfono, `.principal` lleva `padding-top: max(18px, env(safe-area-inset-top))` y `.barra-tel` lleva `bottom: calc(14px + env(safe-area-inset-bottom))`. Es lo único nuevo que se agrega al CSS portado.
 
 - [ ] **Step 4: Fuentes y layout raíz**
@@ -1117,7 +1117,7 @@ select * from finish();
 `supabase/tests/001_espacios.test.sql`:
 ```sql
 begin;
-select plan(24);
+select plan(23);
 
 select pruebas.crear_usuario('11111111-1111-1111-1111-111111111111', 'a@prueba.mx', 'Ana');
 select pruebas.crear_usuario('22222222-2222-2222-2222-222222222222', 'b@prueba.mx');
@@ -1435,7 +1435,7 @@ grant execute on function public.permitir_correo(text) to service_role;
 npx supabase db reset
 npx supabase test db
 ```
-Expected: `000_ayudantes.sql .. ok` y `001_espacios.test.sql .. ok` (25 pruebas: 1 + 24). Si alguna falla, corrige la migración (no la prueba) salvo que la prueba contradiga el spec.
+Expected: `000_ayudantes.sql .. ok` y `001_espacios.test.sql .. ok` (24 pruebas: 1 + 23). Si alguna falla, corrige la migración (no la prueba) salvo que la prueba contradiga el spec.
 
 - [ ] **Step 5: Encender el hook**
 
