@@ -110,7 +110,7 @@ cp -r src public /c/dev/klo-ser-business/
 cat .gitignore >> /c/dev/klo-ser-business/.gitignore
 cd /c/dev && rm -rf klo-andamio
 ```
-NO copies `README.md`, `CLAUDE.md`, `AGENTS.md` ni `.git` del andamio.
+NO copies `README.md`, `CLAUDE.md`, `AGENTS.md` ni `.git` del andamio. Si `next-env.d.ts` no existe todavía, ignora el aviso de `cp`: Next lo crea al primer `dev`/`build`.
 
 - [ ] **Step 4: Ajustar nombre, Cache Components y exclusiones**
 
@@ -144,7 +144,7 @@ cd /c/dev/klo-ser-business
 npm install
 ls node_modules/next/dist/docs/
 ```
-Lee (regla de `CLAUDE.md`) las guías de `proxy`, Server Actions, metadata/manifest y PWA que aparezcan en esa carpeta. Si algo contradice este plan, manda la guía: anótalo en el commit.
+Lee (regla de `CLAUDE.md`) las guías de `proxy`, Server Actions, metadata/manifest, `next/image` y PWA que aparezcan en esa carpeta. Si algo contradice este plan, manda la guía: anótalo en el commit. Ojo conocido: en Next 16 `<Image priority>` está deprecado en favor de `preload`; donde este plan dice `priority`, usa lo que indique la guía.
 
 - [ ] **Step 6: Verificar que arranca**
 
@@ -242,8 +242,10 @@ git push
 - [ ] **Step 1: shadcn con Base UI**
 
 ```bash
+npx shadcn@latest init --help | grep -iE "base|radix|-b"
 npx shadcn@latest init -b base
 ```
+Confirma en la ayuda que `-b` es la librería (`base`/`radix`/`aria`) y no el color base; si fuera el color, usa la bandera que la ayuda indique para elegir Base UI.
 Acepta los valores por defecto. Expected: crea `components.json` y `src/lib/utils.ts` (con `cn`) y reescribe `src/app/globals.css`.
 
 - [ ] **Step 2: Tokens en `globals.css`**
@@ -324,8 +326,9 @@ Copia todo lo que hay entre `<style>` y `</style>` de `diseno/prototipo.html` a 
 4. Borra la regla `.text-amanecer{…}` (ya es `@utility`).
 5. Sustituye `.nav button` → `.nav a` (en todas sus apariciones) y `.barra-tel button` → `.barra-tel :is(a,button)`.
 6. `.vista{display:none}` y `.vista.activa{…}` se vuelven una sola regla: `.vista{animation:vista-entra .48s var(--ease) both}`.
-7. Modo teléfono: toma cada regla cuyo selector empieza con `.app.tel` o `.tel ` y muévela a un bloque `@media (max-width: 860px) { … }` quitando el prefijo (`.app.tel` → `.app`; `.tel .lado` → `.lado`). La regla `.tel .barra-tel{display:flex;…}` se vuelve `.barra-tel{display:flex;…}` dentro del media.
+7. Modo teléfono: toma **solo** las reglas cuyo selector empieza con `.app.tel` o `.tel ` y muévelas a un bloque `@media (max-width: 860px) { … }` quitando el prefijo (`.app.tel` → `.app`; `.tel .lado` → `.lado`; `.tel .barra-tel{display:flex;…}` → `.barra-tel{display:flex;…}`). **Ese bloque `@media` va al final de `@layer components`**, después de todas las demás reglas: al quitar `.tel` la especificidad queda igual y gana lo que va después (si no, `.marca-tel{display:none}` le gana al teléfono y el wordmark nunca aparece). Las reglas de esa sección que **no** empiezan con `.tel` (`.marca-tel{…}`, `.marca-tel img`, `.marca-tel span`, `.barra-tel{display:none}`, `.barra-tel :is(a,button)…`, `.barra-tel .mas…`) se quedan fuera del media, antes de él.
 8. Borra todo lo de `.ver-tel`, `.solo-escritorio` y `.marco` (solo eran del prototipo).
+9. Zonas seguras de iPhone (la app instalada usa `viewport-fit=cover` + barra translúcida): dentro del `@media` del teléfono, `.principal` lleva `padding-top: max(18px, env(safe-area-inset-top))` y `.barra-tel` lleva `bottom: calc(14px + env(safe-area-inset-bottom))`. Es lo único nuevo que se agrega al CSS portado.
 
 - [ ] **Step 4: Fuentes y layout raíz**
 
@@ -512,6 +515,9 @@ describe('zona horaria', () => {
   it('fechaLarga en español de México y con mayúscula', () => {
     expect(fechaLarga(instante, 'America/Monterrey')).toBe('Lunes 12 de octubre')
   })
+  it('una zona inválida cae a Monterrey en vez de romper', () => {
+    expect(horaEn(instante, 'Marte/Olympus')).toBe(9)
+  })
   it('el día cambia según la zona', () => {
     const tarde = new Date('2026-10-13T04:00:00Z') // 23:00 del 12 en Monterrey
     expect(fechaLarga(tarde, 'America/Monterrey')).toBe('Lunes 12 de octubre')
@@ -594,8 +600,20 @@ export function saludoPorHora(hora: number, nombre?: string | null): string {
   return limpio ? `${saludo}, ${limpio}` : saludo
 }
 
+const ZONA_POR_DEFECTO = 'America/Monterrey'
+
+/** Una zona inválida en el perfil no debe tumbar la app: cae a la de fábrica. */
+function zonaValida(zona: string): string {
+  try {
+    new Intl.DateTimeFormat('es-MX', { timeZone: zona })
+    return zona
+  } catch {
+    return ZONA_POR_DEFECTO
+  }
+}
+
 export function horaEn(instante: Date, zona: string): number {
-  const hora = new Intl.DateTimeFormat('es-MX', { hour: 'numeric', hourCycle: 'h23', timeZone: zona }).format(instante)
+  const hora = new Intl.DateTimeFormat('es-MX', { hour: 'numeric', hourCycle: 'h23', timeZone: zonaValida(zona) }).format(instante)
   return Number(hora)
 }
 
@@ -605,7 +623,7 @@ export function fechaLarga(instante: Date, zona: string): string {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-    timeZone: zona,
+    timeZone: zonaValida(zona),
   }).formatToParts(instante)
   const parte = (tipo: Intl.DateTimeFormatPartTypes) => partes.find((p) => p.type === tipo)?.value ?? ''
   const texto = `${parte('weekday')} ${parte('day')} de ${parte('month')}`
@@ -631,7 +649,7 @@ export function destinoSeguro(destino: string | null): string {
 - [ ] **Step 4: Correr y ver que pasan**
 
 Run: `npx vitest run src/lib`
-Expected: PASS (3 archivos, 16 pruebas).
+Expected: PASS (3 archivos, 17 pruebas).
 
 - [ ] **Step 5: Commit**
 
@@ -1099,10 +1117,11 @@ select * from finish();
 `supabase/tests/001_espacios.test.sql`:
 ```sql
 begin;
-select plan(20);
+select plan(24);
 
 select pruebas.crear_usuario('11111111-1111-1111-1111-111111111111', 'a@prueba.mx', 'Ana');
 select pruebas.crear_usuario('22222222-2222-2222-2222-222222222222', 'b@prueba.mx');
+select pruebas.crear_usuario('33333333-3333-3333-3333-333333333333', 'c@prueba.mx');
 
 -- Perfil automático
 select is((select nombre from public.perfiles where user_id = '11111111-1111-1111-1111-111111111111'), 'Ana',
@@ -1145,6 +1164,10 @@ select lives_ok($$ insert into public.miembros (espacio_id, user_id) values (cur
   '22222222-2222-2222-2222-222222222222') $$, 'la dueña invita a B a su espacio');
 select pruebas.autenticar_como('22222222-2222-2222-2222-222222222222');
 select is((select count(*)::int from public.espacios), 3, 'B ya ve el espacio compartido');
+select throws_ok($$ insert into public.miembros (espacio_id, user_id) values (current_setting('pruebas.espacio_a')::uuid,
+  '33333333-3333-3333-3333-333333333333') $$, '42501', null, 'un miembro que no es dueño no da de alta miembros');
+delete from public.espacios where id = current_setting('pruebas.espacio_a')::uuid;
+delete from public.miembros where user_id = '11111111-1111-1111-1111-111111111111';
 
 -- anon no hace nada
 reset role;
@@ -1155,12 +1178,16 @@ reset role;
 
 -- B no pudo renombrar el espacio de A (se revisa como postgres)
 select is((select nombre from public.espacios where id = current_setting('pruebas.espacio_a')::uuid), 'Frente A',
-  'B no pudo renombrar el espacio de A');
+  'B no pudo renombrar ni borrar el espacio de A');
+select is((select count(*)::int from public.miembros where espacio_id = current_setting('pruebas.espacio_a')::uuid
+  and user_id = '11111111-1111-1111-1111-111111111111'), 1, 'B no pudo sacar a la dueña de su espacio');
 
 -- Lista permitida
 insert into private.correos_permitidos (correo) values ('si@prueba.mx');
 select is(public.hook_lista_permitida('{"user":{"email":"SI@prueba.mx"}}'::jsonb), '{}'::jsonb,
   'el hook deja pasar un correo permitido (sin importar mayúsculas)');
+select is(public.hook_lista_permitida('{"user":{"email":"nadie@prueba.mx"}}'::jsonb) -> 'error' ->> 'http_code', '403',
+  'el hook rechaza un correo que no está en la lista');
 
 select * from finish();
 rollback;
@@ -1397,13 +1424,18 @@ revoke execute on function public.permitir_correo(text) from public, anon, authe
 grant execute on function public.permitir_correo(text) to service_role;
 ```
 
+**Decisiones de esta migración (para que la Parte 2 no las «arregle» al revés):**
+- Editar o borrar un espacio es solo de **dueños** (más seguro que «miembros» del spec; un miembro invitado no renombra el frente de otro).
+- Cambiar el `atajo` por UPDATE no pasa por la revisión de unicidad de `crear_espacio`; la pantalla de Ajustes (Parte posterior) lo validará en su acción.
+- `espacio_predeterminado_id` queda en `null` si se borra ese espacio; Ajustes reasignará el siguiente frente. `perfiles.proyecto_destacado_id` llega en `0002` (depende de `proyectos`).
+
 - [ ] **Step 4: Aplicar y correr las pruebas**
 
 ```bash
 npx supabase db reset
 npx supabase test db
 ```
-Expected: `000_ayudantes.sql .. ok` y `001_espacios.test.sql .. ok` (21 pruebas). Si alguna falla, corrige la migración (no la prueba) salvo que la prueba contradiga el spec.
+Expected: `000_ayudantes.sql .. ok` y `001_espacios.test.sql .. ok` (25 pruebas: 1 + 24). Si alguna falla, corrige la migración (no la prueba) salvo que la prueba contradiga el spec.
 
 - [ ] **Step 5: Encender el hook**
 
@@ -1425,7 +1457,7 @@ Expected: arranca sin errores y las pruebas siguen verdes. (`db reset` borra los
 mkdir -p src/lib/supabase
 npm run db:tipos
 ```
-Expected: `src/lib/supabase/tipos.ts` con `perfiles`, `espacios`, `miembros` y las funciones.
+Expected: `src/lib/supabase/tipos.ts` con `perfiles`, `espacios`, `miembros` y las funciones. Si la CLI avisa que el comando está deprecado, usa `supabase gen types --lang typescript --local` en el script `db:tipos`.
 
 - [ ] **Step 7: Commit**
 
@@ -1866,7 +1898,7 @@ export function prepararFrentes(
 - [ ] **Step 3: Correr**
 
 Run: `npx vitest run src/lib/frentes.test.ts`
-Expected: PASS (14 pruebas).
+Expected: PASS (12 pruebas).
 
 - [ ] **Step 4: Commit**
 
@@ -2053,6 +2085,7 @@ npx supabase db reset      # base limpia (borra usuarios de prueba)
 node --env-file=.env.local scripts/permitir-correo.mjs <correo de Jair>
 npm run dev
 ```
+0. Antes de entrar, borra las cookies de `localhost` en el navegador (la sesión de la Task 11 apunta a un usuario que `db reset` ya borró).
 1. Entra con Google → cae en `/bienvenida` con su nombre de Google y las tres sugerencias.
 2. Cambia los frentes por los suyos (Klo-Ser, Top Digital, Marca personal) → «Empezar» → `/hoy`.
 3. La barra lateral muestra sus tres frentes con su inicial; el saludo dice «Buenos días/tardes/noches, <nombre>».
@@ -2113,7 +2146,8 @@ import { expect, test } from '@playwright/test'
 test('entrar se ve completo y sin scroll horizontal', async ({ page }, info) => {
   await page.goto('/entrar')
   await expect(page.getByRole('button', { name: 'Entrar con Google' })).toBeVisible()
-  const anchoDocumento = await page.evaluate(() => document.documentElement.scrollWidth)
+  // body tiene overflow-x:hidden, así que se mide el contenido del body, no el viewport.
+  const anchoDocumento = await page.evaluate(() => document.body.scrollWidth)
   const anchoVentana = page.viewportSize()!.width
   expect(anchoDocumento).toBeLessThanOrEqual(anchoVentana)
   await page.screenshot({ path: `test-results/capturas/entrar-${info.project.name}.png`, fullPage: true })
