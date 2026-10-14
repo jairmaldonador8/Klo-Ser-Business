@@ -1,7 +1,8 @@
 # «Klo-Ser Noche» — la ley visual de Klo-Ser Business
 
 > La referencia viva es `diseno/prototipo.html`. Este documento dice el porqué y los valores
-> exactos; el prototipo dice cómo se ve. Si chocan, manda el prototipo y se corrige este archivo.
+> exactos; el prototipo dice cómo se ve. Si chocan, manda la referencia y se corrige este archivo.
+> Desde 2026-10-14, para la forma (ventana, mosaicos, navegación) manda `diseno/vidrio.html` (§9).
 
 ## La idea en una línea
 
@@ -20,7 +21,7 @@ grande y de trabajo profundo: más contraste, más tamaño, más luz.
 | Token | Valor | Uso |
 |---|---|---|
 | `--noche` | `#06071a` | Fondo de la página. Azul-negro, nunca negro puro ni gris |
-| `--noche-2` | `#0c0e24` | Barra lateral, barra inferior (con vidrio) |
+| `--noche-2` | `#0c0e24` | Fondo de las píldoras de frentes y de chips oscuros |
 | `--tarjeta` | `#11142d` | Tarjeta estándar |
 | `--tarjeta-alta` | `#181c3d` | Tarjeta elevada, hover, inputs |
 | `--linea` | `#242a52` | Bordes 1 px (`ring-1`) |
@@ -57,7 +58,7 @@ mitad.
 
 1. **La tarjeta que manda** — una por pantalla, rellena de amanecer, con la cifra que importa.
 2. **La píldora activa** de la navegación (se desliza entre secciones).
-3. **El «+» central** de la barra del teléfono, con resplandor.
+3. **El «+» azul** de las píldoras de frentes, con resplandor.
 4. **Palabras clave** en titulares grandes (`text-amanecer`, recorte de texto). Una por titular.
 5. **Barras de avance** de proyectos y el aro del avatar.
 
@@ -109,9 +110,9 @@ amanecer de 14×2 px delante — tomado del brand kit de Top Digital.
   `rounded-full`.
 - Tarjeta estándar: `bg-tarjeta ring-1 ring-linea`. Al pasar el mouse sube 2 px y el borde se
   tiñe de violeta (`ring-violeta/45`) con sombra violeta difusa.
-- Vidrio **solo** en barras flotantes (`bg-noche-2/80 backdrop-blur-md`); el resto es sólido
-  (el vidrio cuesta fps).
-- Rejilla bento en escritorio (12 columnas, huecos de 16 px); una columna a 390 px. **Nunca scroll
+- Vidrio: ver §9. Solo tres capas con blur: la ventana, el riel y las píldoras; los mosaicos son
+  translúcidos **sin** blur propio, porque el vidrio cuesta fps.
+- Rejilla bento: ver §9 (4 columnas en escritorio, 2 a 390 px, huecos de 12 px). **Nunca scroll
   horizontal.**
 
 ## 5. Klo y la marca sobre la noche
@@ -174,3 +175,25 @@ parte de la v0.1.
 
 `text-amanecer` usa una versión **más clara** del degradado: el `#1c36ee` como texto sobre la
 noche no se lee.
+
+## 9. Vidrio (dirección 2026-10-14)
+
+Referencia viva de la forma: `diseno/vidrio.html` (aprobada por Jair, inspirada en un tablero
+estilo Vision OS). Lo de arriba (noche, amanecer, tipografía, Klo, estados sin semáforo) sigue
+mandando; esto agrega cómo se acomoda. Para la forma de las vistas, manda `vidrio.html` sobre
+`prototipo.html`.
+
+- **Ventana**: la app vive en un panel de vidrio (`rgba(22,25,58,.62)` + `backdrop-blur` 30 px,
+  borde `rgba(255,255,255,.10)`, radio 34 px; 28 px en teléfono) sobre la noche con auras.
+- **Mosaicos**: dentro, rejilla bento de 4 columnas en escritorio, 2 en teléfono; radio 26 px
+  (22 px en teléfono); fondo `rgba(255,255,255,.06)` sin blur. Lo vacío o «por crear» va punteado.
+- **Color de frente** (identidad, **no** estado — no rompe «estados sin semáforo»): `azul`
+  `#3550ff→#1c2fd0`, `violeta` `#9067ff→#6a3df0`, `rosa` `#ff7aa2→#f2457a`, `sol` `#ffd75a→#ffb81f`
+  (tinta `#14102a` encima del sol). Pinta los mosaicos del frente, su píldora y el tinte de la
+  ventana al estar dentro.
+- **Piezas**: medidor de media luna con el amanecer · anillos de avance · hitos como cuentas ·
+  pilas (barra de avance con texto encima) · interruptores · chips · orbe giratorio de Klo.
+- **Navegación**: riel vertical de íconos (fila arriba en teléfono) y píldoras de frentes flotando
+  abajo con el **+** azul.
+- **Movimiento**: los mosaicos entran escalonados (55 ms) y los arcos se dibujan al abrir; todo se
+  apaga con `prefers-reduced-motion`.

@@ -1,0 +1,458 @@
+<title>Klo-Ser Business en vidrio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Poppins:wght@400;500;600&family=Caveat:wght@600&display=swap">
+<style>
+/* Ventana de vidrio flotando sobre la noche con auras; dentro, un mosaico (bento) distinto por sección.
+   Riel de secciones a la izquierda, píldoras de frentes abajo. En teléfono el riel se vuelve fila arriba. */
+:root{
+  color-scheme:dark;
+  --noche:#06071a; --vidrio:rgba(22,25,58,.62); --vidrio-2:rgba(255,255,255,.06); --borde:rgba(255,255,255,.10);
+  --tinta:#f3f4fb; --tinta-2:#a9aed0; --tinta-3:#6b7199;
+  --azul:#2a44ff; --violeta:#7b4dff; --rosa:#ff5f8f; --sol:#ffc933; --oscuro:#14102a;
+  --amanecer:linear-gradient(100deg,#1c36ee 0%,#7b4dff 38%,#ff5f8f 70%,#ffc933 100%);
+  --amanecer-texto:linear-gradient(100deg,#7181f4 0%,#9b7bff 35%,#ff7fa6 70%,#ffd25c 100%);
+  --fredoka:"Fredoka",system-ui,sans-serif; --poppins:"Poppins",system-ui,sans-serif; --mano:"Caveat",cursive;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--noche);color:var(--tinta);font-family:var(--poppins);overflow-x:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.aura{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.aura i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
+.aura i:nth-child(1){width:520px;height:520px;background:#1c36ee;left:-140px;top:-120px}
+.aura i:nth-child(2){width:460px;height:460px;background:#7b4dff;right:-120px;top:20%}
+.aura i:nth-child(3){width:420px;height:420px;background:#ff5f8f;left:30%;bottom:-220px;opacity:.35}
+.pagina{position:relative;z-index:1;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.intro{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px}
+.intro h1{font-family:var(--fredoka);font-weight:500;font-size:clamp(24px,3.4vw,34px);margin:0;text-wrap:balance}
+.intro p{margin:4px 0 0;color:var(--tinta-2);font-size:14px;max-width:60ch;line-height:1.55}
+.amanecer{background:var(--amanecer-texto);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* Escena */
+.escena{position:relative;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.riel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:99px;
+  background:var(--vidrio);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:inset 0 0 0 1px var(--borde)}
+.riel button{all:unset;cursor:pointer;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:var(--tinta-2);position:relative;transition:background .25s,color .25s}
+.riel button:hover{background:var(--vidrio-2);color:var(--tinta)}
+.riel button:focus-visible{outline:2px solid var(--violeta)}
+.riel button[aria-current="page"]{background:var(--azul);color:#fff;box-shadow:0 8px 24px -8px rgba(42,68,255,.9)}
+.riel button span{position:absolute;left:58px;white-space:nowrap;font-size:12px;padding:4px 10px;border-radius:99px;background:var(--oscuro);opacity:0;transform:translateX(-4px);transition:.2s;pointer-events:none}
+.riel button:hover span{opacity:1;transform:none}
+.riel svg{width:20px;height:20px}
+
+.ventana{position:relative;border-radius:34px;padding:14px;background:var(--vidrio);backdrop-filter:blur(30px) saturate(140%);-webkit-backdrop-filter:blur(30px) saturate(140%);
+  box-shadow:inset 0 0 0 1px var(--borde),0 40px 120px -40px rgba(0,0,0,.8);display:flex;flex-direction:column;gap:12px;min-width:0;padding-bottom:84px}
+.barra{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:24px;background:var(--vidrio-2);box-shadow:inset 0 0 0 1px var(--borde);flex-wrap:wrap}
+.barra .foto{width:46px;height:46px;border-radius:14px;flex:none;display:grid;place-items:center;font-family:var(--fredoka);font-weight:600;font-size:20px}
+.barra h2{font-family:var(--fredoka);font-weight:500;font-size:19px;margin:0}
+.barra small{color:var(--tinta-2);font-size:12px}
+.klo-campo{flex:1;min-width:200px;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:99px;background:rgba(0,0,0,.28);color:var(--tinta-2);font-size:13px}
+.klo-campo .orbe{width:28px;height:28px;border-radius:50%;flex:none;background:conic-gradient(from 0deg,#1c36ee,#7b4dff,#ff5f8f,#ffc933,#1c36ee);animation:girar 6s linear infinite}
+.klo-campo .orbe::after{content:"";display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 50% 50%,transparent 40%,rgba(6,7,26,.45))}
+.yo{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--tinta-2)} .yo b{color:var(--tinta);font-weight:500}
+.yo i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;color:var(--tinta);background:linear-gradient(var(--oscuro),var(--oscuro)) padding-box,var(--amanecer) border-box;border:2px solid transparent}
+
+/* Mosaico */
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(118px,auto);gap:12px}
+.t{position:relative;border-radius:26px;padding:16px;background:var(--vidrio-2);box-shadow:inset 0 0 0 1px var(--borde);display:flex;flex-direction:column;gap:10px;min-width:0;overflow:hidden;
+  animation:entrar .6s var(--ease) both;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.t:hover{transform:translateY(-3px)}
+.t.c2{grid-column:span 2} .t.c3{grid-column:span 3} .t.c4{grid-column:span 4} .t.r2{grid-row:span 2} .t.r3{grid-row:span 3}
+.t.punteada{background:transparent;box-shadow:none;outline:1.5px dashed var(--borde);outline-offset:-1.5px}
+.t h3{font-family:var(--fredoka);font-weight:500;font-size:17px;margin:0;line-height:1.2}
+.t .sub{font-size:11.5px;color:var(--tinta-2);margin-top:3px}
+.t.color .sub{color:inherit;opacity:.75}
+.fila{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 11px;border-radius:99px;background:rgba(0,0,0,.28);white-space:nowrap}
+.chip.claro{background:rgba(255,255,255,.22)}
+.grande{font-family:var(--fredoka);font-weight:500;font-size:46px;line-height:1;font-variant-numeric:tabular-nums}
+.grande small{font-size:20px;color:var(--tinta-2);font-weight:400}
+.mano{font-family:var(--mano);font-size:22px;color:var(--sol)}
+.interruptor{all:unset;cursor:pointer;width:40px;height:24px;border-radius:99px;background:rgba(0,0,0,.35);position:relative;flex:none;transition:background .25s}
+.interruptor::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s var(--ease)}
+.interruptor[aria-pressed="true"]{background:var(--oscuro)} .interruptor[aria-pressed="true"]::after{transform:translateX(16px)}
+.interruptor:focus-visible{outline:2px solid #fff}
+.pila{height:30px;border-radius:99px;background:rgba(0,0,0,.25);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:500}
+.pila i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:rgba(255,255,255,.28);animation:crecer 1s var(--ease) both}
+.pila span{position:relative}
+/* Colores de frente (identidad, no urgencia) */
+.f-azul{background:linear-gradient(160deg,#3550ff,#1c2fd0);color:#fff;box-shadow:none}
+.f-sol{background:linear-gradient(160deg,#ffd75a,#ffb81f);color:var(--oscuro);box-shadow:none}
+.f-rosa{background:linear-gradient(160deg,#ff7aa2,#f2457a);color:#fff;box-shadow:none}
+.f-violeta{background:linear-gradient(160deg,#9067ff,#6a3df0);color:#fff;box-shadow:none}
+.f-sol .chip{background:rgba(20,16,42,.12)} .f-sol .pila{background:rgba(20,16,42,.12)} .f-sol .pila i{background:rgba(20,16,42,.18)}
+.ilus{position:absolute;right:12px;bottom:-22px;font-family:var(--fredoka);font-weight:600;font-size:96px;line-height:1;opacity:.14;pointer-events:none}
+
+/* Medidor */
+.medidor{position:relative;width:100%;max-width:340px;margin:0 auto}
+.medidor svg{width:100%;display:block;overflow:visible}
+.medidor .centro{position:absolute;left:0;right:0;bottom:6%;text-align:center}
+.medidor .centro small{display:block;font-size:10.5px;letter-spacing:.2em;color:var(--tinta-2);text-transform:uppercase}
+.medidor .centro b{font-family:var(--fredoka);font-weight:500;font-size:64px;line-height:1}
+.arco{transition:stroke-dashoffset 1.2s var(--ease)}
+.horas{display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--tinta-2)}
+
+/* Listas con palomita */
+.tarea{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;padding:7px 4px;border-radius:12px;min-width:0}
+.tarea:hover{background:rgba(255,255,255,.05)}
+.tarea:focus-visible{outline:2px solid var(--violeta)}
+.tarea .caja{width:20px;height:20px;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--tinta-3);flex:none;display:grid;place-items:center;transition:.25s}
+.tarea .txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .25s}
+.tarea .e{font-size:11px;color:var(--tinta-3);white-space:nowrap} .tarea .e.v{color:var(--tinta);font-weight:600}
+.tarea[aria-pressed="true"] .caja{background:var(--amanecer);box-shadow:none}
+.tarea[aria-pressed="true"] .caja::after{content:"✓";font-size:12px;color:#fff;font-weight:700}
+.tarea[aria-pressed="true"] .txt{color:var(--tinta-3);text-decoration:line-through}
+.k{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:10.5px;font-weight:600;flex:none}
+
+/* Línea del día */
+.linea-dia{display:flex;flex-direction:column;gap:8px}
+.bloque{display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;font-size:13px}
+.bloque time{font-size:11.5px;color:var(--tinta-3);font-variant-numeric:tabular-nums}
+.bloque div{padding:9px 12px;border-radius:14px;background:rgba(255,255,255,.05);display:flex;justify-content:space-between;gap:8px;min-width:0}
+.bloque div span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bloque.hecho div{color:var(--tinta-3);text-decoration:line-through}
+.bloque.ahora div{background:rgba(42,68,255,.28);box-shadow:inset 0 0 0 1px rgba(113,129,244,.6)}
+.vivo{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#c7cdff}
+.vivo::before{content:"";width:7px;height:7px;border-radius:50%;background:#7181f4;box-shadow:0 0 0 0 rgba(113,129,244,.8);animation:latir 1.6s infinite}
+
+/* Klo */
+.klo{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.disco{width:96px;height:96px;border-radius:24px;background:radial-gradient(circle at 50% 38%,#ffe08a,var(--sol) 70%);display:grid;place-items:center;position:relative}
+.disco svg{width:62px}
+.ondas{display:flex;gap:3px;align-items:center;height:28px}
+.ondas i{width:4px;border-radius:4px;background:var(--amanecer-texto);animation:onda 1.2s ease-in-out infinite}
+.boton-redondo{all:unset;cursor:pointer;width:44px;height:44px;border-radius:50%;background:#fff;color:var(--oscuro);display:grid;place-items:center;font-size:18px}
+
+/* Semana */
+.dias{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.dia{all:unset;cursor:pointer;flex:1;min-width:52px;padding:10px 0;border-radius:18px;text-align:center;background:var(--vidrio-2);box-shadow:inset 0 0 0 1px var(--borde);display:flex;flex-direction:column;gap:2px}
+.dia b{font-family:var(--fredoka);font-size:22px;font-weight:500}
+.dia small{font-size:11px;color:var(--tinta-2)}
+.dia .puntos{display:flex;gap:3px;justify-content:center;height:6px}
+.dia .puntos i{width:5px;height:5px;border-radius:50%}
+.dia[aria-current="true"]{background:#fff;color:var(--oscuro)} .dia[aria-current="true"] small{color:var(--oscuro)}
+.dia:focus-visible{outline:2px solid var(--violeta)}
+.agenda{position:relative;display:grid;grid-template-columns:46px 1fr;row-gap:0}
+.agenda .h{height:56px;font-size:11px;color:var(--tinta-3);border-top:1px solid var(--borde);padding-top:4px;font-variant-numeric:tabular-nums}
+.agenda .carril{position:relative;grid-column:2;grid-row:1 / span 10;border-left:1px solid var(--borde)}
+.ev{position:absolute;z-index:1;left:10px;right:6px;border-radius:16px;padding:8px 12px;font-size:12.5px;display:flex;flex-direction:column;gap:2px;animation:entrar .5s var(--ease) both;overflow:hidden}
+.ev small{opacity:.8;font-size:11px}
+.ahora-linea{position:absolute;z-index:0;opacity:.8;left:-5px;right:0;height:2px;background:#fff;border-radius:2px}
+.ahora-linea::before{content:"";position:absolute;left:0;top:-4px;width:10px;height:10px;border-radius:50%;background:#fff}
+
+/* Clientes */
+.piezas{display:grid;grid-template-columns:repeat(auto-fill,20px);gap:6px}
+.piezas i{aspect-ratio:1;border-radius:6px;background:rgba(0,0,0,.25)}
+.piezas i.ok{background:rgba(255,255,255,.85)}
+.f-sol .piezas i{background:rgba(20,16,42,.14)} .f-sol .piezas i.ok{background:var(--oscuro)}
+
+/* Notas */
+.notas{columns:3 220px;column-gap:12px}
+.nota{break-inside:avoid;margin-bottom:12px;border-radius:24px;padding:16px;background:var(--vidrio-2);box-shadow:inset 0 0 0 1px var(--borde);display:flex;flex-direction:column;gap:10px;animation:entrar .6s var(--ease) both}
+.nota p{margin:0;font-size:14px;line-height:1.55}
+.nota.mano p{font-family:var(--mano);font-size:24px;line-height:1.15}
+.nota .acc{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Píldoras de frentes */
+.frentes{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;border-radius:99px;
+  background:rgba(10,11,32,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:inset 0 0 0 1px var(--borde),0 20px 40px -20px #000;max-width:calc(100% - 24px);overflow-x:auto}
+.frentes button{all:unset;cursor:pointer;padding:10px 18px;border-radius:99px;font-size:14px;color:var(--tinta-2);white-space:nowrap;display:flex;align-items:center;gap:7px;transition:background .25s,color .25s}
+.frentes button:hover{color:var(--tinta)}
+.frentes button:focus-visible{outline:2px solid var(--violeta)}
+.frentes button[aria-current="true"]{background:rgba(255,255,255,.12);color:var(--tinta)}
+.frentes button .p{width:7px;height:7px;border-radius:50%}
+.frentes .mas{width:44px;height:44px;padding:0;justify-content:center;background:var(--azul);color:#fff;font-size:22px;border-radius:50%;box-shadow:0 8px 24px -8px rgba(42,68,255,.9)}
+
+.leyenda{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.leyenda div{padding:14px 16px;border-radius:20px;background:var(--vidrio);box-shadow:inset 0 0 0 1px var(--borde)}
+.leyenda h3{font-family:var(--fredoka);font-weight:500;font-size:16px;margin:0 0 4px}
+.leyenda p{margin:0;font-size:13px;color:var(--tinta-2);line-height:1.55}
+
+@keyframes entrar{from{opacity:.001;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes crecer{from{width:0}}
+@keyframes girar{to{transform:rotate(360deg)}}
+@keyframes latir{70%{box-shadow:0 0 0 8px rgba(113,129,244,0)}100%{box-shadow:0 0 0 0 rgba(113,129,244,0)}}
+@keyframes onda{0%,100%{height:6px}50%{height:26px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+@media (max-width:900px){.bento{grid-template-columns:repeat(2,minmax(0,1fr))} .t.c3,.t.c4{grid-column:span 2}}
+@media (max-width:640px){
+  .escena{grid-template-columns:1fr}
+  .riel{flex-direction:row;justify-content:space-between;position:relative;top:0}
+  .riel button span{display:none}
+  .ventana{border-radius:28px;padding:10px;padding-bottom:80px}
+  .t{border-radius:22px}
+  .yo span{display:none}
+  .grande{font-size:38px}
+}
+@media (max-width:420px){.bento{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .t.c2{grid-column:span 2}}
+</style>
+
+<div class="aura" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="pagina">
+  <div class="intro">
+    <div>
+      <h1>Cada sección con su <span class="amanecer">propia forma</span></h1>
+      <p>Propuesta en vidrio para Klo-Ser Business. Cambia de sección con el riel, abre un frente con las píldoras de abajo y palomea tareas. Los datos son de ejemplo.</p>
+    </div>
+  </div>
+
+  <div class="escena">
+    <nav class="riel" aria-label="Secciones" id="riel"></nav>
+    <main class="ventana" id="ventana">
+      <div class="barra" id="barra"></div>
+      <div id="vista"></div>
+      <div class="frentes" id="frentes" role="tablist" aria-label="Frentes"></div>
+    </main>
+  </div>
+
+  <section class="leyenda" aria-label="Cómo se muestra cada sección">
+    <div><h3>Hoy · el tablero</h3><p>Un medidor grande del día, Klo como «reproductor», tus frentes como mosaicos de color y tu día en una línea viva.</p></div>
+    <div><h3>Frente · su habitación</h3><p>Como cambiar de cuarto: la ventana se tiñe con el color del frente y muestra solo lo suyo.</p></div>
+    <div><h3>Proyectos · anillos</h3><p>Cada proyecto es un mosaico con su anillo de avance, hitos como cuentas y los días que faltan en grande.</p></div>
+    <div><h3>Semana · la cinta</h3><p>Una tira de días con puntitos de carga; al tocar uno, su agenda en bloques con la línea de «ahora».</p></div>
+    <div><h3>Clientes · dispositivos</h3><p>Como aparatos de la casa: interruptor de pauta, rejilla de piezas del mes y una pila de avance.</p></div>
+    <div><h3>Notas · pizarrón</h3><p>Tarjetas sueltas en columnas; las cortas a mano. Un toque y se vuelven tarea.</p></div>
+  </section>
+</div>
+
+<script>
+const ICONOS = {
+  hoy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  proyectos:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6" /><path d="M12 7v5l3 2"/></svg>',
+  semana:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+  clientes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>',
+  notas:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h4"/></svg>',
+}
+const SECCIONES = [['hoy','Hoy'],['proyectos','Proyectos'],['semana','Semana'],['clientes','Clientes'],['notas','Notas']]
+const GALLO = '<svg viewBox="0 0 60 72"><path fill="#1c36ee" d="M34 6c6-6 16-3 15 5 6 0 8 7 3 10l6 4-6 3c4 10-1 22-12 26l2 10h4v3H34l-1-12c-8 1-16-2-20-9-6 1-11-3-10-9 1-5 7-7 11-4 2-4 6-6 10-6 0-7 4-15 10-21z"/><circle cx="42" cy="22" r="5" fill="#fff"/><circle cx="43" cy="22" r="2.4" fill="#1c36ee"/></svg>'
+
+const FRENTES = [
+  { id:'top', k:'T', nombre:'Top Digital', color:'azul', punto:'#4a62ff', hoy:3, riesgo:1, hechas:1, total:4, avance:55 },
+  { id:'klo', k:'K', nombre:'Klo-Ser', color:'sol', punto:'#ffc933', hoy:2, riesgo:0, hechas:2, total:4, avance:40 },
+  { id:'marca', k:'M', nombre:'Mi marca', color:'rosa', punto:'#ff5f8f', hoy:2, riesgo:0, hechas:0, total:2, avance:20 },
+]
+const TAREAS = [
+  { f:'top', t:'Mandar reporte de pauta', e:'vencida · ayer', v:true },
+  { f:'top', t:'Revisar copy del anuncio de Aurora', e:'hoy' },
+  { f:'top', t:'Aprobar 3 carruseles', e:'hoy' },
+  { f:'klo', t:'Escribir plan de la parte 2', e:'hoy' },
+  { f:'klo', t:'Responder a la imprenta', e:'hoy' },
+  { f:'marca', t:'Post: lo que aprendí vendiendo', e:'hoy' },
+  { f:'marca', t:'Grabar reel de 30 s', e:'hoy' },
+]
+const DIA = [
+  { h:'08:30', t:'Pendientes de la mañana', f:'klo', hecho:true },
+  { h:'11:00', t:'Junta de pauta', f:'top', ahora:true, google:'Calendario' },
+  { h:'13:00', t:'Carrusel de Aurora', f:'top' },
+  { h:'17:00', t:'Grabar demo de Business', f:'klo' },
+]
+const PROYECTOS = [
+  { f:'top', m:'Octubre: 60 piezas', palabra:'60 piezas', a:55, hitos:[1,1,1,0,0], dias:17, cifra:'33 de 60' },
+  { f:'klo', m:'Lanzar Klo-Ser Business', palabra:'Business', a:40, hitos:[1,1,0,0,0], dias:46, cifra:'2 de 5 hitos' },
+  { f:'top', m:'Nueva web de la agencia', palabra:'web', a:30, hitos:[1,0,0,0], dias:20, cifra:'1 de 4 hitos' },
+  { f:'marca', m:'30 posts en LinkedIn', palabra:'30 posts', a:20, hitos:[1,0,0,0,0,0], dias:24, cifra:'6 de 30' },
+]
+const CLIENTES = [
+  { f:'top', n:'Aurora', giro:'Cosméticos', pauta:15, hechas:8, total:12, estado:'Faltan 4 · miércoles', on:true },
+  { f:'top', n:'Café Norte', giro:'Cafetería', pauta:5, hechas:6, total:6, estado:'Lista', on:true },
+  { f:'top', n:'Vértice', giro:'Inmobiliaria', pauta:null, hechas:2, total:9, estado:'Faltan 7 · fin de mes', on:false },
+  { f:'klo', n:'Imprenta Sol', giro:'Proveedor', pauta:20, hechas:1, total:2, estado:'Falta 1 · lunes', on:true },
+]
+const NOTAS = [
+  { f:'klo', txt:'Idea: que Klo mande un resumen a las 7 am por WhatsApp.', mano:false },
+  { f:'top', txt:'Aurora quiere más reels', mano:true },
+  { f:'marca', txt:'Hilo sobre cómo dejé WhatsApp como agenda: antes, después y lo que aprendí en una semana.', mano:false },
+  { f:'top', txt:'Cobrar a Vértice', mano:true },
+  { f:'klo', txt:'Probar la app con 3 founders amigos antes de cobrar.', mano:false },
+  { f:'marca', txt:'¡Grabar con luz de la tarde!', mano:true },
+]
+
+const estado = { seccion:'hoy', frente:null, hechas:new Set(), dia:2 }
+const fr = id => FRENTES.find(f => f.id === id)
+const delay = i => `style="animation-delay:${i*55}ms"`
+const enFrente = x => !estado.frente || x.f === estado.frente
+
+function riel(){
+  document.getElementById('riel').innerHTML = SECCIONES.map(([id,n]) =>
+    `<button data-s="${id}" aria-label="${n}" ${estado.seccion===id?'aria-current="page"':''}>${ICONOS[id]}<span>${n}</span></button>`).join('')
+}
+function pildoras(){
+  document.getElementById('frentes').innerHTML =
+    `<button role="tab" data-f="" aria-current="${!estado.frente}">Todos</button>` +
+    FRENTES.map(f => `<button role="tab" data-f="${f.id}" aria-current="${estado.frente===f.id}"><span class="p" style="background:${f.punto}"></span>${f.nombre}</button>`).join('') +
+    `<button class="mas" aria-label="Nuevo">+</button>`
+}
+function barra(){
+  const f = estado.frente && fr(estado.frente)
+  const titulo = f ? f.nombre : ({hoy:'Buenos días, Jair',proyectos:'Proyectos',semana:'Semana',clientes:'Clientes',notas:'Notas'})[estado.seccion]
+  const foto = f ? `<div class="foto f-${f.color}">${f.k}</div>` : `<div class="foto" style="background:radial-gradient(circle at 50% 38%,#ffe08a,#ffc933 70%)">${GALLO.replace('<svg','<svg width="30"')}</div>`
+  document.getElementById('barra').innerHTML = `${foto}
+    <div><h2>${titulo}</h2><small>Miércoles 14 de octubre${f?' · frente':''}</small></div>
+    <div class="klo-campo"><span class="orbe"></span>Díselo a Klo: «mañana entrego…</div>
+    <div class="yo"><i>J</i><span>Hola, <b>Jair</b></span></div>`
+}
+
+function medidor(hechas, total, pend){
+  const pct = total ? hechas/total : 0, L = Math.PI*130
+  const ticks = Array.from({length:31},(_,i)=>{const a=Math.PI+i*Math.PI/30, r1=148, r2=i%5?154:160
+    return `<line x1="${170+r1*Math.cos(a)}" y1="${170+r1*Math.sin(a)}" x2="${170+r2*Math.cos(a)}" y2="${170+r2*Math.sin(a)}" stroke="rgba(255,255,255,${i%5?.18:.4})" stroke-width="2" stroke-linecap="round"/>`}).join('')
+  const a = Math.PI + pct*Math.PI
+  return `<div class="medidor"><svg viewBox="0 0 340 190">
+    <defs><linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="#2a44ff"/><stop offset=".4" stop-color="#7b4dff"/><stop offset=".7" stop-color="#ff5f8f"/><stop offset="1" stop-color="#ffc933"/></linearGradient></defs>
+    ${ticks}
+    <path d="M40 170 A130 130 0 0 1 300 170" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="16" stroke-linecap="round"/>
+    <path class="arco" d="M40 170 A130 130 0 0 1 300 170" fill="none" stroke="url(#gm)" stroke-width="16" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L}" data-off="${L*(1-pct)}"/>
+    <circle cx="${170+130*Math.cos(a)}" cy="${170+130*Math.sin(a)}" r="10" fill="#fff" stroke="#06071a" stroke-width="4"/>
+    <text x="34" y="188" fill="#6b7199" font-size="11" text-anchor="middle">0</text><text x="306" y="188" fill="#6b7199" font-size="11" text-anchor="middle">${total}</text>
+  </svg><div class="centro"><small>por hacer hoy</small><b>${pend}</b></div></div>`
+}
+function anillo(pct, color='#fff', fondo='rgba(0,0,0,.25)', size=86){
+  const r=34, L=2*Math.PI*r
+  return `<svg width="${size}" height="${size}" viewBox="0 0 80 80" style="flex:none"><circle cx="40" cy="40" r="${r}" fill="none" stroke="${fondo}" stroke-width="8"/>
+    <circle class="arco" cx="40" cy="40" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L}" data-off="${L*(1-pct/100)}" transform="rotate(-90 40 40)"/>
+    <text x="40" y="45" text-anchor="middle" font-family="Fredoka" font-size="17" font-weight="500" fill="${color}">${pct}%</text></svg>`
+}
+function tareas(lista){
+  if (!lista.length) return '<p class="sub" style="margin:0">Todo hecho aquí.</p>'
+  return lista.map(x => { const i = TAREAS.indexOf(x), on = estado.hechas.has(i), f = fr(x.f)
+    return `<button class="tarea" data-t="${i}" aria-pressed="${on}"><span class="caja"></span><span class="txt">${x.t}</span>
+      ${estado.frente?'':`<span class="k f-${f.color}">${f.k}</span>`}<span class="e ${x.v?'v':''}">${x.e}</span></button>`}).join('')
+}
+function conteo(fId){
+  // Lo ya hecho antes de abrir el boceto + lo que se palomea aquí.
+  const ts = TAREAS.map((x,i)=>[x,i]).filter(([x])=>!fId||x.f===fId)
+  const palomeadas = ts.filter(([,i])=>estado.hechas.has(i)).length
+  const previas = (fId ? [fr(fId)] : FRENTES).reduce((a,f)=>a+f.hechas,0)
+  const pend = ts.length - palomeadas, hechas = previas + palomeadas
+  return { pend, hechas, total: pend + hechas }
+}
+
+/* ---------- Vistas ---------- */
+function vistaHoy(){
+  const fId = estado.frente, c = conteo(fId), f = fId && fr(fId)
+  const total = c.total
+  const tiles = []
+  tiles.push(`<div class="t c2 r2" ${delay(0)}>
+    <div class="fila"><div><h3>Tu día</h3><div class="sub">${f?f.nombre:'Todos los frentes'}</div></div><span class="chip">${c.hechas} de ${total} hechas</span></div>
+    ${medidor(c.hechas,total,c.pend)}
+    <div class="horas"><span class="chip">Lo siguiente</span><b style="color:var(--tinta);font-weight:500">${(DIA.find(d=>!d.hecho&&enFrente(d))||{t:'Nada más hoy'}).t}</b>${c.hechas*2>=total?'<span class="mano">¡Vas bien!</span>':''}</div>
+  </div>`)
+  if (!f){
+    tiles.push(`<div class="t c2" ${delay(1)}><div class="klo">
+      <div class="disco">${GALLO}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:0"><span class="sub" style="margin:0">Klo te dice</span>
+      <h3>«Hoy pega Top Digital: entrega de Aurora a la 1.»</h3>
+      <div class="fila"><div class="ondas">${Array.from({length:14},(_,i)=>`<i style="animation-delay:${i*80}ms"></i>`).join('')}</div><button class="boton-redondo" aria-label="Hablar con Klo">●</button></div></div>
+    </div></div>`)
+    FRENTES.forEach((x,i)=> tiles.push(`<div class="t color f-${x.color}" data-f="${x.id}" role="button" tabindex="0" ${delay(2+i)} style="cursor:pointer">
+      <div class="fila"><div><h3>${x.nombre}</h3><div class="sub">frente · abrir →</div></div><span class="chip">${x.hoy} hoy</span></div>
+      <div class="pila"><i style="width:${x.avance}%"></i><span>${x.riesgo?`${x.riesgo} en riesgo`:'Al día'} · ${x.avance}%</span></div>
+      <span class="ilus">${x.k}</span></div>`))
+    tiles.push(`<div class="t" ${delay(5)}><div class="fila"><h3>En riesgo</h3><span class="chip">2</span></div><div class="sub" style="margin:0">Reel de lanzamiento · <b style="color:var(--tinta)">vencida</b></div><div class="sub" style="margin:0">3 carruseles · en 2 días</div></div>`)
+  }
+  if (!f){
+    tiles.push(`<div class="t punteada" ${delay(6)}><div class="fila"><h3>La meta</h3><span class="chip">día 14 / 31</span></div><div class="grande">55<small>%</small></div><div class="sub" style="margin:0">Octubre: 60 piezas</div></div>`)
+  }
+  tiles.push(`<div class="t c2" ${delay(6)}><div class="fila"><h3>De un toque</h3><span class="sub" style="margin:0">palomea</span></div>${tareas(TAREAS.filter(enFrente))}</div>`)
+  tiles.push(`<div class="t c2" ${delay(7)}><div class="fila"><h3>Línea del día</h3><span class="vivo">Ahora</span></div><div class="linea-dia">
+    ${DIA.filter(enFrente).map(d=>`<div class="bloque ${d.hecho?'hecho':''} ${d.ahora?'ahora':''}"><time>${d.h}</time><div><span>${d.t}</span><span class="k f-${fr(d.f).color}">${fr(d.f).k}</span></div></div>`).join('') || '<p class="sub">Sin horas fijas hoy.</p>'}</div></div>`)
+  if (f){
+    PROYECTOS.filter(enFrente).forEach((p,i)=> tiles.push(tileProyecto(p, 8+i, 'c2')))
+    const cl = CLIENTES.filter(enFrente)
+    cl.forEach((x,i)=> tiles.push(tileCliente(x, 10+i)))
+    if (!cl.length) tiles.push(`<div class="t punteada c2" ${delay(10)}><h3>Clientes</h3><p class="sub" style="margin:0">Este frente aún no tiene clientes.</p></div>`)
+  }
+  return `<div class="bento">${tiles.join('')}</div>`
+}
+function tileProyecto(p, i, ancho='c2'){
+  const f = fr(p.f)
+  return `<div class="t ${ancho} color f-${f.color}" ${delay(i)}>
+    <div class="fila" style="align-items:flex-start"><div style="min-width:0"><span class="chip claro">${f.k} · ${f.nombre}</span>
+      <h3 style="margin-top:10px;font-size:20px">${p.m}</h3></div>${anillo(p.a, f.color==='sol'?'#14102a':'#fff', f.color==='sol'?'rgba(20,16,42,.15)':'rgba(0,0,0,.25)')}</div>
+    <div style="display:flex;gap:6px">${p.hitos.map((h,j)=>`<i style="flex:1;height:8px;border-radius:99px;background:${h?(f.color==='sol'?'#14102a':'#fff'):'rgba(0,0,0,.22)'};${!h&&p.hitos[j-1]?'outline:2px solid currentColor;outline-offset:1px':''}"></i>`).join('')}</div>
+    <div class="fila"><span class="sub" style="margin:0">${p.cifra}</span><span><b style="font-family:var(--fredoka);font-size:28px;font-weight:500">${p.dias}</b> <span class="sub">días</span></span></div>
+  </div>`
+}
+function tileCliente(c, i){
+  const f = fr(c.f)
+  return `<div class="t c2 color f-${f.color}" ${delay(i)}>
+    <div class="fila"><div><h3>${c.n}</h3><div class="sub">${c.giro}${c.pauta?` · pauta día ${c.pauta}`:' · sin pauta'}</div></div>
+      <button class="interruptor" aria-pressed="${c.on}" aria-label="Pauta activa"></button></div>
+    <div class="piezas">${Array.from({length:c.total},(_,j)=>`<i class="${j<c.hechas?'ok':''}"></i>`).join('')}</div>
+    <div class="fila"><div class="pila" style="flex:1"><i style="width:${Math.round(c.hechas/c.total*100)}%"></i><span>${c.hechas}/${c.total} piezas</span></div><span class="chip">${c.estado}</span></div>
+  </div>`
+}
+function vistaProyectos(){
+  const ps = PROYECTOS.filter(enFrente)
+  const prom = Math.round(ps.reduce((a,p)=>a+p.a,0)/(ps.length||1))
+  return `<div class="bento">
+    <div class="t c2" ${delay(0)}><div class="fila"><div><h3>Avance general</h3><div class="sub">${ps.length} proyectos activos</div></div>${anillo(prom,'#ffc933','rgba(255,255,255,.08)',96)}</div>
+      <div class="sub" style="margin:0">El más cerca de su meta: <b style="color:var(--tinta)">Nueva web · 20 días</b></div></div>
+    <div class="t punteada c2" ${delay(1)} style="justify-content:center;align-items:center;text-align:center"><h3>＋ Nuevo proyecto</h3><p class="sub" style="margin:0">Nombre, frente y fecha meta. Lo demás después.</p></div>
+    ${ps.map((p,i)=>tileProyecto(p,2+i)).join('')}
+  </div>`
+}
+function vistaSemana(){
+  const dias = ['L','M','M','J','V','S','D'], nums=[12,13,14,15,16,17,18], carga=[2,3,4,2,3,0,1]
+  const evs = [
+    { ini:8.5, fin:9.5, t:'Pendientes de la mañana', f:'klo', c:'rgba(255,255,255,.08)' },
+    { ini:11, fin:12, t:'Junta de pauta', f:'top', c:'linear-gradient(160deg,#3550ff,#1c2fd0)', g:'Google' },
+    { ini:13, fin:14.5, t:'Carrusel de Aurora', f:'top', c:'rgba(42,68,255,.28)', borde:'1px dashed #7181f4', sub:'entrega' },
+    { ini:15, fin:16.5, t:'Trabajo profundo · plan', f:'klo', c:'linear-gradient(160deg,#ffd75a,#ffb81f)', osc:true },
+    { ini:17, fin:17.75, t:'Grabar demo', f:'klo', c:'linear-gradient(160deg,#9067ff,#6a3df0)' },
+  ].filter(enFrente)
+  const H0 = 8, alto = 56
+  return `<div style="display:flex;flex-direction:column;gap:12px">
+    <div class="dias">${dias.map((d,i)=>`<button class="dia" data-d="${i}" aria-current="${estado.dia===i}"><small>${d}</small><b>${nums[i]}</b><span class="puntos">${Array.from({length:carga[i]},(_,j)=>`<i style="background:${FRENTES[j%3].punto}"></i>`).join('')}</span></button>`).join('')}</div>
+    <div class="t" ${delay(1)}>
+      <div class="fila"><h3>${estado.dia===2?'Hoy, miércoles':['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'][estado.dia]+' '+nums[estado.dia]}</h3><span class="vivo">Ahora · 11:20</span></div>
+      <div class="agenda">${Array.from({length:10},(_,i)=>`<div class="h" style="grid-row:${i+1}">${String(H0+i).padStart(2,'0')}:00</div>`).join('')}
+        <div class="carril">
+          ${(estado.dia===2?evs:evs.slice(0,carga[estado.dia])).map((e,i)=>`<div class="ev" style="top:${(e.ini-H0)*alto+4}px;height:${(e.fin-e.ini)*alto-8}px;background:${e.c};${e.borde?`border:${e.borde};`:''}color:${e.osc?'#14102a':'#fff'};animation-delay:${i*70}ms">
+            <b style="font-weight:500">${e.t}</b><small>${fr(e.f).nombre}${e.g?' · Google':''}${e.sub?' · '+e.sub:''}</small></div>`).join('')}
+          ${estado.dia===2?`<div class="ahora-linea" style="top:${(11.33-H0)*alto}px"></div>`:''}
+        </div></div>
+    </div></div>`
+}
+function vistaClientes(){
+  const cs = CLIENTES.filter(enFrente)
+  const h = cs.reduce((a,c)=>a+c.hechas,0), t = cs.reduce((a,c)=>a+c.total,0)
+  return `<div class="bento">
+    <div class="t c2" ${delay(0)}><div class="fila"><div><h3>Piezas de octubre</h3><div class="sub">${cs.length} clientes</div></div><div class="grande">${h}<small>/${t}</small></div></div>
+      <div class="pila"><i style="width:${t?Math.round(h/t*100):0}%;background:var(--amanecer)"></i><span>${t-h} por entregar</span></div></div>
+    <div class="t c2 punteada" ${delay(1)} style="justify-content:center"><h3>Armar el mes</h3><p class="sub" style="margin:0">Crea las entregas de noviembre según el plan de cada cliente.</p><span class="chip" style="align-self:flex-start;background:var(--azul)">Armar noviembre →</span></div>
+    ${cs.map((c,i)=>tileCliente(c,2+i)).join('')}
+  </div>`
+}
+function vistaNotas(){
+  const ns = NOTAS.filter(enFrente)
+  return `<div class="notas">${ns.map((n,i)=>{const f=fr(n.f); const col = i%3===1
+    return `<div class="nota ${n.mano?'mano':''} ${col?'f-'+f.color:''}" ${delay(i)}>
+      <span class="chip ${col?'claro':''}" style="align-self:flex-start">${f.k} · ${f.nombre}</span><p>${n.txt}</p>
+      <div class="acc"><span class="chip ${col?'claro':''}">Volver tarea</span></div></div>`}).join('')}</div>`
+}
+
+function pintar(){
+  riel(); pildoras(); barra()
+  const v = document.getElementById('vista')
+  v.innerHTML = ({hoy:vistaHoy,proyectos:vistaProyectos,semana:vistaSemana,clientes:vistaClientes,notas:vistaNotas})[estado.seccion]()
+  requestAnimationFrame(()=>requestAnimationFrame(()=>v.querySelectorAll('.arco').forEach(a=>a.style.strokeDashoffset=a.dataset.off)))
+  const f = estado.frente && fr(estado.frente)
+  document.getElementById('ventana').style.background = f
+    ? `linear-gradient(180deg, ${f.punto}38, rgba(22,25,58,.62) 46%)` : ''
+}
+
+document.addEventListener('click', e => {
+  const s = e.target.closest('[data-s]'); if (s){ estado.seccion = s.dataset.s; return pintar() }
+  const f = e.target.closest('[data-f]'); if (f){ estado.frente = f.dataset.f || null; if (f.classList.contains('t')) estado.seccion='hoy'; return pintar() }
+  const t = e.target.closest('[data-t]'); if (t){ const i=+t.dataset.t; estado.hechas.has(i)?estado.hechas.delete(i):estado.hechas.add(i); return pintar() }
+  const d = e.target.closest('[data-d]'); if (d){ estado.dia = +d.dataset.d; return pintar() }
+  const sw = e.target.closest('.interruptor'); if (sw){ sw.setAttribute('aria-pressed', sw.getAttribute('aria-pressed')!=='true') }
+})
+document.addEventListener('keydown', e => { if ((e.key==='Enter'||e.key===' ') && e.target.matches('.t[data-f]')){ e.preventDefault(); e.target.click() } })
+pintar()
+</script>
