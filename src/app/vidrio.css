@@ -20,14 +20,15 @@
   padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
 
 /* ── Riel de secciones ──────────────────────────────────────────────── */
-.v-riel{position:sticky;top:max(20px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:99px;
+.v-riel{position:sticky;z-index:10;top:max(20px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:99px;
   background:var(--v-vidrio);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:inset 0 0 0 1px var(--v-borde)}
 .v-riel a{position:relative;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:var(--tinta-2);transition:background .25s,color .25s}
 .v-riel a:hover{background:var(--v-vidrio-2);color:var(--tinta)}
 .v-riel a:focus-visible{outline:2px solid var(--violeta);outline-offset:2px}
 .v-riel a[aria-current="page"]{background:var(--v-azul);color:#fff;box-shadow:0 8px 24px -8px rgba(42,68,255,.9)}
-.v-riel a span{position:absolute;left:58px;white-space:nowrap;font-size:12px;padding:4px 10px;border-radius:99px;background:var(--v-oscuro);color:var(--tinta);opacity:0;transform:translateX(-4px);transition:.2s;pointer-events:none}
-.v-riel a:hover span{opacity:1;transform:none}
+/* Etiqueta al pasar el mouse: a la derecha del ícono, centrada en su altura. */
+.v-riel a span{position:absolute;left:58px;top:50%;white-space:nowrap;font-size:12px;padding:4px 10px;border-radius:99px;background:var(--v-oscuro);color:var(--tinta);box-shadow:inset 0 0 0 1px var(--v-borde);opacity:0;transform:translate(-4px,-50%);transition:opacity .2s,transform .2s;pointer-events:none}
+.v-riel a:is(:hover,:focus-visible) span{opacity:1;transform:translate(0,-50%)}
 .v-riel svg{width:20px;height:20px}
 
 /* ── Ventana ────────────────────────────────────────────────────────── */
