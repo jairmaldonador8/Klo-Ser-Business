@@ -43,6 +43,7 @@ export type Database = {
         Row: {
           actualizado_en: string
           atajo: string
+          color: string
           creado_en: string
           creado_por: string
           id: string
@@ -53,6 +54,7 @@ export type Database = {
         Insert: {
           actualizado_en?: string
           atajo: string
+          color: string
           creado_en?: string
           creado_por?: string
           id?: string
@@ -63,6 +65,7 @@ export type Database = {
         Update: {
           actualizado_en?: string
           atajo?: string
+          color?: string
           creado_en?: string
           creado_por?: string
           id?: string
@@ -108,6 +111,7 @@ export type Database = {
           espacio_predeterminado_id: string | null
           nombre: string
           user_id: string
+          vista: Json
           zona_horaria: string
         }
         Insert: {
@@ -116,6 +120,7 @@ export type Database = {
           espacio_predeterminado_id?: string | null
           nombre?: string
           user_id: string
+          vista?: Json
           zona_horaria?: string
         }
         Update: {
@@ -124,6 +129,7 @@ export type Database = {
           espacio_predeterminado_id?: string | null
           nombre?: string
           user_id?: string
+          vista?: Json
           zona_horaria?: string
         }
         Relationships: [

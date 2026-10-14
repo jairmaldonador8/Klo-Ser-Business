@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "./noche.css";
+@import "./vidrio.css";
 
 /* La app siempre es de noche: las variantes dark: de shadcn aplican siempre. */
 @custom-variant dark (&:where(html, html *));

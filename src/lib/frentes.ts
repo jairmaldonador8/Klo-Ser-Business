@@ -40,3 +40,18 @@ export function prepararFrentes(
   })
   return { ok: true, frentes }
 }
+
+export const COLORES = ['azul', 'sol', 'rosa', 'violeta'] as const
+export type Color = (typeof COLORES)[number]
+
+/** Lo que el armazón necesita de cada frente. */
+export type FrenteVista = { id: string; nombre: string; inicial: string; atajo: string; color: Color }
+
+export function esColor(valor: unknown): valor is Color {
+  return typeof valor === 'string' && (COLORES as readonly string[]).includes(valor)
+}
+
+/** El frente abierto según `?frente=`; uno ajeno o inexistente cuenta como «Todos». */
+export function frenteAbierto(frentes: readonly FrenteVista[], atajo: string | null | undefined): FrenteVista | null {
+  return (atajo && frentes.find((f) => f.atajo === atajo)) || null
+}
