@@ -388,7 +388,7 @@ export default function Inicio() {
 ```bash
 npm run dev
 ```
-Abre `http://localhost:3000`: fondo azul-negro con grano, micro-etiqueta con rayita de amanecer, titular en Fredoka con «founder» en degradado y el 66 en Poppins 800. Cierra el servidor. Luego:
+Abre `http://localhost:3200`: fondo azul-negro con grano, micro-etiqueta con rayita de amanecer, titular en Fredoka con «founder» en degradado y el 66 en Poppins 800. Cierra el servidor. Luego:
 ```bash
 npm run lint && npm run typecheck && npm run build
 ```
@@ -968,7 +968,7 @@ export default function manifest(): MetadataRoute.Manifest {
 ```bash
 npm run dev
 ```
-Abre `http://localhost:3000` → redirige a `/hoy`. En escritorio: barra lateral con lockup, píldora de amanecer sobre «Hoy», vacío con Klo en disco sol. Navega a Proyectos: la píldora baja. Con DevTools a 390 px: sin barra lateral, wordmark arriba, captura a ancho completo, barra inferior flotante con el + de amanecer, **sin scroll horizontal**. `http://localhost:3000/manifest.webmanifest` responde el JSON. Luego:
+Abre `http://localhost:3200` → redirige a `/hoy`. En escritorio: barra lateral con lockup, píldora de amanecer sobre «Hoy», vacío con Klo en disco sol. Navega a Proyectos: la píldora baja. Con DevTools a 390 px: sin barra lateral, wordmark arriba, captura a ancho completo, barra inferior flotante con el + de amanecer, **sin scroll horizontal**. `http://localhost:3200/manifest.webmanifest` responde el JSON. Luego:
 ```bash
 npm test && npm run lint && npm run typecheck && npm run build
 ```
@@ -1046,7 +1046,7 @@ Si la CLI no acepta `--linked` en `test db`, usa `--db-url "$SUPABASE_DB_URL"` c
 2. *APIs y servicios → Pantalla de consentimiento de OAuth*: **Externo**, nombre «Klo-Ser Business», correo de soporte; permisos `openid`, `email`, `profile`; su correo como usuario de prueba.
 3. *Credenciales → ID de cliente de OAuth → Aplicación web*. URI de redirección autorizado: `https://<ref>.supabase.co/auth/v1/callback`.
 4. En Supabase: *Authentication → Sign In / Providers → Google*: activar y pegar ahí el Client ID y el Client secret (no en el chat).
-5. *Authentication → URL Configuration*: **Site URL** `http://localhost:3000`; **Redirect URLs** agrega `http://localhost:3000/auth/callback`.
+5. *Authentication → URL Configuration*: **Site URL** `http://localhost:3200`; **Redirect URLs** agrega `http://localhost:3200/auth/callback`.
 6. *Authentication → Sign In / Providers → Email*: desactiva «Allow new users to sign up» con correo (solo se entra con Google).
 
 - [ ] **Step 6: Commit**
@@ -1575,7 +1575,7 @@ Si `tsc` marca la firma de `setAll` (versión de `@supabase/ssr` sin el segundo 
 npm run typecheck && npm run lint && npm run build
 npm run dev
 ```
-Abre `http://localhost:3000/hoy` sin sesión → redirige a `/entrar` (404 por ahora, se crea en la Task 11).
+Abre `http://localhost:3200/hoy` sin sesión → redirige a `/entrar` (404 por ahora, se crea en la Task 11).
 
 - [ ] **Step 5: Commit**
 
@@ -1741,7 +1741,7 @@ console.log(`Listo: ${correo.toLowerCase()} ya puede entrar.`)
 node --env-file=.env.local scripts/permitir-correo.mjs <correo de Google de Jair>
 npm run dev
 ```
-1. `http://localhost:3000/entrar` con un correo **no** permitido → vuelve con «No pudiste entrar…».
+1. `http://localhost:3200/entrar` con un correo **no** permitido → vuelve con «No pudiste entrar…».
 2. Con el correo de Jair → vuelve a `/hoy` (que hoy pinta el armazón provisional).
 3. En Supabase *Authentication → Users* (o MCP `execute_sql`: `select email from auth.users`) aparece solo el correo permitido: el rechazado **no** creó usuario.
 
@@ -2116,8 +2116,8 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: 'e2e',
-  use: { baseURL: 'http://localhost:3000' },
-  webServer: { command: 'npm run dev', url: 'http://localhost:3000/entrar', reuseExistingServer: true, timeout: 120_000 },
+  use: { baseURL: 'http://localhost:3200' },
+  webServer: { command: 'npm run dev', url: 'http://localhost:3200/entrar', reuseExistingServer: true, timeout: 120_000 },
   projects: [
     { name: 'telefono', use: { ...devices['iPhone 14'], viewport: { width: 390, height: 844 } } },
     { name: 'escritorio', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
@@ -2163,7 +2163,7 @@ Expected: 4 pruebas PASS (2 por proyecto). Revisa `test-results/capturas/entrar-
 ```bash
 npm test && npm run lint && npm run typecheck && npm run build && npm run test:db && npm run e2e
 ```
-Expected: todo verde. **Verde no basta:** con `npm run dev`, Jair abre en su compu `http://localhost:3000` (escritorio) y, en DevTools a 390 px, revisa entrar → bienvenida → Hoy → navegar las cinco secciones. Para verlo en el iPhone en la misma red: `npm run dev -- -H 0.0.0.0` y abrir `http://<IP-de-la-compu>:3000` (la entrada con Google en el iPhone queda para cuando haya dominio; aquí basta ver el armazón tras entrar en la compu).
+Expected: todo verde. **Verde no basta:** con `npm run dev`, Jair abre en su compu `http://localhost:3200` (escritorio) y, en DevTools a 390 px, revisa entrar → bienvenida → Hoy → navegar las cinco secciones. Para verlo en el iPhone en la misma red: `npm run dev -- -H 0.0.0.0` y abrir `http://<IP-de-la-compu>:3000` (la entrada con Google en el iPhone queda para cuando haya dominio; aquí basta ver el armazón tras entrar en la compu).
 
 - [ ] **Step 5: Commit**
 
