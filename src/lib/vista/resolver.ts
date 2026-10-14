@@ -52,3 +52,8 @@ export function mover<T extends { id: string }>(lista: readonly T[], id: string,
   ;[copia[i], copia[j]] = [copia[j], copia[i]]
   return copia
 }
+
+/** Lo que deja el modo Personalizar: visibles en el orden arrastrado y, al final, los ocultos. */
+export function acomodarMosaicos(visibles: string[], ocultos: string[]): Preferencia[] {
+  return [...visibles.map((id) => ({ id, visible: true })), ...ocultos.map((id) => ({ id, visible: false }))]
+}

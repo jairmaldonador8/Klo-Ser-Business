@@ -1,3 +1,4 @@
+import { EditorHoy, type ItemHoy } from '@/components/vidrio/editor-hoy'
 import { MosaicoFrente, MosaicoKlo, MosaicoMedidor, MosaicoSimple } from '@/components/vidrio/mosaicos'
 import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
@@ -5,6 +6,18 @@ import type { IdMosaico } from '@/lib/vista/registro'
 import { resolverVista } from '@/lib/vista/resolver'
 
 type Props = { searchParams: Promise<{ frente?: string | string[] }> }
+
+/** Cuánto ocupa cada mosaico en la rejilla (4 columnas en escritorio, 2 en teléfono). */
+const CLASE: Record<IdMosaico, string> = {
+  medidor: 'c2 r2',
+  klo: 'c2',
+  frentes: 'c2',
+  en_riesgo: '',
+  meta: '',
+  de_un_toque: 'c2',
+  tu_dia: 'c2',
+  proyectos: 'c2',
+}
 
 export default async function Hoy({ searchParams }: Props) {
   const { frente: atajo } = await searchParams
@@ -16,43 +29,60 @@ export default async function Hoy({ searchParams }: Props) {
   ])
   const frentes: FrenteVista[] = (espacios ?? []).map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))
   const frente = frenteAbierto(frentes, typeof atajo === 'string' ? atajo : null)
-  const mosaicos = resolverVista(perfil?.vista).mosaicos.filter((m) => m.visible)
+  const mosaicos = resolverVista(perfil?.vista).mosaicos
 
-  let i = 0
-  const pintar = (id: IdMosaico): React.ReactNode => {
+  const nodo = (id: IdMosaico, i: number): React.ReactNode => {
     switch (id) {
       case 'medidor':
-        return <MosaicoMedidor key={id} hechas={0} pendientes={0} siguiente={null} i={i++} />
+        return <MosaicoMedidor key={id} hechas={0} pendientes={0} siguiente={null} i={i} />
       case 'klo':
-        return <MosaicoKlo key={id} frase="Cuando me escribas, aquí te digo qué sigue." i={i++} />
+        return <MosaicoKlo key={id} frase="Cuando me escribas, aquí te digo qué sigue." i={i} />
       case 'frentes':
-        // Dentro de un frente, o con uno solo, el panorama sobra.
-        if (frente || frentes.length < 2) return null
-        return frentes.map((f) => <MosaicoFrente key={f.id} frente={f} ruta="/hoy" i={i++} />)
+        return (
+          <div key={id} className="v-grupo c2" aria-label="Tus frentes">
+            {frentes.map((f, n) => (
+              <MosaicoFrente key={f.id} frente={f} ruta="/hoy" i={i + n} />
+            ))}
+          </div>
+        )
       case 'en_riesgo':
-        return <MosaicoSimple key={id} titulo="En riesgo" vacio="Nada en riesgo." i={i++} />
+        return <MosaicoSimple key={id} titulo="En riesgo" vacio="Nada en riesgo." i={i} />
       case 'meta':
-        if (frente) return null
-        return <MosaicoSimple key={id} titulo="La meta" vacio="Elige un proyecto para destacarlo aquí." punteada i={i++} />
+        return <MosaicoSimple key={id} titulo="La meta" vacio="Elige un proyecto para destacarlo aquí." punteada i={i} />
       case 'de_un_toque':
-        return <MosaicoSimple key={id} titulo="De un toque" vacio="Nada por palomear." ancho={2} i={i++} />
+        return <MosaicoSimple key={id} titulo="De un toque" vacio="Nada por palomear." ancho={2} i={i} />
       case 'tu_dia':
-        return <MosaicoSimple key={id} titulo="Agenda de hoy" vacio="Sin horas fijas hoy." ancho={2} i={i++} />
+        return <MosaicoSimple key={id} titulo="Agenda de hoy" vacio="Sin horas fijas hoy." ancho={2} i={i} />
       case 'proyectos':
-        return [
-          <MosaicoSimple key={id} titulo="Proyectos" vacio={frente ? `Los proyectos activos de ${frente.nombre} van aquí.` : 'Tus proyectos activos más cerca de su meta van aquí.'} ancho={2} punteada i={i++} />,
-          frente && <MosaicoSimple key="clientes" titulo="Clientes" vacio={`Los clientes de ${frente.nombre} van aquí.`} ancho={2} punteada i={i++} />,
-        ]
+        return (
+          <MosaicoSimple
+            key={id}
+            titulo="Proyectos"
+            vacio={frente ? `Los proyectos activos de ${frente.nombre} van aquí.` : 'Tus proyectos activos más cerca de su meta van aquí.'}
+            ancho={2}
+            punteada
+            i={i}
+          />
+        )
     }
   }
 
-  const tieneProyectos = mosaicos.some((m) => m.id === 'proyectos')
-  return (
-    <div className="v-bento">
-      {mosaicos.map((m) => pintar(m.id))}
-      {frente && !tieneProyectos && (
-        <MosaicoSimple titulo="Clientes" vacio={`Los clientes de ${frente.nombre} van aquí.`} ancho={2} punteada i={i++} />
-      )}
-    </div>
-  )
+  // Dentro de un frente, o con uno solo, el panorama de frentes sobra; dentro de un frente, La meta también.
+  const aplica = (id: IdMosaico) => !(id === 'frentes' && (frente || frentes.length < 2)) && !(id === 'meta' && frente)
+  const items: ItemHoy[] = mosaicos
+    .filter((m) => aplica(m.id))
+    .map((m, i) => ({ id: m.id, nombre: m.nombre, clase: CLASE[m.id], obligatorio: m.obligatorio, visible: m.visible, nodo: nodo(m.id, i) }))
+
+  if (frente) {
+    items.push({
+      id: 'clientes',
+      nombre: 'Clientes',
+      clase: 'c2',
+      visible: true,
+      nodo: <MosaicoSimple key="clientes" titulo="Clientes" vacio={`Los clientes de ${frente.nombre} van aquí.`} ancho={2} punteada i={items.length} />,
+    })
+  }
+
+  // Se personaliza desde «Todos»: dentro de un frente cambian los mosaicos que aplican.
+  return <EditorHoy items={items} editable={!frente} />
 }

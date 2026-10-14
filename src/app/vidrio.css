@@ -95,6 +95,38 @@ a.v-t:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .v-ondas{display:flex;gap:3px;align-items:center;height:26px}
 .v-ondas i{width:4px;height:6px;border-radius:4px;background:var(--amanecer-texto);animation:v-onda 1.2s ease-in-out infinite}
 
+/* Grupo de mosaicos de frente: ocupa dos columnas y adentro van de dos en dos */
+.v-grupo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;grid-column:span 2;min-width:0}
+.v-grupo > .v-t{min-height:120px}
+
+/* ── Modo Personalizar ──────────────────────────────────────────────── */
+.v-hoy{display:flex;flex-direction:column;gap:12px}
+.v-herramientas{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;min-height:36px}
+.v-herramientas .v-sub{margin-right:auto}
+.v-herramientas .v-aviso{min-height:0}
+.v-boton.chico{padding:7px 14px;font-size:13px}
+.v-boton.primario{background:var(--v-azul);box-shadow:0 8px 24px -10px rgba(42,68,255,.9)}
+.v-boton.primario:hover{background:#3a53ff}
+.v-boton:disabled{opacity:.6;cursor:default}
+.v-boton:focus-visible{outline:2px solid var(--violeta);outline-offset:2px}
+/* En edición, el envoltorio es el que ocupa el lugar en la rejilla. */
+.v-editable.c2{grid-column:span 2} .v-editable.r2{grid-row:span 2}
+.v-editable{position:relative;min-width:0;border-radius:26px;cursor:grab;touch-action:manipulation}
+/* El temblor va adentro: una animación en el envoltorio pisaría el transform del arrastre. */
+.v-editable .v-editable-contenido{animation:v-temblar .5s ease-in-out infinite alternate}
+.v-editable:nth-child(2n) .v-editable-contenido{animation-delay:-.25s}
+.v-editable:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.v-editable[data-arrastrando]{cursor:grabbing;z-index:20;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
+.v-editable[data-arrastrando] .v-editable-contenido{animation:none}
+.v-editable-contenido{height:100%;pointer-events:none;user-select:none;-webkit-user-select:none}
+.v-editable-contenido > *{height:100%}
+.v-editable-contenido .v-t,.v-editable-contenido .v-t *{animation:none}
+.v-quitar{position:absolute;top:-8px;left:-8px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:17px;line-height:1;color:var(--v-oscuro);background:#fff;box-shadow:0 6px 16px -6px #000;z-index:2}
+.v-quitar:focus-visible{outline:2px solid var(--violeta);outline-offset:2px}
+.v-ocultos{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px;border-radius:22px;outline:1.5px dashed var(--v-borde);outline-offset:-1.5px}
+.v-ocultos .v-chip{cursor:pointer;color:var(--tinta)}
+.v-ocultos .v-chip:hover{background:rgba(255,255,255,.12)}
+
 /* ── Píldoras de frentes ────────────────────────────────────────────── */
 .v-pildoras{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;border-radius:99px;
   background:rgba(10,11,32,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:inset 0 0 0 1px var(--v-borde),0 20px 40px -20px #000;max-width:calc(100% - 24px);overflow-x:auto;scrollbar-width:none;z-index:5}
@@ -153,4 +185,5 @@ a.v-t:focus-visible{outline:2px solid #fff;outline-offset:2px}
 @keyframes v-entrar{from{opacity:.001;transform:translateY(14px) scale(.98)}}
 @keyframes v-arco{to{stroke-dashoffset:var(--fin)}}
 @keyframes v-girar{to{transform:rotate(360deg)}}
+@keyframes v-temblar{from{transform:rotate(-.35deg)}to{transform:rotate(.35deg)}}
 @keyframes v-onda{0%,100%{height:6px}50%{height:24px}}

@@ -67,3 +67,40 @@ test('ocultar una sección en Ajustes la quita del riel', async ({ page }, info)
   await page.reload()
   await expect(riel.getByRole('link', { name: 'Notas' })).toBeVisible()
 })
+
+test('Personalizar: arrastrar, ocultar y guardar el acomodo de Hoy', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'cambia la vista guardada: basta con un proyecto')
+  test.slow()
+  await page.goto('/hoy', { waitUntil: 'networkidle' })
+  const ids = () => page.locator('.v-bento > *').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))
+
+  await page.getByRole('button', { name: '✎ Personalizar' }).click()
+  // Arrastrar Klo encima de «Tu día» lo pone primero.
+  const klo = page.getByRole('button', { name: 'Mover Klo' })
+  const medidor = page.getByRole('button', { name: 'Mover Tu día' })
+  const a = (await klo.boundingBox())!
+  const b = (await medidor.boundingBox())!
+  await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(a.x + a.width / 2 - 20, a.y + a.height / 2, { steps: 4 })
+  await page.mouse.move(b.x + b.width / 4, b.y + b.height / 4, { steps: 12 })
+  await page.mouse.up()
+  await page.getByRole('button', { name: 'Ocultar En riesgo' }).click()
+  await expect(page.getByRole('button', { name: '＋ En riesgo' })).toBeVisible()
+  await page.screenshot({ path: `test-results/capturas/personalizar-${info.project.name}.png`, fullPage: true })
+  await page.getByRole('button', { name: 'Listo' }).click()
+  await expect(page.getByRole('button', { name: '✎ Personalizar' })).toBeVisible()
+
+  await page.reload({ waitUntil: 'networkidle' })
+  const orden = await ids()
+  expect(orden[0]).toBe('Klo')
+  expect(orden).not.toContain('En riesgo')
+
+  // Deja la cuenta como estaba.
+  await page.getByRole('button', { name: '✎ Personalizar' }).click()
+  await page.getByRole('button', { name: 'Restablecer' }).click()
+  await page.getByRole('button', { name: 'Listo' }).click()
+  await expect(page.getByRole('button', { name: '✎ Personalizar' })).toBeVisible()
+  await page.reload({ waitUntil: 'networkidle' })
+  expect((await ids())[0]).toBe('Tu día')
+})

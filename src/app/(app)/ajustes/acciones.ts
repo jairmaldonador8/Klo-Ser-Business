@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { esColor } from '@/lib/frentes'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { MOSAICOS, SECCIONES } from '@/lib/vista/registro'
-import { esquemaVista, resolverLista } from '@/lib/vista/resolver'
+import { esquemaVista, leerVista, resolverLista } from '@/lib/vista/resolver'
 
 export type Resultado = { ok: true } | { ok: false; mensaje: string }
 
@@ -28,6 +28,15 @@ export async function guardarVista(vista: unknown): Promise<Resultado> {
   }
   revalidatePath('/', 'layout')
   return { ok: true }
+}
+
+/** Lo que deja el modo Personalizar de Hoy: solo cambia los mosaicos y respeta las secciones. */
+export async function guardarMosaicos(mosaicos: unknown): Promise<Resultado> {
+  const supabase = await crearClienteServidor()
+  const { data } = await supabase.auth.getClaims()
+  if (!data?.claims) return { ok: false, mensaje: 'Tu sesión terminó; vuelve a entrar.' }
+  const { data: perfil } = await supabase.from('perfiles').select('vista').eq('user_id', data.claims.sub).single()
+  return guardarVista({ ...leerVista(perfil?.vista), mosaicos_hoy: mosaicos })
 }
 
 export async function guardarFrente(id: string, cambios: { nombre?: string; color?: string }): Promise<Resultado> {

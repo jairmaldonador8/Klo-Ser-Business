@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { MOSAICOS, SECCIONES } from './registro'
-import { leerVista, mover, resolverLista, resolverVista } from './resolver'
+import { acomodarMosaicos, leerVista, mover, resolverLista, resolverVista } from './resolver'
 
 const REGISTRO = [
   { id: 'a', obligatorio: true },
@@ -93,5 +93,24 @@ describe('mover', () => {
   it('en las orillas no hace nada', () => {
     expect(mover(lista, 'a', -1)).toEqual(lista)
     expect(mover(lista, 'c', 1)).toEqual(lista)
+  })
+})
+
+describe('acomodarMosaicos', () => {
+  it('los visibles quedan en el orden arrastrado y los ocultos al final', () => {
+    expect(acomodarMosaicos(['d', 'a', 'b'], ['c'])).toEqual([
+      { id: 'd', visible: true },
+      { id: 'a', visible: true },
+      { id: 'b', visible: true },
+      { id: 'c', visible: false },
+    ])
+  })
+  it('ocultar uno lo manda al final como oculto', () => {
+    expect(acomodarMosaicos(['a', 'd'], ['b', 'c']).map((x) => [x.id, x.visible])).toEqual([
+      ['a', true],
+      ['d', true],
+      ['b', false],
+      ['c', false],
+    ])
   })
 })
