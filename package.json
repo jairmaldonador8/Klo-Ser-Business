@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:db": "supabase test db --linked",
+    "test:db": "node --env-file=.env.local scripts/probar-db.mjs",
     "db:tipos": "supabase gen types typescript --linked > src/lib/supabase/tipos.ts"
   },
   "dependencies": {
@@ -34,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "jsdom": "^29.1.1",
+    "pg": "^8.23.1",
     "supabase": "2.120.0",
     "tailwindcss": "^4",
     "typescript": "^5",
