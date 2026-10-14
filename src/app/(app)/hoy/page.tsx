@@ -83,6 +83,6 @@ export default async function Hoy({ searchParams }: Props) {
     })
   }
 
-  // Se personaliza desde «Todos»: dentro de un frente cambian los mosaicos que aplican.
-  return <EditorHoy items={items} editable={!frente} />
+  // Se personaliza desde «Todos». La key reinicia el editor al abrir un frente: ahí cambian los mosaicos.
+  return <EditorHoy key={frente?.id ?? 'todos'} items={items} editable={!frente} />
 }

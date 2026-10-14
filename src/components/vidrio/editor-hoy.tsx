@@ -112,14 +112,14 @@ export function EditorHoy({ items, editable }: Props) {
           <SortableContext items={visibles} strategy={rectSortingStrategy}>
             <div className="v-bento">
               {visibles.map((id) => {
-                const x = porId.get(id)!
-                return <Arrastrable key={id} item={x} onOcultar={() => ocultar(id)} />
+                const x = porId.get(id)
+                return x && <Arrastrable key={id} item={x} onOcultar={() => ocultar(id)} />
               })}
             </div>
           </SortableContext>
         </DndContext>
       ) : (
-        <div className="v-bento">{visibles.map((id) => porId.get(id)!.nodo)}</div>
+        <div className="v-bento">{visibles.map((id) => porId.get(id)?.nodo)}</div>
       )}
 
       {editando && ocultos.length > 0 && (
