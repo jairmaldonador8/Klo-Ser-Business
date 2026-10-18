@@ -15,7 +15,8 @@ export default defineConfig({
     { name: 'sesion', testMatch: /sesion\.setup\.ts/, use: { ...devices['Desktop Chrome'] } },
     {
       name: 'telefono',
-      use: { ...devices['iPhone 14'], viewport: { width: 390, height: 844 }, storageState: SESION },
+      // Sin animaciones: WebKit en Windows las pinta lento y la prueba mide el reloj, no la app.
+      use: { ...devices['iPhone 14'], viewport: { width: 390, height: 844 }, storageState: SESION, contextOptions: { reducedMotion: 'reduce' } },
       dependencies: ['sesion'],
     },
     {
