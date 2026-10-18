@@ -85,7 +85,7 @@ export default async function Hoy({ searchParams }: Props) {
         return (
           <div key={id} className="v-grupo c2" aria-label="Tus frentes">
             {frentes.map((f, n) => (
-              <MosaicoFrente key={f.id} frente={f} ruta="/hoy" resumen={resumen.get(f.id)} i={i + n} />
+              <MosaicoFrente key={f.id} frente={f} ruta="/hoy" resumen={resumen.get(f.id)} proyectos={proyectos.filter((p) => p.espacio_id === f.id).length} i={i + n} />
             ))}
           </div>
         )

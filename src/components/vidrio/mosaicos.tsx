@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ProyectoLista } from '@/lib/datos'
 import type { FrenteVista } from '@/lib/frentes'
+import type { ResumenFrente } from '@/lib/hoy/calcular'
 import { avance, porcentaje, textoFaltan } from '@/lib/proyectos/avance'
 import { conFrente } from '@/lib/rutas'
 
@@ -105,19 +106,25 @@ export function MosaicoKlo({ frase, i }: { frase: string; i: number }) {
   )
 }
 
-type Resumen = { hoy: number; riesgo: number }
+const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`
 
-export function MosaicoFrente({ frente, ruta, resumen, i }: { frente: FrenteVista; ruta: string; resumen?: Resumen; i: number }) {
-  const { hoy, riesgo } = resumen ?? { hoy: 0, riesgo: 0 }
+type Frente = { frente: FrenteVista; ruta: string; resumen?: ResumenFrente; proyectos?: number; i: number }
+
+/** Cómo va el frente: lo de hoy y lo pendiente, y abajo lo vencido o en riesgo y sus proyectos. */
+export function MosaicoFrente({ frente, ruta, resumen, proyectos = 0, i }: Frente) {
+  const { hoy, riesgo, pendientes, vencidas } = resumen ?? { hoy: 0, riesgo: 0, pendientes: 0, vencidas: 0 }
+  const estado = vencidas ? plural(vencidas, 'vencida', 'vencidas') : riesgo ? `${riesgo} en riesgo` : 'Al día'
   return (
     <Link href={conFrente(ruta, frente.atajo)} className={`v-t v-color-${frente.color}`} style={retraso(i)}>
       <div style={{ minWidth: 0 }}>
         <h3>{frente.nombre}</h3>
-        <div className="v-sub">abrir frente →</div>
+        <div className="v-sub">
+          {estado} · {plural(proyectos, 'proyecto activo', 'proyectos activos')}
+        </div>
       </div>
       <div className="v-pila" style={{ marginTop: 'auto' }}>
         <span>
-          {hoy} hoy · {riesgo ? `${riesgo} en riesgo` : 'Al día'}
+          {hoy} hoy · {plural(pendientes, 'pendiente', 'pendientes')}
         </span>
       </div>
       <span className="v-ilus" aria-hidden>

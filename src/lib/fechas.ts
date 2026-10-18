@@ -29,4 +29,12 @@ export function etiquetaDia(fecha: string, hoy: string): string {
   return n > 0 ? `en ${n} días` : `hace ${-n} días`
 }
 
+/** «martes 20 de oct»: para encabezar un día de la agenda. */
+export function nombreDia(fecha: string): string {
+  return new Intl.DateTimeFormat('es-MX', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'short' })
+    .format(new Date(`${fecha}T12:00:00Z`))
+    .replace(/,/g, '')
+    .replace(/\.$/, '')
+}
+
 export { diferencia as diasEntre }

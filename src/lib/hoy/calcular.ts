@@ -27,10 +27,19 @@ export function enRiesgo(tareas: readonly Tarea[], hoy: string): Tarea[] {
   return tareas.filter((x) => x.clase === 'entrega' && !x.completada_en && x.fecha && x.fecha <= limite).sort(porFechaYHora)
 }
 
-export function resumenPorFrente(tareas: readonly Tarea[], ctx: Contexto): Map<string, { hoy: number; riesgo: number }> {
-  const mapa = new Map<string, { hoy: number; riesgo: number }>()
-  const fila = (id: string) => mapa.get(id) ?? (mapa.set(id, { hoy: 0, riesgo: 0 }), mapa.get(id)!)
-  for (const x of tareas) if (!x.completada_en && cuenta(x, ctx.hoy)) fila(x.espacio_id).hoy++
+export type ResumenFrente = { hoy: number; riesgo: number; pendientes: number; vencidas: number }
+
+/** Cómo va cada frente: lo de hoy, lo que está en riesgo, todo lo pendiente (sin juntas) y lo vencido. */
+export function resumenPorFrente(tareas: readonly Tarea[], ctx: Contexto): Map<string, ResumenFrente> {
+  const mapa = new Map<string, ResumenFrente>()
+  const fila = (id: string) => mapa.get(id) ?? (mapa.set(id, { hoy: 0, riesgo: 0, pendientes: 0, vencidas: 0 }), mapa.get(id)!)
+  for (const x of tareas) {
+    if (x.completada_en || x.clase === 'junta') continue
+    const f = fila(x.espacio_id)
+    f.pendientes++
+    if (cuenta(x, ctx.hoy)) f.hoy++
+    if (x.fecha && x.fecha < ctx.hoy) f.vencidas++
+  }
   for (const x of enRiesgo(tareas, ctx.hoy)) fila(x.espacio_id).riesgo++
   return mapa
 }

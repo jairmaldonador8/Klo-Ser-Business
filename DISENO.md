@@ -261,3 +261,9 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Brasa de alta calidad: degradado interpolado en oklch, brillo de vidrio arriba y hondura abajo. Sin resplandor hacia el fondo: solo sombra oscura, como en la referencia. Número del medidor gigante y fino (Urbanist 200).
 - Grises: brillo de esquina superior izquierda, interpolado en oklch, sombra profunda; esquinas 24 px.
 - Frentes: su color entra suave desde la izquierda; la «M» a la derecha.
+
+## 16. Semana = agenda de pendientes (2026-10-18)
+
+- Semana muestra tus pendientes por fecha (`lib/semana/agrupar.ts`): Vencidas (si hay), los 7 días desde hoy (siempre, aunque estén libres; hoy y mañana marcados), Más adelante y Sin fecha. Respeta el frente abierto (`?frente=`).
+- En teléfono, un día por renglón.
+- Los frentes en Hoy dicen cómo van: «N hoy · N pendientes» y «vencidas / en riesgo / Al día · N proyectos activos».

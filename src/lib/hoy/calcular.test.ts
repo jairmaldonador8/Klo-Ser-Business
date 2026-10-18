@@ -46,7 +46,21 @@ describe('enRiesgo', () => {
 describe('resumenPorFrente', () => {
   it('da pendientes de hoy y en riesgo por frente', () => {
     const r = resumenPorFrente([t({ espacio_id: 'a' }), t({ espacio_id: 'b', clase: 'entrega', fecha: '2026-10-19' }), t({ espacio_id: 'b' })], ctx)
-    expect(r.get('a')).toEqual({ hoy: 1, riesgo: 0 })
-    expect(r.get('b')).toEqual({ hoy: 1, riesgo: 1 })
+    expect(r.get('a')).toEqual({ hoy: 1, riesgo: 0, pendientes: 1, vencidas: 0 })
+    expect(r.get('b')).toEqual({ hoy: 1, riesgo: 1, pendientes: 2, vencidas: 0 })
+  })
+
+  it('cuenta todo lo pendiente y lo vencido, sin juntas ni hechas', () => {
+    const r = resumenPorFrente(
+      [
+        t({ fecha: '2026-10-16' }),
+        t({ fecha: '2026-10-25' }),
+        t({ fecha: null }),
+        t({ clase: 'junta', hora: '12:00' }),
+        t({ completada_en: '2026-10-18T15:00:00Z' }),
+      ],
+      ctx,
+    )
+    expect(r.get('a')).toEqual({ hoy: 1, riesgo: 0, pendientes: 3, vencidas: 1 })
   })
 })

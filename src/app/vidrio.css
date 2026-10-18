@@ -626,5 +626,8 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
   .v-editorial > [aria-label="Agenda de hoy"]{grid-column:span 7}
   .v-editorial > [aria-label="Proyectos"]{grid-column:span 5}
 }
+
+/* Agenda (Semana): en teléfono, un día por renglón. */
+@media (max-width:700px){.v-agenda > section{grid-column:span 2}}
 }
 

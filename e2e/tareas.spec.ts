@@ -36,3 +36,28 @@ test('capturar una tarea y palomearla', async ({ page }, info) => {
   await expect(editar).toBeHidden()
   await expect(page.getByText(titulo)).toHaveCount(0)
 })
+
+test('una tarea para mañana aparece en Semana, en su día', async ({ page }, info) => {
+  test.slow()
+  const titulo = `Semana ${info.project.name} ${Date.now()}`
+  await page.goto('/semana', { waitUntil: 'networkidle' })
+
+  await page.getByRole('button', { name: 'Nuevo' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Nueva tarea' })
+  await hoja.getByLabel('Título').fill(titulo)
+  await expect(hoja).toBeVisible()
+  await hoja.getByRole('button', { name: 'Mañana', exact: true }).click()
+  await hoja.getByRole('button', { name: 'Guardar' }).click()
+  await expect(hoja).toBeHidden()
+
+  // El mosaico de mañana es el segundo día de la agenda; su chip dice «mañana · N».
+  const manana = page.locator('.v-agenda > section').filter({ has: page.locator('.v-chip', { hasText: 'mañana' }) })
+  const texto = manana.getByRole('button', { name: titulo, exact: false }).filter({ hasText: titulo })
+  await expect(texto).toBeVisible()
+
+  await texto.click()
+  const editar = page.getByRole('dialog', { name: 'Editar tarea' })
+  await editar.getByRole('button', { name: 'Borrar' }).click()
+  await expect(editar).toBeHidden()
+  await expect(page.getByText(titulo)).toHaveCount(0)
+})
