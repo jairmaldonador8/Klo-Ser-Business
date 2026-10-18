@@ -36,6 +36,8 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
         <i />
         <i />
         <i />
+        <i />
+        <i />
       </div>
       {/* La hoja de edición se abre desde cualquier parte (el +, un renglón, una nota). */}
       <HojaProvider frentes={frentes} proyectos={proyectos ?? []} hoy={fechaEn(ahora, zona)}>

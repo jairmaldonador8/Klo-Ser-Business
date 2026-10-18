@@ -457,5 +457,33 @@ a.v-t[class*=v-color-]:hover::after{opacity:1}
 a.v-t[class*=v-color-] .v-ilus{opacity:1;font-weight:700;color:transparent;
   background:linear-gradient(180deg,color-mix(in srgb,var(--c) 38%,transparent),transparent 80%);-webkit-background-clip:text;background-clip:text}
 a.v-t[class*=v-color-] :is(.v-chip,.v-pila){background:rgba(255,255,255,.045);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+
+/* ── Brasa viva (DISENO §12) ────────────────────────────────────────────
+   Mucho naranja, como células: las de la orilla respiran (se estiran y giran
+   sin prisa) y en el centro nacen otras de tono parecido que crecen y se
+   desvanecen. Solo transform y opacity: lo mueve la GPU sin repintar. */
+.v-auras i:nth-child(1){background:radial-gradient(closest-side,rgba(255,106,42,0.55) 0%,rgba(255,106,42,0.473) 12%,rgba(255,106,42,0.374) 24%,rgba(255,106,42,0.275) 35%,rgba(255,106,42,0.1925) 45%,rgba(255,106,42,0.132) 54%,rgba(255,106,42,0.0825) 63%,rgba(255,106,42,0.0495) 71%,rgba(255,106,42,0.0275) 79%,rgba(255,106,42,0.0121) 86%,rgba(255,106,42,0.0039) 93%,rgba(255,106,42,0.0) 100%);animation:v-celula 46s ease-in-out infinite alternate}
+.v-auras i:nth-child(2){background:radial-gradient(closest-side,rgba(255,80,30,0.7) 0%,rgba(255,80,30,0.602) 12%,rgba(255,80,30,0.476) 24%,rgba(255,80,30,0.35) 35%,rgba(255,80,30,0.245) 45%,rgba(255,80,30,0.168) 54%,rgba(255,80,30,0.105) 63%,rgba(255,80,30,0.063) 71%,rgba(255,80,30,0.035) 79%,rgba(255,80,30,0.0154) 86%,rgba(255,80,30,0.0049) 93%,rgba(255,80,30,0.0) 100%);animation:v-celula 54s ease-in-out -20s infinite alternate-reverse}
+.v-auras i:nth-child(3){background:radial-gradient(closest-side,rgba(230,70,30,0.5) 0%,rgba(230,70,30,0.43) 12%,rgba(230,70,30,0.34) 24%,rgba(230,70,30,0.25) 35%,rgba(230,70,30,0.175) 45%,rgba(230,70,30,0.12) 54%,rgba(230,70,30,0.075) 63%,rgba(230,70,30,0.045) 71%,rgba(230,70,30,0.025) 79%,rgba(230,70,30,0.011) 86%,rgba(230,70,30,0.0035) 93%,rgba(230,70,30,0.0) 100%);animation:v-celula 62s ease-in-out -35s infinite alternate}
+.v-auras i:nth-child(4){background:radial-gradient(closest-side,rgba(255,150,90,0.3) 0%,rgba(255,150,90,0.258) 12%,rgba(255,150,90,0.204) 24%,rgba(255,150,90,0.15) 35%,rgba(255,150,90,0.105) 45%,rgba(255,150,90,0.072) 54%,rgba(255,150,90,0.045) 63%,rgba(255,150,90,0.027) 71%,rgba(255,150,90,0.015) 79%,rgba(255,150,90,0.0066) 86%,rgba(255,150,90,0.0021) 93%,rgba(255,150,90,0.0) 100%);animation:v-celula 70s ease-in-out -50s infinite alternate-reverse}
+.v-auras i:nth-child(5),.v-auras i:nth-child(6){width:min(900px,85vmax);height:min(900px,85vmax);left:calc(50% - min(450px,42.5vmax));top:calc(50% - min(450px,42.5vmax));right:auto;bottom:auto;opacity:.6}
+.v-auras i:nth-child(5){background:radial-gradient(closest-side,rgba(255,122,51,0.5) 0%,rgba(255,122,51,0.43) 12%,rgba(255,122,51,0.34) 24%,rgba(255,122,51,0.25) 35%,rgba(255,122,51,0.175) 45%,rgba(255,122,51,0.12) 54%,rgba(255,122,51,0.075) 63%,rgba(255,122,51,0.045) 71%,rgba(255,122,51,0.025) 79%,rgba(255,122,51,0.011) 86%,rgba(255,122,51,0.0035) 93%,rgba(255,122,51,0.0) 100%);animation:v-nace 26s ease-in-out infinite}
+.v-auras i:nth-child(6){background:radial-gradient(closest-side,rgba(255,84,38,0.42) 0%,rgba(255,84,38,0.3612) 12%,rgba(255,84,38,0.2856) 24%,rgba(255,84,38,0.21) 35%,rgba(255,84,38,0.147) 45%,rgba(255,84,38,0.1008) 54%,rgba(255,84,38,0.063) 63%,rgba(255,84,38,0.0378) 71%,rgba(255,84,38,0.021) 79%,rgba(255,84,38,0.0092) 86%,rgba(255,84,38,0.0029) 93%,rgba(255,84,38,0.0) 100%);animation:v-nace 26s ease-in-out -13s infinite;margin:8vh 0 0 -6vw}
+@keyframes v-celula{
+  0%{transform:translate3d(0,0,0) scale(1,1) rotate(0)}
+  33%{transform:translate3d(5vw,3vh,0) scale(1.14,.9) rotate(25deg)}
+  66%{transform:translate3d(-3vw,7vh,0) scale(.92,1.1) rotate(-15deg)}
+  100%{transform:translate3d(4vw,-4vh,0) scale(1.06,.96) rotate(35deg)}}
+@keyframes v-nace{
+  0%{transform:scale(.35) rotate(0);opacity:0}
+  35%{opacity:.85}
+  65%{transform:scale(1.1,.94) rotate(50deg);opacity:.7}
+  100%{transform:scale(1.35,1.2) rotate(90deg);opacity:0}}
+
+/* Cuadros solo negros: el color vive en el fondo, no dentro de las secciones.
+   Los frentes conservan su filo de color y la inicial. */
+:root{--v-panel:#000}
+.v-t::before{display:none}
+.v-t.r2,a.v-t[class*=v-color-],.v-t.punteada{background:#000}
 }
 

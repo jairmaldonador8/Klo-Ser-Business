@@ -233,3 +233,5 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Klo sigue azul #1c36ee: es la mascota, no el acento.
 - Fondo con 4 luces (cobre, brasa, óxido, durazno) más intensas; los paneles son un poco translúcidos para que la luz se asome.
 - Frentes: sin raya de color. Su color vive en una luz suave desde la esquina superior izquierda, un filo de 1 px degradado que se funde en gris y la inicial como marca de agua que se desvanece. Tonos afinados: azul #6b80ff, violeta #a487ff, rosa #ff7d95, sol #f2b45a.
+- **Brasa viva:** fondo con 6 luces naranjas. Las 4 de la orilla respiran como células (se estiran, giran y se mueven en 46–70 s). En el centro nacen 2 de tono parecido que crecen y se desvanecen cada 26 s, desfasadas. Solo transform y opacity.
+- **Cuadros solo negros** (#000): sin luces por dentro; el color vive en el fondo. Los frentes conservan su filo de color y la inicial.
