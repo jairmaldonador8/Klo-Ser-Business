@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Icono } from '@/components/armazon/iconos'
+import { useHoja } from '@/components/hoja/hoja-provider'
 import { frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { conFrente } from '@/lib/rutas'
 
@@ -10,6 +11,7 @@ import { conFrente } from '@/lib/rutas'
 export function Pildoras({ frentes }: { frentes: FrenteVista[] }) {
   const ruta = usePathname()
   const abierto = frenteAbierto(frentes, useSearchParams().get('frente'))
+  const abrir = useHoja()
 
   return (
     <nav className="v-pildoras" aria-label="Frentes">
@@ -26,8 +28,8 @@ export function Pildoras({ frentes }: { frentes: FrenteVista[] }) {
           ))}
         </>
       )}
-      {/* El + abre la captura de Klo (Parte 3) o la hoja a mano (Parte 2). */}
-      <button type="button" className="mas" aria-label="Nuevo" disabled>
+      {/* El + abre la hoja a mano; con Klo (Parte 3) abrirá la captura. */}
+      <button type="button" className="mas" aria-label="Nuevo" onClick={() => abrir({ valores: abierto ? { espacio_id: abierto.id } : {} })}>
         <Icono nombre="mas" />
       </button>
     </nav>

@@ -1,0 +1,208 @@
+'use client'
+
+import { useEffect, useRef, useState, useTransition } from 'react'
+import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
+import { fechaEn, sumarDias } from '@/lib/fechas'
+import type { FrenteVista } from '@/lib/frentes'
+import { CLASES, NOMBRE_CLASE, hhmm, type Clase } from '@/lib/tareas/esquema'
+import type { Apertura, ProyectoOpcion } from './hoja-provider'
+
+type Formulario = {
+  titulo: string
+  clase: Clase
+  espacio_id: string
+  fecha: string
+  hora: string
+  hora_fin: string
+  proyecto_id: string
+}
+
+/** Hoy en la zona del navegador. */
+const hoyAqui = () => fechaEn(new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone)
+
+function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[]): Formulario {
+  const base = tarea ?? valores
+  const espacio = base.espacio_id && frentes.some((f) => f.id === base.espacio_id) ? base.espacio_id : (frentes[0]?.id ?? '')
+  return {
+    titulo: base.titulo ?? '',
+    clase: base.clase ?? 'tarea',
+    espacio_id: espacio,
+    // En una nueva, la fecha por defecto es hoy; «Sin fecha» la quita.
+    fecha: tarea ? (tarea.fecha ?? '') : valores.fecha === undefined ? hoyAqui() : (valores.fecha ?? ''),
+    hora: hhmm(base.hora ?? null) ?? '',
+    hora_fin: hhmm(base.hora_fin ?? null) ?? '',
+    proyecto_id: base.proyecto_id ?? '',
+  }
+}
+
+export function HojaTarea({
+  apertura,
+  frentes,
+  proyectos,
+  cerrar,
+}: {
+  apertura: Apertura
+  frentes: FrenteVista[]
+  proyectos: ProyectoOpcion[]
+  cerrar: () => void
+}) {
+  const { tarea, notaId } = apertura
+  const dialogo = useRef<HTMLDialogElement>(null)
+  const [form, setForm] = useState(() => inicial(apertura, frentes))
+  const [aviso, setAviso] = useState('')
+  const [ocupada, empezar] = useTransition()
+  const hoy = hoyAqui()
+  const manana = sumarDias(hoy, 1)
+  const delFrente = proyectos.filter((p) => p.espacio_id === form.espacio_id)
+
+  useEffect(() => {
+    const d = dialogo.current
+    if (d && !d.open) d.showModal()
+  }, [])
+
+  const poner = <K extends keyof Formulario>(campo: K, valor: Formulario[K]) => setForm((f) => ({ ...f, [campo]: valor }))
+
+  function correr(accion: () => Promise<Resultado>) {
+    setAviso('')
+    empezar(async () => {
+      const r = await accion()
+      if (r.ok) cerrar()
+      else setAviso(r.mensaje)
+    })
+  }
+
+  const guardar = () => correr(() => guardarTarea({ ...form, id: tarea?.id ?? '' }, notaId))
+
+  return (
+    <dialog
+      ref={dialogo}
+      className="v-hoja"
+      aria-label={tarea ? 'Editar tarea' : 'Nueva tarea'}
+      onClose={cerrar}
+      // Tocar el fondo (fuera del panel) la cierra.
+      onClick={(e) => e.target === e.currentTarget && dialogo.current?.close()}
+    >
+      <form
+        className="cuerpo"
+        onSubmit={(e) => {
+          e.preventDefault()
+          guardar()
+        }}
+      >
+        <h3>{tarea ? 'Tarea' : 'Nueva tarea'}</h3>
+
+        {/* Enter en el título envía el formulario. */}
+        <input
+          className="v-campo"
+          autoFocus
+          maxLength={200}
+          placeholder="¿Qué hay que hacer?"
+          aria-label="Título"
+          value={form.titulo}
+          onChange={(e) => poner('titulo', e.target.value)}
+        />
+
+        <span className="etq">Clase</span>
+        <div className="grupo" aria-label="Clase">
+          {CLASES.map((c) => (
+            <button key={c} type="button" className="v-boton chico" aria-pressed={form.clase === c} onClick={() => poner('clase', c)}>
+              {NOMBRE_CLASE[c]}
+            </button>
+          ))}
+        </div>
+
+        {frentes.length > 1 && (
+          <>
+            <span className="etq">Frente</span>
+            <div className="grupo" role="radiogroup" aria-label="Frente">
+              {frentes.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  role="radio"
+                  className="v-boton chico"
+                  aria-checked={form.espacio_id === f.id}
+                  // Al cambiar de frente se limpia el proyecto: era de otro frente.
+                  onClick={() => setForm((x) => (x.espacio_id === f.id ? x : { ...x, espacio_id: f.id, proyecto_id: '' }))}
+                >
+                  <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 6 }}>
+                    {f.inicial}
+                  </span>
+                  {f.nombre}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        <label className="etq" htmlFor="hoja-fecha">
+          Fecha
+        </label>
+        <div className="grupo">
+          <input id="hoja-fecha" type="date" className="v-campo" value={form.fecha} onChange={(e) => poner('fecha', e.target.value)} />
+          <button type="button" className="v-boton chico" aria-pressed={form.fecha === hoy} onClick={() => poner('fecha', hoy)}>
+            Hoy
+          </button>
+          <button type="button" className="v-boton chico" aria-pressed={form.fecha === manana} onClick={() => poner('fecha', manana)}>
+            Mañana
+          </button>
+          <button
+            type="button"
+            className="v-boton chico"
+            aria-pressed={form.fecha === ''}
+            // Sin fecha no puede haber hora.
+            onClick={() => setForm((x) => ({ ...x, fecha: '', hora: '', hora_fin: '' }))}
+          >
+            Sin fecha
+          </button>
+        </div>
+
+        <span className="etq">Hora</span>
+        <div className="grupo">
+          <input type="time" className="v-campo" aria-label="Hora de inicio" value={form.hora} onChange={(e) => poner('hora', e.target.value)} />
+          <input type="time" className="v-campo" aria-label="Hora de fin" value={form.hora_fin} onChange={(e) => poner('hora_fin', e.target.value)} />
+        </div>
+
+        {delFrente.length > 0 && (
+          <>
+            <label className="etq" htmlFor="hoja-proyecto">
+              Proyecto
+            </label>
+            <select id="hoja-proyecto" className="v-campo" value={form.proyecto_id} onChange={(e) => poner('proyecto_id', e.target.value)}>
+              <option value="">Sin proyecto</option>
+              {delFrente.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nombre}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+
+        <p className="v-aviso" role="status">
+          {aviso}
+        </p>
+
+        <div className="pie">
+          <button type="submit" className="v-boton primario" disabled={ocupada}>
+            {ocupada ? 'Guardando…' : 'Guardar'}
+          </button>
+          {tarea && (
+            <>
+              <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => completarTarea(tarea.id, !tarea.completada_en))}>
+                {tarea.completada_en ? 'Reabrir' : 'Completar'}
+              </button>
+              {/* El toast de Deshacer llega con la Task 7; por ahora borra y cierra. */}
+              <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => borrarTarea(tarea.id))}>
+                Borrar
+              </button>
+            </>
+          )}
+          <button type="button" className="v-boton" onClick={() => dialogo.current?.close()}>
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </dialog>
+  )
+}

@@ -187,3 +187,18 @@ a.v-t:focus-visible{outline:2px solid #fff;outline-offset:2px}
 @keyframes v-girar{to{transform:rotate(360deg)}}
 @keyframes v-temblar{from{transform:rotate(-.35deg)}to{transform:rotate(.35deg)}}
 @keyframes v-onda{0%,100%{height:6px}50%{height:24px}}
+
+/* Hoja de edición: lateral en escritorio, panel inferior en teléfono */
+.v-hoja{margin:0 0 0 auto;height:100dvh;max-height:none;width:min(440px,100vw);max-width:100vw;border:0;padding:0;background:rgba(14,16,40,.98);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);color:var(--tinta);box-shadow:-30px 0 80px -30px rgba(0,0,0,.8);overflow-y:auto}
+.v-hoja[open]{display:flex;flex-direction:column}
+.v-hoja::backdrop{background:rgba(3,4,14,.55)}
+/* El relleno va en el formulario: así un clic en el propio dialog es el fondo. */
+.v-hoja .cuerpo{flex:1;display:flex;flex-direction:column;gap:14px;padding:24px}
+.v-hoja .cuerpo>.v-campo{flex:none}
+.v-hoja .grupo{display:flex;flex-wrap:wrap;gap:6px}
+.v-hoja .grupo .v-campo{flex:1 1 140px;color-scheme:dark}
+.v-hoja select.v-campo{color-scheme:dark}
+.v-hoja .grupo button[aria-pressed=true],.v-hoja .grupo button[aria-checked=true]{background:var(--v-azul)}
+.v-hoja .etq{font-size:12px;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.08em}
+.v-hoja .pie{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:700px){.v-hoja{margin:auto 0 0;width:100vw;height:auto;max-height:88dvh;border-radius:26px 26px 0 0}.v-hoja .cuerpo{padding-bottom:calc(24px + env(safe-area-inset-bottom))}}
