@@ -42,6 +42,6 @@ export async function editarNota(id: string, texto: string): Promise<Resultado> 
 export async function borrarNota(id: string, borrar = true): Promise<Resultado> {
   const supabase = await crearClienteServidor()
   const { error } = await supabase.from('notas').update({ borrado_en: borrar ? new Date().toISOString() : null }).eq('id', id)
-  if (error) return { ok: false, mensaje: 'No pude borrarla, inténtalo otra vez.' }
+  if (error) return { ok: false, mensaje: borrar ? 'No pude borrarla, inténtalo otra vez.' : 'No pude deshacerlo, inténtalo otra vez.' }
   return listo()
 }

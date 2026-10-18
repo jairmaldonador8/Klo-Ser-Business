@@ -53,7 +53,13 @@ export function ControlesProyecto({ id, estado, manual }: { id: string; estado: 
     startTransition(async () => {
       const r = await sumarCifra(id, 1)
       if (!r.ok) return avisar(r.mensaje)
-      avisar('Sumaste 1', () => startTransition(() => void sumarCifra(id, -1)))
+      // Si el Deshacer falla, te lo decimos: antes se perdía en silencio.
+      avisar('Sumaste 1', () =>
+        startTransition(async () => {
+          const d = await sumarCifra(id, -1)
+          if (!d.ok) avisar(d.mensaje)
+        }),
+      )
     })
   }
 
@@ -63,7 +69,12 @@ export function ControlesProyecto({ id, estado, manual }: { id: string; estado: 
       setEstadoVista(nuevo)
       const r = await cambiarEstado(id, nuevo)
       if (!r.ok) return avisar(r.mensaje)
-      avisar(texto, () => startTransition(() => void cambiarEstado(id, antes)))
+      avisar(texto, () =>
+        startTransition(async () => {
+          const d = await cambiarEstado(id, antes)
+          if (!d.ok) avisar(d.mensaje)
+        }),
+      )
     })
   }
 

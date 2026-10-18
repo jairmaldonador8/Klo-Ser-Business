@@ -49,7 +49,13 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
     empezar(async () => {
       const r = await borrarNota(n.id)
       if (!r.ok) return avisar(r.mensaje)
-      avisar('Nota borrada', () => void borrarNota(n.id, false))
+      // Si el Deshacer falla, te lo decimos: antes se perdía en silencio.
+      avisar('Nota borrada', () =>
+        empezar(async () => {
+          const d = await borrarNota(n.id, false)
+          if (!d.ok) avisar(d.mensaje)
+        }),
+      )
     })
   }
 

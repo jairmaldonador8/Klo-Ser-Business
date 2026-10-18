@@ -31,7 +31,14 @@ export function RenglonTarea({ tarea, frente, detalle, vencida, ahora }: Props) 
       const r = await completarTarea(tarea.id, nueva)
       if (!r.ok) avisar(r.mensaje)
       // El renglón puede desaparecer al marcarse (De un toque solo lista pendientes): el Deshacer no depende de él.
-      else if (nueva) avisar('Hecha', () => startTransition(() => void completarTarea(tarea.id, false)))
+      else if (nueva)
+        avisar('Hecha', () =>
+          // Si el Deshacer falla, te lo decimos: antes se perdía en silencio.
+          startTransition(async () => {
+            const d = await completarTarea(tarea.id, false)
+            if (!d.ok) avisar(d.mensaje)
+          }),
+        )
     })
   }
 

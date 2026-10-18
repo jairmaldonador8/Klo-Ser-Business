@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
 import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
@@ -199,7 +199,19 @@ export function HojaTarea({
                 type="button"
                 className="v-boton"
                 disabled={ocupada}
-                onClick={() => correr(() => borrarTarea(tarea.id), () => avisar('Borrada', () => void borrarTarea(tarea.id, false)))}
+                onClick={() =>
+                  correr(
+                    () => borrarTarea(tarea.id),
+                    // La hoja ya se cerró: el Deshacer corre fuera de ella y avisa si falla.
+                    () =>
+                      avisar('Borrada', () =>
+                        startTransition(async () => {
+                          const d = await borrarTarea(tarea.id, false)
+                          if (!d.ok) avisar(d.mensaje)
+                        }),
+                      ),
+                  )
+                }
               >
                 Borrar
               </button>

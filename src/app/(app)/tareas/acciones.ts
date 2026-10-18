@@ -55,7 +55,7 @@ export async function completarTarea(id: string, hecha: boolean): Promise<Result
 export async function borrarTarea(id: string, borrar = true): Promise<Resultado> {
   const supabase = await crearClienteServidor()
   const { error } = await supabase.from('tareas').update({ borrado_en: borrar ? new Date().toISOString() : null }).eq('id', id)
-  if (error) return { ok: false, mensaje: 'No pude borrarla, inténtalo otra vez.' }
+  if (error) return { ok: false, mensaje: borrar ? 'No pude borrarla, inténtalo otra vez.' : 'No pude deshacerlo, inténtalo otra vez.' }
   // Si venía de una nota, la nota regresa a la lista para no perder la idea.
   if (borrar) {
     const { error: errorNota } = await supabase.from('notas').update({ convertida_en_tarea_id: null }).eq('convertida_en_tarea_id', id)
