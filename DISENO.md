@@ -258,6 +258,6 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 
 - Acomodo asimétrico en escritorio (≥1100 px, 12 columnas, `.v-editorial`): «Tu día» héroe 7×3; Klo 5; tus frentes 5×2 como barras apiladas; fila de tres (En riesgo, La meta, De un toque); abajo Agenda 7 y Proyectos 5. En teléfono, una columna con los frentes como barras.
 - Índice editorial 01, 02… en brasa sobre cada título (solo los que tienen título).
-- Brasa de alta calidad: degradado interpolado en oklch, brillo de vidrio arriba, hondura abajo y resplandor naranja que se derrama sobre el negro. Número del medidor gigante y fino (Urbanist 200).
+- Brasa de alta calidad: degradado interpolado en oklch, brillo de vidrio arriba y hondura abajo. Sin resplandor hacia el fondo: solo sombra oscura, como en la referencia. Número del medidor gigante y fino (Urbanist 200).
 - Grises: brillo de esquina superior izquierda, interpolado en oklch, sombra profunda; esquinas 24 px.
 - Frentes: su color entra suave desde la izquierda; la «M» a la derecha.

@@ -579,8 +579,7 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
 
 /* ── Hoy editorial (DISENO §15) ─────────────────────────────────────────
    Brasa de alta calidad: degradado interpolado en oklch (sin escalones),
-   brillo de vidrio arriba, hondura abajo y un resplandor que se derrama sobre
-   el negro. Grises con brillo de esquina. Acomodo asimétrico con índice 01, 02… */
+   brillo de vidrio arriba y hondura abajo; nada se derrama sobre el negro. Grises con brillo de esquina. Acomodo asimétrico con índice 01, 02… */
 .v-t.r2{background:
     linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.04) 18%,transparent 34%),
     radial-gradient(70% 60% at 88% 4%,rgba(255,224,204,.85),rgba(255,224,204,0) 70%),
@@ -588,12 +587,12 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
     radial-gradient(85% 75% at 0% 100%,rgba(110,14,4,.95),rgba(110,14,4,0) 70%),
     linear-gradient(in oklch 160deg,#e8542a 0%,#d63d1a 45%,#b0260f 78%,#7a1608 100%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -60px 90px -50px rgba(60,6,0,.65),
-    0 50px 120px -50px rgba(255,90,42,.55),0 30px 60px -30px rgba(0,0,0,.9)}
+    0 40px 70px -35px rgba(0,0,0,.95),0 12px 24px -12px rgba(0,0,0,.6)}
 .v-t[aria-label="Klo"]{background:
     linear-gradient(180deg,rgba(255,255,255,.08),transparent 30%),
     radial-gradient(80% 120% at 100% 50%,rgba(232,98,48,.85),rgba(232,98,48,0) 70%),
     linear-gradient(in oklch 115deg,#242322 0%,#2c211d 40%,#6e2f19 78%,#b44a24 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 40px 100px -50px rgba(232,98,48,.45),0 30px 60px -30px rgba(0,0,0,.9)}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 40px 70px -35px rgba(0,0,0,.95),0 12px 24px -12px rgba(0,0,0,.6)}
 :root{--v-gris:radial-gradient(120% 90% at 0% 0%,rgba(255,255,255,.055),rgba(255,255,255,0) 55%),linear-gradient(in oklch 165deg,#282726 0%,#1d1c1b 55%,#161514 100%)}
 .v-t,a.v-t[class*=v-color-],.v-t.punteada{box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 40px 70px -35px rgba(0,0,0,.95),0 12px 24px -12px rgba(0,0,0,.6)}
 .v-t{border-radius:24px}
