@@ -7,7 +7,7 @@ export function saludoPorHora(hora: number, nombre?: string | null): string {
 const ZONA_POR_DEFECTO = 'America/Monterrey'
 
 /** Una zona inválida en el perfil no debe tumbar la app: cae a la de fábrica. */
-function zonaValida(zona: string): string {
+export function zonaValida(zona: string): string {
   try {
     new Intl.DateTimeFormat('es-MX', { timeZone: zona })
     return zona
