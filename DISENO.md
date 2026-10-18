@@ -215,3 +215,10 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
   desplazar); barra de arriba sin caja con una línea abajo; metadatos (fecha, chips, etiquetas, ⌘K) y el campo de Klo en
   **JetBrains Mono**, con `›` de terminal en lugar del orbe.
 
+
+## 11. Aura viva (dirección 2026-10-18)
+
+- Luz de color detrás del negro: azul Klo, violeta y brasa (#ff5a2a / durazno #ff9a6b), como vidrio esmerilado. El negro sigue mandando.
+- Fondo: 3 manchas fijas (`.v-auras`) con degradado radial, deriva lenta de 70–90 s. Grano fijo encima (SVG, opacidad .07).
+- Cada mosaico trae su luz (`.v-t::before`), rotando la paleta por posición; «Tu día» lleva brasa sobre azul; los frentes, su color.
+- Barato: nada de `filter:blur` ni `backdrop-filter`; solo se anima `transform`. Pasando del 8.º mosaico la luz queda quieta. Con «reducir movimiento» todo queda fijo.
