@@ -205,6 +205,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 
 - Fondo `#000`, sin auras; superficies `rgba(255,255,255,.035)` con línea `rgba(255,255,255,.08)`.
 - **Una sola familia: Poppins** (Fredoka sale). Neue Montreal se evaluó, pero su licencia comercial es de pago.
-- Klo se para en un **disco claro** (`#f4f4f5`), ya no en el sol amarillo.
+- Klo va **solo sobre el negro**, sin disco ni sol atrás.
+- **Pantalla completa:** la ventana deja de ser caja; la app ocupa todo el ancho (6 columnas desde 1800 px, 4 en escritorio, 2 en tableta y teléfono).
 - El amanecer se reduce a **azul**: medidor, barras y textos destacados van de `#1c36ee` a azul claro o blanco.
 - Los mosaicos de frente son oscuros: su color queda en una línea arriba, la letra grande y el punto de la píldora.

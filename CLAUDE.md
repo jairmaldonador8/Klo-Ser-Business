@@ -17,8 +17,8 @@ Lee primero, en este orden:
 - **Commitear secretos.** `.env*` va en `.gitignore` desde el commit 1. Si aparece una llave en el
   chat, se dice y se pide rotarla.
 - **Tocar la marca.** El wordmark Klo-Ser, el monograma K y Klo (el gallo) no se redibujan, no se
-  recolorean fuera de su paleta, no se deforman. **Klo va SIEMPRE azul `#1c36ee`**; sobre fondo
-  oscuro se para en un disco claro o en el sol amarillo, nunca se pinta de blanco.
+  recolorean fuera de su paleta, no se deforman. **Klo va SIEMPRE azul `#1c36ee`**, nunca se pinta
+  de blanco. En la app (dirección negra, 2026-10-18) va solo sobre el negro, sin disco ni sol atrás.
 - **Mezclar datos de clientes de la agencia en commits, docs o capturas.** Los datos reales viven
   en la base, no en el repo.
 - **Colores de semáforo para estado** (rojo/ámbar/verde). La urgencia se dice con tinta, peso y el
