@@ -6,6 +6,7 @@ import { cablesEntre, type Cable } from '@/lib/vista/cables'
 // Cables entre los mosaicos de su bento (DISENO §14). Va como primer hijo del
 // .v-bento: mide a sus hermanos .v-t y dibuja detrás los cables y encima los puertos.
 // En teléfono (una columna) no se dibuja: no hay espacio entre cuadros.
+// Hoy no se usa (2026-10-18: fondo limpio); queda para cuando haya flujos que conectar.
 export function Conexiones() {
   const ref = useRef<SVGSVGElement>(null)
   const [cables, setCables] = useState<Cable[]>([])
