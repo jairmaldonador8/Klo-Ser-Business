@@ -232,3 +232,21 @@ a.v-t:focus-visible{outline:2px solid #fff;outline-offset:2px}
 textarea.v-campo{resize:vertical;line-height:1.5}
 select.v-campo{color-scheme:dark}
 .v-nota .v-boton,.v-t .v-fila .v-boton{white-space:nowrap}
+
+/* Proyectos: rejilla, alta y detalle */
+a.v-proyecto{color:inherit;transition:background .2s}
+a.v-proyecto:hover{background:rgba(0,0,0,.28)}
+a.v-proyecto:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.v-cifra{font-family:var(--fredoka);font-weight:500;font-size:44px;line-height:1}
+.v-formulario{display:flex;flex-direction:column;gap:10px}
+.v-formulario>.v-campo{flex:none}
+.v-formulario .grupo{display:flex;flex-wrap:wrap;gap:6px}
+.v-formulario .grupo .v-campo{flex:1 1 140px}
+.v-formulario .grupo button[aria-pressed=true],.v-formulario .grupo button[aria-checked=true]{background:var(--v-azul)}
+.v-formulario .etq{font-size:12px;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.08em}
+.v-formulario input[type=date]{color-scheme:dark}
+details.v-t>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.v-t>summary::-webkit-details-marker{display:none}
+details.v-t>summary::after{content:"＋";color:var(--tinta-2)}
+details.v-t[open]>summary::after{content:"－"}
+details.v-t>summary:focus-visible{outline:2px solid var(--violeta);outline-offset:4px;border-radius:8px}

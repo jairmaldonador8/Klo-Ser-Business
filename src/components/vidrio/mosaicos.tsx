@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ProyectoLista } from '@/lib/datos'
 import type { FrenteVista } from '@/lib/frentes'
-import { avance, diasRestantes, porcentaje } from '@/lib/proyectos/avance'
+import { avance, porcentaje, textoFaltan } from '@/lib/proyectos/avance'
 import { conFrente } from '@/lib/rutas'
 
 const retraso = (i: number) => ({ animationDelay: `${i * 55}ms` })
@@ -161,14 +161,6 @@ export function MosaicoLista({ titulo, vacio, ancho = 1, chip, mas = 0, i, child
   )
 }
 
-function faltan(fechaMeta: string | null, hoy: string): string {
-  const n = diasRestantes(fechaMeta, hoy)
-  if (n === null) return 'sin fecha meta'
-  if (n === 0) return 'la meta es hoy'
-  if (n === 1) return 'falta 1 día'
-  return n > 0 ? `faltan ${n} días` : `meta vencida hace ${-n} ${n === -1 ? 'día' : 'días'}`
-}
-
 type Proyectos = { proyectos: ProyectoLista[]; hoy: string; frente?: FrenteVista | null; i: number }
 
 /** Los proyectos activos más cerca de su meta, con su barra de avance. */
@@ -189,7 +181,8 @@ export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
           {proyectos.map((p) => {
             const x = avance(p, p)
             return (
-              <li key={p.id} className="v-proyecto">
+              <li key={p.id}>
+                <Link href={conFrente('/proyectos/' + p.id, frente?.atajo)} className="v-proyecto">
                 <div className="v-fila">
                   <b>{p.nombre}</b>
                   <span className="v-sub">{porcentaje(x)}</span>
@@ -197,7 +190,8 @@ export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
                 <div className="v-barra-avance" role="progressbar" aria-label={`Avance de ${p.nombre}`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
                   <i style={{ width: `${x * 100}%` }} />
                 </div>
-                <small className="v-sub">{faltan(p.fecha_meta, hoy)}</small>
+                <small className="v-sub">{textoFaltan(p.fecha_meta, hoy)}</small>
+                </Link>
               </li>
             )
           })}
