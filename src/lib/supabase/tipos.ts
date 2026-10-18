@@ -104,6 +104,54 @@ export type Database = {
           },
         ]
       }
+      notas: {
+        Row: {
+          actualizado_en: string
+          borrado_en: string | null
+          convertida_en_tarea_id: string | null
+          creado_en: string
+          creado_por: string
+          espacio_id: string
+          id: string
+          texto: string
+        }
+        Insert: {
+          actualizado_en?: string
+          borrado_en?: string | null
+          convertida_en_tarea_id?: string | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id: string
+          id?: string
+          texto: string
+        }
+        Update: {
+          actualizado_en?: string
+          borrado_en?: string | null
+          convertida_en_tarea_id?: string | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id?: string
+          id?: string
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notas_convertida_en_tarea_id_fkey"
+            columns: ["convertida_en_tarea_id"]
+            isOneToOne: false
+            referencedRelation: "tareas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notas_espacio_id_fkey"
+            columns: ["espacio_id"]
+            isOneToOne: false
+            referencedRelation: "espacios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfiles: {
         Row: {
           actualizado_en: string
@@ -138,6 +186,134 @@ export type Database = {
             columns: ["espacio_predeterminado_id"]
             isOneToOne: false
             referencedRelation: "espacios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proyectos: {
+        Row: {
+          actualizado_en: string
+          cifra_actual: number
+          cifra_meta: number | null
+          creado_en: string
+          creado_por: string
+          espacio_id: string
+          estado: string
+          fecha_inicio: string
+          fecha_meta: string | null
+          id: string
+          meta: string
+          modo_avance: string
+          nombre: string
+          orden: number
+        }
+        Insert: {
+          actualizado_en?: string
+          cifra_actual?: number
+          cifra_meta?: number | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id: string
+          estado?: string
+          fecha_inicio?: string
+          fecha_meta?: string | null
+          id?: string
+          meta?: string
+          modo_avance?: string
+          nombre: string
+          orden?: number
+        }
+        Update: {
+          actualizado_en?: string
+          cifra_actual?: number
+          cifra_meta?: number | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id?: string
+          estado?: string
+          fecha_inicio?: string
+          fecha_meta?: string | null
+          id?: string
+          meta?: string
+          modo_avance?: string
+          nombre?: string
+          orden?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proyectos_espacio_id_fkey"
+            columns: ["espacio_id"]
+            isOneToOne: false
+            referencedRelation: "espacios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tareas: {
+        Row: {
+          actualizado_en: string
+          borrado_en: string | null
+          clase: string
+          completada_en: string | null
+          creado_en: string
+          creado_por: string
+          espacio_id: string
+          fecha: string | null
+          hora: string | null
+          hora_fin: string | null
+          id: string
+          origen: string
+          proyecto_id: string | null
+          responsable_id: string
+          titulo: string
+        }
+        Insert: {
+          actualizado_en?: string
+          borrado_en?: string | null
+          clase?: string
+          completada_en?: string | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id: string
+          fecha?: string | null
+          hora?: string | null
+          hora_fin?: string | null
+          id?: string
+          origen?: string
+          proyecto_id?: string | null
+          responsable_id?: string
+          titulo: string
+        }
+        Update: {
+          actualizado_en?: string
+          borrado_en?: string | null
+          clase?: string
+          completada_en?: string | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id?: string
+          fecha?: string | null
+          hora?: string | null
+          hora_fin?: string | null
+          id?: string
+          origen?: string
+          proyecto_id?: string | null
+          responsable_id?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tareas_espacio_id_fkey"
+            columns: ["espacio_id"]
+            isOneToOne: false
+            referencedRelation: "espacios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tareas_proyecto_id_fkey"
+            columns: ["proyecto_id"]
+            isOneToOne: false
+            referencedRelation: "proyectos"
             referencedColumns: ["id"]
           },
         ]
