@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { ProyectoLista } from '@/lib/datos'
 import type { FrenteVista } from '@/lib/frentes'
+import { avance, diasRestantes, porcentaje } from '@/lib/proyectos/avance'
 import { conFrente } from '@/lib/rutas'
 
 const retraso = (i: number) => ({ animationDelay: `${i * 55}ms` })
@@ -72,8 +74,12 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
           <>
             Lo siguiente: <b style={{ color: 'var(--tinta)', fontWeight: 500 }}>{siguiente}</b>
           </>
+        ) : total === 0 ? (
+          'Nada pendiente hoy. Captura con el +.'
+        ) : pendientes === 0 ? (
+          '¡Todo listo por hoy!'
         ) : (
-          'Aún no hay tareas. Muy pronto las capturas con el +.'
+          `Te quedan ${pendientes} por hacer hoy.`
         )}
       </p>
     </section>
@@ -101,7 +107,10 @@ export function MosaicoKlo({ frase, i }: { frase: string; i: number }) {
   )
 }
 
-export function MosaicoFrente({ frente, ruta, i }: { frente: FrenteVista; ruta: string; i: number }) {
+type Resumen = { hoy: number; riesgo: number }
+
+export function MosaicoFrente({ frente, ruta, resumen, i }: { frente: FrenteVista; ruta: string; resumen?: Resumen; i: number }) {
+  const { hoy, riesgo } = resumen ?? { hoy: 0, riesgo: 0 }
   return (
     <Link href={conFrente(ruta, frente.atajo)} className={`v-t v-color-${frente.color}`} style={retraso(i)}>
       <div style={{ minWidth: 0 }}>
@@ -109,7 +118,9 @@ export function MosaicoFrente({ frente, ruta, i }: { frente: FrenteVista; ruta: 
         <div className="v-sub">abrir frente →</div>
       </div>
       <div className="v-pila" style={{ marginTop: 'auto' }}>
-        <span>0 hoy · Al día</span>
+        <span>
+          {hoy} hoy · {riesgo ? `${riesgo} en riesgo` : 'Al día'}
+        </span>
       </div>
       <span className="v-ilus" aria-hidden>
         {frente.inicial}
@@ -129,6 +140,76 @@ export function MosaicoSimple({ titulo, vacio, ancho = 1, punteada, chip, i }: S
         {chip && <span className="v-chip">{chip}</span>}
       </div>
       <p className="v-sub">{vacio}</p>
+    </section>
+  )
+}
+
+type Lista = { titulo: string; vacio: string; ancho?: 1 | 2; chip?: string; mas?: number; i: number; children?: React.ReactNode[] }
+
+/** Mosaico con renglones (la página ya los cortó a 6; `mas` dice cuántos quedaron fuera). */
+export function MosaicoLista({ titulo, vacio, ancho = 1, chip, mas = 0, i, children = [] }: Lista) {
+  return (
+    // Con renglones, el de una columna se abre a lo ancho en el teléfono: a media columna no caben.
+    <section className={`v-t ${ancho === 2 ? 'c2' : children.length ? 'lleno' : ''}`} style={retraso(i)} aria-label={titulo}>
+      <div className="v-fila">
+        <h3>{titulo}</h3>
+        {chip && <span className="v-chip">{chip}</span>}
+      </div>
+      {children.length ? <ul className="v-lista">{children}</ul> : <p className="v-sub">{vacio}</p>}
+      {mas > 0 && <p className="v-sub">y {mas} más</p>}
+    </section>
+  )
+}
+
+function faltan(fechaMeta: string | null, hoy: string): string {
+  const n = diasRestantes(fechaMeta, hoy)
+  if (n === null) return 'sin fecha meta'
+  if (n === 0) return 'la meta es hoy'
+  if (n === 1) return 'falta 1 día'
+  return n > 0 ? `faltan ${n} días` : `meta vencida hace ${-n} ${n === -1 ? 'día' : 'días'}`
+}
+
+type Proyectos = { proyectos: ProyectoLista[]; hoy: string; frente?: FrenteVista | null; i: number }
+
+/** Los proyectos activos más cerca de su meta, con su barra de avance. */
+export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
+  const ruta = conFrente('/proyectos', frente?.atajo)
+  return (
+    <section className={`v-t c2 ${proyectos.length ? '' : 'punteada'}`} style={retraso(i)} aria-label="Proyectos">
+      <div className="v-fila">
+        <h3>Proyectos</h3>
+        {proyectos.length > 0 && (
+          <Link href={ruta} className="v-chip">
+            Ver todos →
+          </Link>
+        )}
+      </div>
+      {proyectos.length ? (
+        <ul className="v-lista">
+          {proyectos.map((p) => {
+            const x = avance(p, p)
+            return (
+              <li key={p.id} className="v-proyecto">
+                <div className="v-fila">
+                  <b>{p.nombre}</b>
+                  <span className="v-sub">{porcentaje(x)}</span>
+                </div>
+                <div className="v-barra-avance" role="progressbar" aria-label={`Avance de ${p.nombre}`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
+                  <i style={{ width: `${x * 100}%` }} />
+                </div>
+                <small className="v-sub">{faltan(p.fecha_meta, hoy)}</small>
+              </li>
+            )
+          })}
+        </ul>
+      ) : (
+        <p className="v-sub">
+          {frente ? `${frente.nombre} aún no tiene proyectos activos. ` : 'Aún no tienes proyectos activos. '}
+          <Link href={ruta} style={{ color: 'var(--tinta)', textDecoration: 'underline' }}>
+            Nuevo proyecto
+          </Link>
+        </p>
+      )}
     </section>
   )
 }

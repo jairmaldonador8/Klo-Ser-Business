@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 import type { FrenteVista } from '@/lib/frentes'
 import type { Tarea } from '@/lib/tareas/esquema'
+import { ToastProvider } from '@/components/tareas/toast'
 import { HojaTarea } from './hoja-tarea'
 
 export type ProyectoOpcion = { id: string; espacio_id: string; nombre: string }
@@ -16,17 +17,20 @@ export function HojaProvider({ frentes, proyectos, children }: { frentes: Frente
   const [abierta, setAbierta] = useState<Apertura | null>(null)
   const abrir = useCallback((a: Apertura = {}) => setAbierta(a), [])
   return (
-    <Contexto.Provider value={abrir}>
-      {children}
-      {abierta && (
-        <HojaTarea
-          key={abierta.tarea?.id ?? 'nueva'}
-          apertura={abierta}
-          frentes={frentes}
-          proyectos={proyectos}
-          cerrar={() => setAbierta(null)}
-        />
-      )}
-    </Contexto.Provider>
+    // El toast vive aquí: un solo proveedor en el layout para la hoja y los renglones.
+    <ToastProvider>
+      <Contexto.Provider value={abrir}>
+        {children}
+        {abierta && (
+          <HojaTarea
+            key={abierta.tarea?.id ?? 'nueva'}
+            apertura={abierta}
+            frentes={frentes}
+            proyectos={proyectos}
+            cerrar={() => setAbierta(null)}
+          />
+        )}
+      </Contexto.Provider>
+    </ToastProvider>
   )
 }

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
 import { fechaEn, sumarDias } from '@/lib/fechas'
+import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
 import { CLASES, NOMBRE_CLASE, hhmm, type Clase } from '@/lib/tareas/esquema'
 import type { Apertura, ProyectoOpcion } from './hoja-provider'
@@ -51,6 +52,7 @@ export function HojaTarea({
   const [form, setForm] = useState(() => inicial(apertura, frentes))
   const [aviso, setAviso] = useState('')
   const [ocupada, empezar] = useTransition()
+  const avisar = useToast()
   const hoy = hoyAqui()
   const manana = sumarDias(hoy, 1)
   const delFrente = proyectos.filter((p) => p.espacio_id === form.espacio_id)
@@ -62,12 +64,13 @@ export function HojaTarea({
 
   const poner = <K extends keyof Formulario>(campo: K, valor: Formulario[K]) => setForm((f) => ({ ...f, [campo]: valor }))
 
-  function correr(accion: () => Promise<Resultado>) {
+  function correr(accion: () => Promise<Resultado>, despues?: () => void) {
     setAviso('')
     empezar(async () => {
       const r = await accion()
-      if (r.ok) cerrar()
-      else setAviso(r.mensaje)
+      if (!r.ok) return setAviso(r.mensaje)
+      cerrar()
+      despues?.()
     })
   }
 
@@ -192,8 +195,12 @@ export function HojaTarea({
               <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => completarTarea(tarea.id, !tarea.completada_en))}>
                 {tarea.completada_en ? 'Reabrir' : 'Completar'}
               </button>
-              {/* El toast de Deshacer llega con la Task 7; por ahora borra y cierra. */}
-              <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => borrarTarea(tarea.id))}>
+              <button
+                type="button"
+                className="v-boton"
+                disabled={ocupada}
+                onClick={() => correr(() => borrarTarea(tarea.id), () => avisar('Borrada', () => void borrarTarea(tarea.id, false)))}
+              >
                 Borrar
               </button>
             </>
