@@ -252,3 +252,4 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - «Tu día» lleva el campo bermellón vivo a toda su fuerza (luces que respiran por dentro); su medidor va en blanco. Klo es gris que se enciende en cobre hacia la derecha.
 - Cables (`Conexiones`, `lib/vista/cables.ts`): del puerto derecho de un mosaico al izquierdo del siguiente, solo hacia adelante. Uno sí, uno no lleva brasa: brillo, luz que corre (6 s) y puertos naranjas; los otros son grises. En teléfono no hay cables.
 - **Actualización:** fondo negro puro tipo vanta, sin puntos ni luces; el naranja resalta solo en las secciones. Los cables se quitaron de Hoy; `Conexiones` y `lib/vista/cables.ts` quedan para cuando haya flujos que conectar.
+- Sin tinte del frente detrás de la ventana: el fondo es negro limpio en todos los frentes.
