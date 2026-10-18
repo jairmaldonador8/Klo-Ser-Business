@@ -7,7 +7,7 @@ import { conFrente } from '@/lib/rutas'
 
 const retraso = (i: number) => ({ animationDelay: `${i * 55}ms` })
 
-/** La tarjeta que manda en vidrio: media luna con el amanecer. */
+/** La tarjeta que manda: media luna en azul sobre negro. */
 export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: number; pendientes: number; siguiente: string | null; i: number }) {
   const total = hechas + pendientes
   const avance = total ? hechas / total : 0
@@ -42,10 +42,8 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
         <svg viewBox="0 0 340 190" role="img" aria-label={`${pendientes} por hacer hoy`}>
           <defs>
             <linearGradient id="v-amanecer" x1="0" x2="1">
-              <stop offset="0" stopColor="#2a44ff" />
-              <stop offset=".4" stopColor="#7b4dff" />
-              <stop offset=".7" stopColor="#ff5f8f" />
-              <stop offset="1" stopColor="#ffc933" />
+              <stop offset="0" stopColor="#1c36ee" />
+              <stop offset="1" stopColor="#8b98ff" />
             </linearGradient>
           </defs>
           {marcas}
@@ -62,7 +60,7 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
               style={{ '--largo': largo, '--fin': largo * (1 - avance) } as React.CSSProperties}
             />
           )}
-          <circle cx={170 + 130 * Math.cos(angulo)} cy={170 + 130 * Math.sin(angulo)} r={10} fill="#fff" stroke="#06071a" strokeWidth={4} />
+          <circle cx={170 + 130 * Math.cos(angulo)} cy={170 + 130 * Math.sin(angulo)} r={10} fill="#fff" stroke="#000" strokeWidth={4} />
         </svg>
         <div className="centro">
           <small>por hacer hoy</small>

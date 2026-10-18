@@ -197,3 +197,14 @@ mandando; esto agrega cómo se acomoda. Para la forma de las vistas, manda `vidr
   abajo con el **+** azul.
 - **Movimiento**: los mosaicos entran escalonados (55 ms) y los arcos se dibujan al abrir; todo se
   apaga con `prefers-reduced-motion`.
+
+## 10. Negro (dirección 2026-10-18)
+
+Pedido de Jair: fondo **negro puro**, estético y minimalista, profesional — una app que invite a
+trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando tokens:
+
+- Fondo `#000`, sin auras; superficies `rgba(255,255,255,.035)` con línea `rgba(255,255,255,.08)`.
+- **Una sola familia: Poppins** (Fredoka sale). Neue Montreal se evaluó, pero su licencia comercial es de pago.
+- Klo se para en un **disco claro** (`#f4f4f5`), ya no en el sol amarillo.
+- El amanecer se reduce a **azul**: medidor, barras y textos destacados van de `#1c36ee` a azul claro o blanco.
+- Los mosaicos de frente son oscuros: su color queda en una línea arriba, la letra grande y el punto de la píldora.

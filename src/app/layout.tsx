@@ -1,10 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { Caveat, Fredoka, Poppins } from 'next/font/google'
+import { Caveat, Poppins } from 'next/font/google'
 import './globals.css'
 
 const poppins = Poppins({ variable: '--font-poppins', subsets: ['latin'], weight: ['400', '500', '600', '700', '800'] })
-// La redonda hermana del wordmark: titulares, saludos, nombres de proyecto.
-const fredoka = Fredoka({ variable: '--font-fredoka', subsets: ['latin'], weight: ['500', '600', '700'] })
 // Notas a mano, con cuentagotas.
 const caveat = Caveat({ variable: '--font-caveat', subsets: ['latin'], weight: ['700'] })
 
@@ -17,14 +15,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#06071a',
+  themeColor: '#000000',
   // Sin cover, env(safe-area-inset-*) vale 0 en iPhone.
   viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es-MX" className={`${poppins.variable} ${fredoka.variable} ${caveat.variable}`}>
+    <html lang="es-MX" className={`${poppins.variable} ${caveat.variable}`}>
       <body>{children}</body>
     </html>
   )

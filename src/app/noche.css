@@ -3,14 +3,15 @@
 @layer base {
 /* ── Tokens «Klo-Ser Noche» (ver DISENO.md) ───────────────────────────── */
 :root{
-  --noche:#06071a; --noche-2:#0c0e24; --tarjeta:#11142d; --tarjeta-alta:#181c3d;
-  --linea:#242a52; --linea-suave:rgba(255,255,255,.06);
-  --tinta:#f3f4fb; --tinta-2:#a9aed0; --tinta-3:#6b7199;
+  --noche:#000; --noche-2:#0a0a0a; --tarjeta:#0c0c0d; --tarjeta-alta:#151517;
+  --linea:#232326; --linea-suave:rgba(255,255,255,.06);
+  --tinta:#f5f5f6; --tinta-2:#a1a1aa; --tinta-3:#62626b;
   --azul:#1c36ee; --azul-luz:#7181f4; --violeta:#7b4dff; --rosa:#ff5f8f; --sol:#ffc933;
-  --amanecer:linear-gradient(100deg,#1c36ee 0%,#7b4dff 38%,#ff5f8f 70%,#ffc933 100%);
-  --amanecer-texto:linear-gradient(100deg,#7181f4 0%,#9b7bff 35%,#ff7fa6 70%,#ffd25c 100%);
+  --amanecer:linear-gradient(100deg,#1c36ee 0%,#4a62ff 100%);
+  --amanecer-texto:linear-gradient(100deg,#ffffff 0%,#9aa6ff 100%);
   --r:1rem; --r-tarjeta:1.4rem; --r-manda:1.75rem;
-  --fredoka: var(--font-fredoka), system-ui, sans-serif;
+  /* Negro: una sola familia, Poppins, para todo. */
+  --fredoka: var(--font-poppins), system-ui, sans-serif;
   --poppins: var(--font-poppins), system-ui, sans-serif;
   --mano: var(--font-caveat), cursive;
   --ease:cubic-bezier(.16,1,.3,1);

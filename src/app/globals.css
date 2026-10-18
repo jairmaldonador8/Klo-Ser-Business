@@ -17,9 +17,9 @@
 :root {
   color-scheme: dark;
   --radius: 1rem;
-  --background: #06071a;
+  --background: #000000;
   --foreground: #f3f4fb;
-  --card: #11142d;
+  --card: #0c0c0d;
   --card-foreground: #f3f4fb;
   --popover: #181c3d;
   --popover-foreground: #f3f4fb;
@@ -38,9 +38,9 @@
 }
 
 @theme {
-  --color-noche: #06071a;
-  --color-noche-2: #0c0e24;
-  --color-tarjeta: #11142d;
+  --color-noche: #000000;
+  --color-noche-2: #0a0a0a;
+  --color-tarjeta: #0c0c0d;
   --color-tarjeta-alta: #181c3d;
   --color-linea: #242a52;
   --color-tinta: #f3f4fb;
@@ -52,7 +52,7 @@
   --color-rosa: #ff5f8f;
   --color-sol: #ffc933;
   --font-sans: var(--font-poppins), system-ui, sans-serif;
-  --font-titulo: var(--font-fredoka), system-ui, sans-serif;
+  --font-titulo: var(--font-poppins), system-ui, sans-serif;
   --font-mano: var(--font-caveat), cursive;
 }
 
