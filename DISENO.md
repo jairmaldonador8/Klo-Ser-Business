@@ -243,3 +243,4 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Sin cuadrícula de puntos.
 - Cuadros negros flotando: sin contorno ni filo, solo sombra profunda cálida. Los frentes conservan la inicial en su color.
 - Texto directo sobre el color en blanco (.82); botones sueltos en negro. Riel sin línea, translúcido en escritorio y negro en teléfono.
+- Intensidad: velo negro uniforme (.46) más viñeta encima de todo el campo; misma composición, color más tenue.
