@@ -235,3 +235,11 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Frentes: sin raya de color. Su color vive en una luz suave desde la esquina superior izquierda, un filo de 1 px degradado que se funde en gris y la inicial como marca de agua que se desvanece. Tonos afinados: azul #6b80ff, violeta #a487ff, rosa #ff7d95, sol #f2b45a.
 - **Brasa viva:** fondo con 6 luces naranjas. Las 4 de la orilla respiran como células (se estiran, giran y se mueven en 46–70 s). En el centro nacen 2 de tono parecido que crecen y se desvanecen cada 26 s, desfasadas. Solo transform y opacity.
 - **Cuadros solo negros** (#000): sin luces por dentro; el color vive en el fondo. Los frentes conservan su filo de color y la inicial.
+
+## 13. Campo bermellón (dirección 2026-10-18, referencia «Preview Video» de RON Design)
+
+- El fondo ya no es negro: campo de color completo. Rojo profundo abajo a la izquierda, naranja claro al centro, durazno grisáceo arriba a la derecha, viñeta oscura en las orillas.
+- Encima, 6 luces animadas (solo transform/opacity): durazno, rojo, naranja que respiran; una sombra vertical difuminada que se mece como figura en movimiento; dos naranjas que nacen y se desvanecen en el centro.
+- Sin cuadrícula de puntos.
+- Cuadros negros flotando: sin contorno ni filo, solo sombra profunda cálida. Los frentes conservan la inicial en su color.
+- Texto directo sobre el color en blanco (.82); botones sueltos en negro. Riel sin línea, translúcido en escritorio y negro en teléfono.
