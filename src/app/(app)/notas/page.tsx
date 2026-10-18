@@ -1,9 +1,39 @@
 import { Vacio } from '@/components/armazon/vacio'
+import { contextoAhora } from '@/lib/datos'
+import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
+import { crearClienteServidor } from '@/lib/supabase/servidor'
+import { ListaNotas, type NotaVista } from './lista-notas'
 
-export default function Notas() {
+type Props = { searchParams: Promise<{ frente?: string | string[] }> }
+
+export default async function Notas({ searchParams }: Props) {
+  const { frente: atajo } = await searchParams
+  const supabase = await crearClienteServidor()
+  const [{ data: espacios }, { data: filas }, ctx] = await Promise.all([
+    supabase.from('espacios').select('id, nombre, inicial, atajo, color').order('orden'),
+    supabase
+      .from('notas')
+      .select('id, espacio_id, texto, creado_en')
+      .is('borrado_en', null)
+      .is('convertida_en_tarea_id', null)
+      .order('creado_en', { ascending: false }),
+    contextoAhora(),
+  ])
+  const frentes: FrenteVista[] = (espacios ?? []).map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))
+  const frente = frenteAbierto(frentes, typeof atajo === 'string' ? atajo : null)
+
+  const formato = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short', timeZone: ctx.zona })
+  const notas: NotaVista[] = (filas ?? [])
+    .filter((n) => !frente || n.espacio_id === frente.id)
+    .map((n) => ({ id: n.id, espacio_id: n.espacio_id, texto: n.texto, fecha: formato.format(new Date(n.creado_en)) }))
+
   return (
-    <section className="vista">
-      <Vacio antes="Aquí van tus ideas" palabra="sueltas" texto="Escríbele a Klo lo que se te ocurra y aquí aparece, acomodado por frente." />
+    <section className="v-bento">
+      <ListaNotas key={frente?.id ?? 'todos'} notas={notas} frentes={frentes} abierto={frente?.id ?? null}>
+        {notas.length === 0 && (
+          <Vacio antes="Aquí van tus ideas" palabra="sueltas" texto="Escribe lo que se te ocurra y aquí aparece, acomodado por frente." />
+        )}
+      </ListaNotas>
     </section>
   )
 }

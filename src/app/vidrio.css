@@ -225,3 +225,10 @@ a.v-t:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .v-barra-avance{height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
 .v-barra-avance i{display:block;height:100%;background:linear-gradient(90deg,#2a44ff,#7b4dff,#ff5f8f)}
 @media (max-width:700px){.v-t.lleno{grid-column:span 2}}
+
+.v-nota{display:flex;flex-direction:column;gap:8px}
+.v-nota p{white-space:pre-wrap;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.v-nota .acciones{display:flex;gap:6px;margin-top:auto;flex-wrap:wrap}
+textarea.v-campo{resize:vertical;line-height:1.5}
+select.v-campo{color-scheme:dark}
+.v-nota .v-boton,.v-t .v-fila .v-boton{white-space:nowrap}
