@@ -42,8 +42,8 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
         <svg viewBox="0 0 340 190" role="img" aria-label={`${pendientes} por hacer hoy`}>
           <defs>
             <linearGradient id="v-amanecer" x1="0" x2="1">
-              <stop offset="0" stopColor="#1c36ee" />
-              <stop offset="1" stopColor="#8b98ff" />
+              <stop offset="0" stopColor="#c8643a" />
+              <stop offset="1" stopColor="#ffb38a" />
             </linearGradient>
           </defs>
           {marcas}

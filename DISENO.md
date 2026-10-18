@@ -222,3 +222,12 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Fondo: 3 manchas fijas (`.v-auras`) con degradado radial, deriva lenta de 70–90 s. Sin grano: la luz se desvanece en curva suave (muchas paradas), sin pixeles ni anillos.
 - Cada mosaico trae su luz (`.v-t::before`), rotando la paleta por posición; «Tu día» lleva brasa sobre azul; los frentes, su color.
 - Barato: nada de `filter:blur` ni `backdrop-filter`; solo se anima `transform`. Pasando del 8.º mosaico la luz queda quieta. Con «reducir movimiento» todo queda fijo.
+
+## 12. Carbón y brasa (dirección 2026-10-18, referencia: carrusel «RON Design» en Cosmos)
+
+- Fondo negro; paneles carbón elevados (`--v-panel` #1a1817→#121110) con filo de luz arriba y sombra profunda (`--v-elevado`). Esquinas 20 px.
+- Un solo acento: brasa #ff5a2a / cobre #c8643a / durazno #ffb38a. Las auras y la luz de los mosaicos son cálidas. «Tu día» va en degradado óxido.
+- Lienzo de puntos fijo (22 px) que se apaga hacia abajo.
+- Letra: Urbanist en toda la app. Títulos 600, texto 400, cifras grandes 300. Metadatos en mayúsculas chicas espaciadas (.14em). Mono solo para atajos.
+- Activo = blanco con negro (riel, píldoras, opciones). Botones de icono en cuadros carbón.
+- Klo sigue azul #1c36ee: es la mascota, no el acento.
