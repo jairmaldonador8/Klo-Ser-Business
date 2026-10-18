@@ -338,6 +338,10 @@ export type Database = {
       }
       hook_lista_permitida: { Args: { event: Json }; Returns: Json }
       permitir_correo: { Args: { p_correo: string }; Returns: undefined }
+      sumar_cifra: {
+        Args: { p_delta: number; p_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

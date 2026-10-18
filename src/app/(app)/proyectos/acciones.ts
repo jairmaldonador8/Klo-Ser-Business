@@ -85,12 +85,8 @@ export async function editarProyecto(proyectoId: string, datos: unknown): Promis
 export async function sumarCifra(proyectoId: string, delta: number): Promise<Resultado> {
   if (!id.safeParse(proyectoId).success || !Number.isFinite(delta)) return { ok: false, mensaje: 'Revisa los datos.' }
   const supabase = await crearClienteServidor()
-  const { data, error: errorLeer } = await supabase.from('proyectos').select('cifra_actual').eq('id', proyectoId).single()
-  if (errorLeer || !data) return { ok: false, mensaje: 'No encontré ese proyecto.' }
-  const { error } = await supabase
-    .from('proyectos')
-    .update({ cifra_actual: Math.max(0, Number(data.cifra_actual) + delta) })
-    .eq('id', proyectoId)
+  // Suma en la base, en una sola orden: varios toques rápidos no se pisan.
+  const { error } = await supabase.rpc('sumar_cifra', { p_id: proyectoId, p_delta: delta })
   if (error) return { ok: false, mensaje: 'No pude sumarlo, inténtalo otra vez.' }
   return listo()
 }
