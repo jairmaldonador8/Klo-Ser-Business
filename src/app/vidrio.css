@@ -347,19 +347,16 @@ details.v-t>summary:focus-visible{outline:2px solid var(--violeta);outline-offse
 /* ── Aura viva (DISENO §11) ─────────────────────────────────────────────
    Manchas de color sobre el negro, como luz detrás de vidrio esmerilado.
    Barato a propósito: degradados radiales (nada de filter:blur), solo se
-   anima transform (lo mueve la GPU sin repintar) y el grano es una imagen fija. */
+   anima transform (lo mueve la GPU sin repintar). Sin grano: se veía como pixeles. */
 :root{--v-brasa:#ff5a2a; --v-durazno:#ff9a6b}
 .v-auras{display:block;contain:strict}
 .v-auras i{filter:none;opacity:1;will-change:transform;animation:v-flota 70s ease-in-out infinite alternate}
 .v-auras i:nth-child(1){width:min(1100px,95vmax);height:min(1100px,95vmax);left:-28vmax;top:-34vmax;
-  background:radial-gradient(closest-side,rgba(28,54,238,.42),rgba(28,54,238,.12) 55%,transparent)}
+  background:radial-gradient(closest-side,rgba(28,54,238,0.42) 0.0%,rgba(28,54,238,0.3612) 12.0%,rgba(28,54,238,0.2856) 24.0%,rgba(28,54,238,0.21) 35.0%,rgba(28,54,238,0.147) 45.0%,rgba(28,54,238,0.1008) 54.0%,rgba(28,54,238,0.063) 63.0%,rgba(28,54,238,0.0378) 71.0%,rgba(28,54,238,0.021) 79.0%,rgba(28,54,238,0.0092) 86.0%,rgba(28,54,238,0.0029) 93.0%,rgba(28,54,238,0.0) 100.0%)}
 .v-auras i:nth-child(2){width:min(900px,80vmax);height:min(900px,80vmax);right:-26vmax;left:auto;top:auto;bottom:-30vmax;
-  background:radial-gradient(closest-side,rgba(255,90,42,.36),rgba(255,154,107,.1) 55%,transparent);animation-duration:90s;animation-delay:-30s}
+  background:radial-gradient(closest-side,rgba(255,90,42,0.36) 0.0%,rgba(255,90,42,0.3096) 12.0%,rgba(255,90,42,0.2448) 24.0%,rgba(255,90,42,0.18) 35.0%,rgba(255,90,42,0.126) 45.0%,rgba(255,90,42,0.0864) 54.0%,rgba(255,90,42,0.054) 63.0%,rgba(255,90,42,0.0324) 71.0%,rgba(255,90,42,0.018) 79.0%,rgba(255,90,42,0.0079) 86.0%,rgba(255,90,42,0.0025) 93.0%,rgba(255,90,42,0.0) 100.0%);animation-duration:90s;animation-delay:-30s}
 .v-auras i:nth-child(3){width:min(760px,70vmax);height:min(760px,70vmax);right:-18vmax;left:auto;top:8vh;bottom:auto;
-  background:radial-gradient(closest-side,rgba(106,61,240,.26),rgba(106,61,240,.06) 60%,transparent);animation-duration:80s;animation-delay:-55s}
-/* Grano fino encima: quita el «banding» del degradado y le da textura de foto. */
-.v-auras::after{content:"";position:absolute;inset:0;opacity:.07;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+  background:radial-gradient(closest-side,rgba(106,61,240,0.26) 0.0%,rgba(106,61,240,0.2236) 12.0%,rgba(106,61,240,0.1768) 24.0%,rgba(106,61,240,0.13) 35.0%,rgba(106,61,240,0.091) 45.0%,rgba(106,61,240,0.0624) 54.0%,rgba(106,61,240,0.039) 63.0%,rgba(106,61,240,0.0234) 71.0%,rgba(106,61,240,0.013) 79.0%,rgba(106,61,240,0.0057) 86.0%,rgba(106,61,240,0.0018) 93.0%,rgba(106,61,240,0.0) 100.0%);animation-duration:80s;animation-delay:-55s}
 @keyframes v-flota{
   33%{transform:translate3d(6vw,4vh,0) scale(1.08) rotate(20deg)}
   66%{transform:translate3d(-3vw,8vh,0) scale(.94) rotate(-14deg)}
@@ -371,7 +368,7 @@ details.v-t>summary:focus-visible{outline:2px solid var(--violeta);outline-offse
 /* Secciones: cada mosaico trae su propia luz, rotando la paleta. */
 .v-t{isolation:isolate;--g1:rgba(28,54,238,.42);--g2:rgba(106,61,240,.22)}
 .v-t::before{content:"";position:absolute;z-index:-1;inset:-40%;pointer-events:none;opacity:.85;transition:opacity .4s;
-  background:radial-gradient(40% 45% at 22% 18%,var(--g1),transparent 70%),radial-gradient(38% 40% at 85% 90%,var(--g2),transparent 70%);
+  background:radial-gradient(45% 50% at 22% 18%,color-mix(in srgb,var(--g1) 100%,transparent) 0%,color-mix(in srgb,var(--g1) 86.0%,transparent) 12%,color-mix(in srgb,var(--g1) 68.0%,transparent) 24%,color-mix(in srgb,var(--g1) 50.0%,transparent) 35%,color-mix(in srgb,var(--g1) 35.0%,transparent) 45%,color-mix(in srgb,var(--g1) 24.0%,transparent) 54%,color-mix(in srgb,var(--g1) 15.0%,transparent) 63%,color-mix(in srgb,var(--g1) 9.0%,transparent) 71%,color-mix(in srgb,var(--g1) 5.0%,transparent) 79%,color-mix(in srgb,var(--g1) 2.2%,transparent) 86%,color-mix(in srgb,var(--g1) 0.7%,transparent) 93%,color-mix(in srgb,var(--g1) 0%,transparent) 100%),radial-gradient(42% 46% at 85% 90%,color-mix(in srgb,var(--g2) 100%,transparent) 0%,color-mix(in srgb,var(--g2) 86.0%,transparent) 12%,color-mix(in srgb,var(--g2) 68.0%,transparent) 24%,color-mix(in srgb,var(--g2) 50.0%,transparent) 35%,color-mix(in srgb,var(--g2) 35.0%,transparent) 45%,color-mix(in srgb,var(--g2) 24.0%,transparent) 54%,color-mix(in srgb,var(--g2) 15.0%,transparent) 63%,color-mix(in srgb,var(--g2) 9.0%,transparent) 71%,color-mix(in srgb,var(--g2) 5.0%,transparent) 79%,color-mix(in srgb,var(--g2) 2.2%,transparent) 86%,color-mix(in srgb,var(--g2) 0.7%,transparent) 93%,color-mix(in srgb,var(--g2) 0%,transparent) 100%);
   will-change:transform;animation:v-deriva 26s ease-in-out infinite alternate}
 .v-t:nth-child(4n+2){--g1:rgba(255,90,42,.32);--g2:rgba(28,54,238,.2)}
 .v-t:nth-child(4n+2)::before{animation-delay:-9s}
