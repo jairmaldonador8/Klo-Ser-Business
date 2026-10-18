@@ -119,7 +119,7 @@ export function EditorHoy({ items, editable }: Props) {
           </SortableContext>
         </DndContext>
       ) : (
-        <div className="v-bento">{visibles.map((id) => porId.get(id)?.nodo)}</div>
+        <div className="v-bento v-editorial">{visibles.map((id) => porId.get(id)?.nodo)}</div>
       )}
 
       {editando && ocultos.length > 0 && (

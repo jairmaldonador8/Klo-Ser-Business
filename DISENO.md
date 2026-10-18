@@ -253,3 +253,11 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Cables (`Conexiones`, `lib/vista/cables.ts`): del puerto derecho de un mosaico al izquierdo del siguiente, solo hacia adelante. Uno sí, uno no lleva brasa: brillo, luz que corre (6 s) y puertos naranjas; los otros son grises. En teléfono no hay cables.
 - **Actualización:** fondo negro puro tipo vanta, sin puntos ni luces; el naranja resalta solo en las secciones. Los cables se quitaron de Hoy; `Conexiones` y `lib/vista/cables.ts` quedan para cuando haya flujos que conectar.
 - Sin tinte del frente detrás de la ventana: el fondo es negro limpio en todos los frentes.
+
+## 15. Hoy editorial (dirección 2026-10-18)
+
+- Acomodo asimétrico en escritorio (≥1100 px, 12 columnas, `.v-editorial`): «Tu día» héroe 7×3; Klo 5; tus frentes 5×2 como barras apiladas; fila de tres (En riesgo, La meta, De un toque); abajo Agenda 7 y Proyectos 5. En teléfono, una columna con los frentes como barras.
+- Índice editorial 01, 02… en brasa sobre cada título (solo los que tienen título).
+- Brasa de alta calidad: degradado interpolado en oklch, brillo de vidrio arriba, hondura abajo y resplandor naranja que se derrama sobre el negro. Número del medidor gigante y fino (Urbanist 200).
+- Grises: brillo de esquina superior izquierda, interpolado en oklch, sombra profunda; esquinas 24 px.
+- Frentes: su color entra suave desde la izquierda; la «M» a la derecha.

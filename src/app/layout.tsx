@@ -3,7 +3,7 @@ import { Caveat, JetBrains_Mono, Urbanist } from 'next/font/google'
 import './globals.css'
 
 // Geométrica redonda y ligera: la letra de toda la app (DISENO §12).
-const urbanist = Urbanist({ variable: '--font-urbanist', subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800'] })
+const urbanist = Urbanist({ variable: '--font-urbanist', subsets: ['latin'], weight: ['200', '300', '400', '500', '600', '700', '800'] })
 // Mono solo para atajos de teclado.
 const mono = JetBrains_Mono({ variable: '--font-mono', subsets: ['latin'], weight: ['400', '500'] })
 // Notas a mano, con cuentagotas.
