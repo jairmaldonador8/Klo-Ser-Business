@@ -57,11 +57,11 @@
 }
 
 @utility bg-amanecer {
-  background-image: linear-gradient(100deg, #1c36ee 0%, #7b4dff 38%, #ff5f8f 70%, #ffc933 100%);
+  background-image: linear-gradient(100deg, #1c36ee 0%, #4a62ff 100%);
 }
 
 @utility text-amanecer {
-  background-image: linear-gradient(100deg, #7181f4 0%, #9b7bff 35%, #ff7fa6 70%, #ffd25c 100%);
+  background-image: linear-gradient(100deg, #ffffff 0%, #9aa6ff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

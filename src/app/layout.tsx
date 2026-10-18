@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Caveat, Poppins } from 'next/font/google'
+import { Caveat, JetBrains_Mono, Poppins } from 'next/font/google'
 import './globals.css'
 
 const poppins = Poppins({ variable: '--font-poppins', subsets: ['latin'], weight: ['400', '500', '600', '700', '800'] })
+// Mono para metadatos y la captura de Klo (navegación tipo terminal).
+const mono = JetBrains_Mono({ variable: '--font-mono', subsets: ['latin'], weight: ['400', '500'] })
 // Notas a mano, con cuentagotas.
 const caveat = Caveat({ variable: '--font-caveat', subsets: ['latin'], weight: ['700'] })
 
@@ -22,7 +24,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es-MX" className={`${poppins.variable} ${caveat.variable}`}>
+    <html lang="es-MX" className={`${poppins.variable} ${mono.variable} ${caveat.variable}`}>
       <body>{children}</body>
     </html>
   )

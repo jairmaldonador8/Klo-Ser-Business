@@ -209,3 +209,9 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - **Pantalla completa:** la ventana deja de ser caja; la app ocupa todo el ancho (6 columnas desde 1800 px, 4 en escritorio, 2 en tableta y teléfono).
 - El amanecer se reduce a **azul**: medidor, barras y textos destacados van de `#1c36ee` a azul claro o blanco.
 - Los mosaicos de frente son oscuros: su color queda en una línea arriba, la letra grande y el punto de la píldora.
+- **Botones minimalistas:** esquinas de 10 px (8 en chicos), sin resplandores. Principal = blanco con tinta negra;
+  secundario = línea fina `rgba(255,255,255,.12)`; lo elegido (opciones de la hoja, palomita, interruptor) va en blanco.
+- **Navegación tipo Codex:** riel pegado a la orilla, de alto completo y con una línea (arriba en el teléfono, fijo al
+  desplazar); barra de arriba sin caja con una línea abajo; metadatos (fecha, chips, etiquetas, ⌘K) y el campo de Klo en
+  **JetBrains Mono**, con `›` de terminal en lugar del orbe.
+

@@ -163,7 +163,8 @@ a.v-t[class*=v-color-] .v-ilus{color:var(--c);opacity:.2}
 .v-flecha:focus-visible,.v-interruptor:focus-visible,.v-muestra:focus-visible{outline:2px solid var(--violeta);outline-offset:2px}
 .v-interruptor{width:42px;height:26px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;flex:none;transition:background .25s}
 .v-interruptor::after{content:"";position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s var(--ease)}
-.v-interruptor[aria-checked="true"]{background:var(--v-azul)}
+.v-interruptor[aria-checked="true"]{background:#fff}
+.v-interruptor[aria-checked="true"]::after{background:#000}
 .v-interruptor[aria-checked="true"]::after{transform:translateX(16px)}
 .v-interruptor:disabled{opacity:.5;cursor:not-allowed}
 .v-muestras{display:flex;gap:6px}
@@ -210,7 +211,7 @@ a.v-t[class*=v-color-] .v-ilus{color:var(--c);opacity:.2}
 .v-hoja .grupo{display:flex;flex-wrap:wrap;gap:6px}
 .v-hoja .grupo .v-campo{flex:1 1 140px;color-scheme:dark}
 .v-hoja select.v-campo{color-scheme:dark}
-.v-hoja .grupo button[aria-pressed=true],.v-hoja .grupo button[aria-checked=true]{background:var(--v-azul)}
+.v-hoja .grupo button[aria-pressed=true],.v-hoja .grupo button[aria-checked=true]{background:#fff;color:#000;box-shadow:none}
 .v-hoja .etq{font-size:12px;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.08em}
 .v-hoja .pie{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:700px){.v-hoja{margin:auto 0 0;width:100vw;height:auto;max-height:88dvh;border-radius:26px 26px 0 0}.v-hoja .cuerpo{padding-bottom:calc(24px + env(safe-area-inset-bottom))}}
@@ -254,7 +255,7 @@ a.v-proyecto:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .v-formulario>.v-campo{flex:none}
 .v-formulario .grupo{display:flex;flex-wrap:wrap;gap:6px}
 .v-formulario .grupo .v-campo{flex:1 1 140px}
-.v-formulario .grupo button[aria-pressed=true],.v-formulario .grupo button[aria-checked=true]{background:var(--v-azul)}
+.v-formulario .grupo button[aria-pressed=true],.v-formulario .grupo button[aria-checked=true]{background:#fff;color:#000;box-shadow:none}
 .v-formulario .etq{font-size:12px;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.08em}
 .v-formulario input[type=date]{color-scheme:dark}
 details.v-t>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -262,3 +263,85 @@ details.v-t>summary::-webkit-details-marker{display:none}
 details.v-t>summary::after{content:"＋";color:var(--tinta-2)}
 details.v-t[open]>summary::after{content:"－"}
 details.v-t>summary:focus-visible{outline:2px solid var(--violeta);outline-offset:4px;border-radius:8px}
+
+/* ── Botones minimalistas (DISENO §10) ──────────────────────────────────
+   Esquinas de 10 px, sin resplandores. Principal = blanco con tinta negra;
+   secundario = línea fina. El azul queda para acentos (arco, punto vivo, frentes). */
+@layer components {
+:root{--v-linea-boton:rgba(255,255,255,.12); --v-hover:rgba(255,255,255,.06); --v-activo:rgba(255,255,255,.09)}
+
+.v-boton,.btn-amanecer{border-radius:10px;padding:9px 16px;font-size:13.5px;font-weight:500;background:transparent;color:var(--tinta);
+  box-shadow:inset 0 0 0 1px var(--v-linea-boton);transition:background .15s,color .15s,box-shadow .15s;transform:none}
+.v-boton:hover,.btn-amanecer:hover{background:var(--v-hover);transform:none}
+.v-boton.chico{padding:6px 12px;font-size:12.5px;border-radius:8px}
+.v-boton.primario,.btn-amanecer{background:#fff;color:#000;box-shadow:none}
+.v-boton.primario:hover,.btn-amanecer:hover{background:#e4e4e7}
+.v-boton:disabled,.btn-amanecer:disabled{opacity:.45}
+:is(.v-boton,.btn-amanecer,.v-riel a,.v-pildoras a,.v-pildoras button,.v-flecha,.v-palomita,.v-toast button,.v-yo,.v-muestra,.v-interruptor):focus-visible{outline:1.5px solid #fff;outline-offset:2px}
+
+/* Riel: íconos sobrios; el activo se marca con un fondo tenue, no con un disco azul. */
+.v-riel{border-radius:14px;padding:6px;gap:4px;background:var(--v-vidrio);box-shadow:inset 0 0 0 1px var(--v-borde)}
+.v-riel a{width:40px;height:40px;border-radius:10px}
+.v-riel a:hover{background:var(--v-hover)}
+.v-riel a[aria-current="page"]{background:var(--v-activo);color:#fff;box-shadow:none}
+.v-riel a span{border-radius:8px;background:#0c0c0d}
+
+/* Píldoras de frentes y el + */
+.v-pildoras{border-radius:14px;padding:5px;gap:2px;background:rgba(10,10,11,.92);box-shadow:inset 0 0 0 1px var(--v-borde),0 20px 40px -20px #000}
+.v-pildoras a,.v-pildoras button{padding:8px 14px;border-radius:10px;font-size:13.5px}
+.v-pildoras a:hover{background:var(--v-hover)}
+.v-pildoras a[aria-current="true"]{background:var(--v-activo)}
+.v-pildoras .mas{width:38px;height:38px;border-radius:10px;background:#fff;color:#000;box-shadow:none}
+.v-pildoras .mas:hover{background:#e4e4e7}
+.v-pildoras .mas svg{width:18px;height:18px}
+
+/* Chips, flechas, avatar y toast */
+.v-chip{border-radius:8px;padding:5px 9px;background:transparent;box-shadow:inset 0 0 0 1px var(--v-borde);color:var(--tinta-2)}
+.v-flecha{border-radius:8px;background:transparent;box-shadow:inset 0 0 0 1px var(--v-borde)}
+.v-flecha:hover:not(:disabled){background:var(--v-hover)}
+.v-yo i{width:34px;height:34px;border:0;background:#151517;box-shadow:inset 0 0 0 1px var(--v-linea-boton);font-family:var(--poppins);font-weight:500;font-size:14px}
+.v-toast{border-radius:12px}
+.v-toast button{border-radius:8px;background:#fff;color:#000;box-shadow:none;font-weight:500}
+.v-toast button:hover{background:#e4e4e7}
+
+/* Palomita y opciones de la hoja: lo elegido va en blanco. */
+.v-palomita{box-shadow:inset 0 0 0 1.5px var(--tinta-3)}
+.v-palomita[aria-pressed=true]{background:#fff}
+.v-palomita[aria-pressed=true]::after{border-color:#000}
+.v-hoja .grupo button{border-radius:8px}
+.v-hoja .grupo button[aria-pressed=true],.v-hoja .grupo button[aria-checked=true]{background:#fff;color:#000;box-shadow:none}
+.v-campo{border-radius:10px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--v-borde)}
+.v-campo:focus{box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
+
+/* ── Navegación tipo Codex (DISENO §10) ────────────────────────────────
+   Negro plano, líneas finas, metadatos en mono. Nada flota en cajas de colores. */
+:root{--mono:var(--font-mono),ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* Riel: barra lateral pegada a la orilla, de alto completo. */
+.v-escena{padding-left:0}
+.v-riel{top:0;align-self:stretch;height:100dvh;margin-top:calc(-1 * max(16px,env(safe-area-inset-top)));margin-bottom:calc(-1 * max(16px,env(safe-area-inset-bottom)));
+  padding:max(16px,env(safe-area-inset-top)) 10px 16px max(10px,env(safe-area-inset-left));border-radius:0;background:#000;box-shadow:inset -1px 0 0 var(--v-borde)}
+.v-riel a span{font-family:var(--mono);font-size:11px;letter-spacing:.02em}
+
+/* Barra de arriba: sin caja, con una línea abajo. */
+.v-barra{background:transparent;box-shadow:inset 0 -1px 0 var(--v-borde);border-radius:0;padding:4px 0 14px}
+.v-barra small,.v-medidor .centro small,.v-chip,.v-hoja .etq,.v-klo-campo kbd{font-family:var(--mono);letter-spacing:.02em}
+.v-barra small{color:var(--tinta-3);font-size:11.5px}
+.v-klo-campo{border-radius:10px;background:#0a0a0b;box-shadow:inset 0 0 0 1px var(--v-borde);font-family:var(--mono);font-size:12.5px;padding:9px 12px}
+.v-klo-campo:focus-within{box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+/* El orbe se vuelve el cursor de una terminal. */
+.v-orbe{width:auto;height:auto;border-radius:0;background:none;animation:none;color:var(--v-p-azul);font-family:var(--mono);font-size:14px;line-height:1}
+.v-orbe::before{content:"›"}
+.v-klo-campo kbd{font-size:10.5px;color:var(--tinta-3)}
+
+/* Píldoras: barra negra plana. */
+.v-pildoras{background:#000;box-shadow:inset 0 0 0 1px var(--v-borde),0 -10px 40px -10px #000}
+
+@media (max-width:700px){
+  .v-escena{padding-left:max(10px,env(safe-area-inset-left))}
+  .v-riel{height:auto;margin:calc(-1 * max(10px,env(safe-area-inset-top))) calc(-1 * max(10px,env(safe-area-inset-right))) 0 calc(-1 * max(10px,env(safe-area-inset-left)));
+    padding:max(10px,env(safe-area-inset-top)) 12px 8px;box-shadow:inset 0 -1px 0 var(--v-borde);position:sticky;top:0}
+  .v-barra{padding:2px 0 12px}
+}
+}
+

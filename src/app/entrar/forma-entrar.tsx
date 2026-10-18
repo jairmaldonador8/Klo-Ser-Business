@@ -3,7 +3,7 @@
 import { useActionState } from 'react'
 import { entrarConCorreo, type EstadoEntrar } from './acciones'
 
-const CAMPO = 'w-full rounded-full bg-tarjeta-alta px-4 py-3 text-[15px] text-tinta ring-1 ring-linea outline-none placeholder:text-tinta-3 focus:ring-violeta/60'
+const CAMPO = 'w-full rounded-[10px] bg-[#0a0a0b] px-4 py-3 text-[15px] text-tinta ring-1 ring-white/10 outline-none placeholder:text-tinta-3 focus:ring-white/40'
 
 export function FormaEntrar() {
   const [estado, accion, enviando] = useActionState<EstadoEntrar, FormData>(entrarConCorreo, { mensaje: null })
