@@ -6,6 +6,8 @@ import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
 import { borrarNota, crearNota, editarNota } from './acciones'
 
+const LARGO_TITULO = 200
+
 export type NotaVista = { id: string; espacio_id: string; texto: string; fecha: string }
 
 type Props = { notas: NotaVista[]; frentes: FrenteVista[]; abierto: string | null; children?: React.ReactNode }
@@ -49,6 +51,13 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
       if (!r.ok) return avisar(r.mensaje)
       avisar('Nota borrada', () => void borrarNota(n.id, false))
     })
+  }
+
+  // El título de una tarea llega a 200 letras: cortarla en silencio perdería parte de la idea.
+  function volverTarea(n: NotaVista) {
+    const titulo = n.texto.trim()
+    if (titulo.length > LARGO_TITULO) return avisar('Esta nota es larga: acórtala a 200 letras para volverla tarea.')
+    abrir({ valores: { titulo, espacio_id: n.espacio_id }, notaId: n.id })
   }
 
   return (
@@ -126,7 +135,7 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
               <button
                 type="button"
                 className="v-boton chico"
-                onClick={() => abrir({ valores: { titulo: n.texto.slice(0, 200), espacio_id: n.espacio_id }, notaId: n.id })}
+                onClick={() => volverTarea(n)}
               >
                 Volver tarea
               </button>
