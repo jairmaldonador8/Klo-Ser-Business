@@ -5,6 +5,7 @@ import { BarraArriba } from '@/components/vidrio/barra-arriba'
 import { Pildoras } from '@/components/vidrio/pildoras'
 import { Riel } from '@/components/vidrio/riel'
 import { Ventana } from '@/components/vidrio/ventana'
+import { fechaEn } from '@/lib/fechas'
 import { esColor, type FrenteVista } from '@/lib/frentes'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { resolverVista } from '@/lib/vista/resolver'
@@ -23,6 +24,9 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
 
   const frentes: FrenteVista[] = espacios.map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))
   const secciones = resolverVista(perfil?.vista).secciones.filter((s) => s.visible)
+  // Una sola hora del servidor, en tu zona: la barra y la hoja («Hoy», «Mañana») no dependen del navegador.
+  const zona = perfil?.zona_horaria ?? 'America/Monterrey'
+  const ahora = new Date()
 
   // useSearchParams (frente abierto) vive en componentes cliente: van dentro de Suspense.
   return (
@@ -33,12 +37,12 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
         <i />
       </div>
       {/* La hoja de edición se abre desde cualquier parte (el +, un renglón, una nota). */}
-      <HojaProvider frentes={frentes} proyectos={proyectos ?? []}>
+      <HojaProvider frentes={frentes} proyectos={proyectos ?? []} hoy={fechaEn(ahora, zona)}>
         <div className="v-escena">
           <Suspense>
             <Riel secciones={secciones} />
             <Ventana frentes={frentes}>
-              <BarraArriba nombre={perfil?.nombre ?? null} zona={perfil?.zona_horaria ?? 'America/Monterrey'} frentes={frentes} ahora={new Date().toISOString()} />
+              <BarraArriba nombre={perfil?.nombre ?? null} zona={zona} frentes={frentes} ahora={ahora.toISOString()} />
               {children}
             </Ventana>
             {/* Fuera de la ventana: su backdrop-filter atraparía el position:fixed. */}

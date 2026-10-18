@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
-import { fechaEn, sumarDias } from '@/lib/fechas'
+import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
 import { CLASES, NOMBRE_CLASE, hhmm, type Clase } from '@/lib/tareas/esquema'
@@ -18,10 +18,7 @@ type Formulario = {
   proyecto_id: string
 }
 
-/** Hoy en la zona del navegador. */
-const hoyAqui = () => fechaEn(new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone)
-
-function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[]): Formulario {
+function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[], hoy: string): Formulario {
   const base = tarea ?? valores
   const espacio = base.espacio_id && frentes.some((f) => f.id === base.espacio_id) ? base.espacio_id : (frentes[0]?.id ?? '')
   return {
@@ -29,7 +26,7 @@ function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[]): For
     clase: base.clase ?? 'tarea',
     espacio_id: espacio,
     // En una nueva, la fecha por defecto es hoy; «Sin fecha» la quita.
-    fecha: tarea ? (tarea.fecha ?? '') : valores.fecha === undefined ? hoyAqui() : (valores.fecha ?? ''),
+    fecha: tarea ? (tarea.fecha ?? '') : valores.fecha === undefined ? hoy : (valores.fecha ?? ''),
     hora: hhmm(base.hora ?? null) ?? '',
     hora_fin: hhmm(base.hora_fin ?? null) ?? '',
     proyecto_id: base.proyecto_id ?? '',
@@ -40,20 +37,22 @@ export function HojaTarea({
   apertura,
   frentes,
   proyectos,
+  hoy,
   cerrar,
 }: {
   apertura: Apertura
   frentes: FrenteVista[]
   proyectos: ProyectoOpcion[]
+  /** Hoy en la zona de tu perfil (no la del navegador). */
+  hoy: string
   cerrar: () => void
 }) {
   const { tarea, notaId } = apertura
   const dialogo = useRef<HTMLDialogElement>(null)
-  const [form, setForm] = useState(() => inicial(apertura, frentes))
+  const [form, setForm] = useState(() => inicial(apertura, frentes, hoy))
   const [aviso, setAviso] = useState('')
   const [ocupada, empezar] = useTransition()
   const avisar = useToast()
-  const hoy = hoyAqui()
   const manana = sumarDias(hoy, 1)
   const delFrente = proyectos.filter((p) => p.espacio_id === form.espacio_id)
 

@@ -13,7 +13,18 @@ export type Apertura = { tarea?: Tarea; valores?: Partial<Tarea>; notaId?: strin
 const Contexto = createContext<(a?: Apertura) => void>(() => {})
 export const useHoja = () => useContext(Contexto)
 
-export function HojaProvider({ frentes, proyectos, children }: { frentes: FrenteVista[]; proyectos: ProyectoOpcion[]; children: React.ReactNode }) {
+// `hoy` llega del servidor, ya en la zona de tu perfil.
+export function HojaProvider({
+  frentes,
+  proyectos,
+  hoy,
+  children,
+}: {
+  frentes: FrenteVista[]
+  proyectos: ProyectoOpcion[]
+  hoy: string
+  children: React.ReactNode
+}) {
   const [abierta, setAbierta] = useState<Apertura | null>(null)
   const abrir = useCallback((a: Apertura = {}) => setAbierta(a), [])
   return (
@@ -27,6 +38,7 @@ export function HojaProvider({ frentes, proyectos, children }: { frentes: Frente
             apertura={abierta}
             frentes={frentes}
             proyectos={proyectos}
+            hoy={hoy}
             cerrar={() => setAbierta(null)}
           />
         )}
