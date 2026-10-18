@@ -14,6 +14,7 @@ import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordi
 import { CSS } from '@dnd-kit/utilities'
 import { useState, useTransition } from 'react'
 import { guardarMosaicos } from '@/app/(app)/ajustes/acciones'
+import { Conexiones } from '@/components/vidrio/conexiones'
 import { MOSAICOS } from '@/lib/vista/registro'
 import { acomodarMosaicos } from '@/lib/vista/resolver'
 
@@ -119,7 +120,10 @@ export function EditorHoy({ items, editable }: Props) {
           </SortableContext>
         </DndContext>
       ) : (
-        <div className="v-bento">{visibles.map((id) => porId.get(id)?.nodo)}</div>
+        <div className="v-bento">
+          <Conexiones />
+          {visibles.map((id) => porId.get(id)?.nodo)}
+        </div>
       )}
 
       {editando && ocultos.length > 0 && (

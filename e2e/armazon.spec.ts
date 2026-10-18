@@ -72,7 +72,7 @@ test('Personalizar: arrastrar, ocultar y guardar el acomodo de Hoy', async ({ pa
   test.skip(info.project.name !== 'escritorio', 'cambia la vista guardada: basta con un proyecto')
   test.slow()
   await page.goto('/hoy', { waitUntil: 'networkidle' })
-  const ids = () => page.locator('.v-bento > *').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))
+  const ids = () => page.locator('.v-bento > :not(svg)').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))
 
   await page.getByRole('button', { name: '✎ Personalizar' }).click()
   // Arrastrar Klo encima de «Tu día» lo pone primero.

@@ -244,3 +244,10 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Cuadros negros flotando: sin contorno ni filo, solo sombra profunda cálida. Los frentes conservan la inicial en su color.
 - Texto directo sobre el color en blanco (.82); botones sueltos en negro. Riel sin línea, translúcido en escritorio y negro en teléfono.
 - Intensidad: velo negro uniforme (.46) más viñeta encima de todo el campo; misma composición, color más tenue.
+
+## 14. Nodos (dirección 2026-10-18, referencia: editor de nodos de RON Design)
+
+- Fondo negro con cuadrícula de puntos (22 px). Sin luces de fondo: el color vive dentro de algunos mosaicos y en los cables.
+- Mosaicos gris carbón (#242322→#1b1a19), sin contorno, con sombra que los despega.
+- «Tu día» lleva el campo bermellón vivo a toda su fuerza (luces que respiran por dentro); su medidor va en blanco. Klo es gris que se enciende en cobre hacia la derecha.
+- Cables (`Conexiones`, `lib/vista/cables.ts`): del puerto derecho de un mosaico al izquierdo del siguiente, solo hacia adelante. Uno sí, uno no lleva brasa: brillo, luz que corre (6 s) y puertos naranjas; los otros son grises. En teléfono no hay cables.
