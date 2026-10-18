@@ -114,7 +114,8 @@ export function HojaTarea({
           ))}
         </div>
 
-        {frentes.length > 1 && (
+        {/* Desde una nota, el frente es el de la nota: la tarea y la nota van juntas. */}
+        {frentes.length > 1 && !notaId && (
           <>
             <span className="etq">Frente</span>
             <div className="grupo" role="radiogroup" aria-label="Frente">

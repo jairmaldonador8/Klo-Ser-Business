@@ -24,7 +24,23 @@ export async function guardarTarea(datos: unknown, notaId?: string): Promise<Res
     console.error('guardarTarea', error)
     return { ok: false, mensaje: 'No pude guardar la tarea, inténtalo otra vez.' }
   }
-  if (notaId) await supabase.from('notas').update({ convertida_en_tarea_id: data.id }).eq('id', notaId)
+  if (notaId) {
+    // Liga la nota solo si sigue suelta: si no se puede, la tarea se borra (suave) para no dejar
+    // la idea duplicada (nota visible + tarea nueva). El trigger exige el mismo frente.
+    const { data: nota, error: errorNota } = await supabase
+      .from('notas')
+      .update({ convertida_en_tarea_id: data.id })
+      .eq('id', notaId)
+      .is('convertida_en_tarea_id', null)
+      .is('borrado_en', null)
+      .select('id')
+      .single()
+    if (errorNota || !nota) {
+      console.error('guardarTarea: ligar nota', errorNota)
+      if (!id) await supabase.from('tareas').update({ borrado_en: new Date().toISOString() }).eq('id', data.id)
+      return { ok: false, mensaje: 'No pude volver la nota tarea: recarga e inténtalo otra vez.' }
+    }
+  }
   return listo(data.id)
 }
 
