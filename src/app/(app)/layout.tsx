@@ -38,7 +38,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
           <Suspense>
             <Riel secciones={secciones} />
             <Ventana frentes={frentes}>
-              <BarraArriba nombre={perfil?.nombre ?? null} zona={perfil?.zona_horaria ?? 'America/Monterrey'} frentes={frentes} />
+              <BarraArriba nombre={perfil?.nombre ?? null} zona={perfil?.zona_horaria ?? 'America/Monterrey'} frentes={frentes} ahora={new Date().toISOString()} />
               {children}
             </Ventana>
             {/* Fuera de la ventana: su backdrop-filter atraparía el position:fixed. */}

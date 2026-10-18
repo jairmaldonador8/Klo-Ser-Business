@@ -7,12 +7,13 @@ import { frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { conFrente } from '@/lib/rutas'
 import { fechaLarga, horaEn, saludoPorHora } from '@/lib/saludo'
 
-type Props = { nombre: string | null; zona: string; frentes: FrenteVista[] }
+// ahora llega del servidor: si se calcula aquí, el HTML y el cliente pueden diferir (hidratación).
+type Props = { nombre: string | null; zona: string; frentes: FrenteVista[]; ahora: string }
 
-export function BarraArriba({ nombre, zona, frentes }: Props) {
+export function BarraArriba({ nombre, zona, frentes, ahora: ahoraIso }: Props) {
   const atajo = useSearchParams().get('frente')
   const frente = frenteAbierto(frentes, atajo)
-  const ahora = new Date()
+  const ahora = new Date(ahoraIso)
   const inicial = nombre?.trim().charAt(0).toUpperCase() || '·'
 
   return (
@@ -34,7 +35,8 @@ export function BarraArriba({ nombre, zona, frentes }: Props) {
       {/* La captura de Klo se enciende en la Parte 3. */}
       <label className="v-klo-campo">
         <span className="v-orbe" />
-        <input placeholder="Díselo a Klo: «mañana entrego los carruseles a las 5»" disabled aria-label="Díselo a Klo" />
+        {/* Las extensiones del navegador le inyectan atributos al input. */}
+        <input suppressHydrationWarning placeholder="Díselo a Klo: «mañana entrego los carruseles a las 5»" disabled aria-label="Díselo a Klo" />
         <kbd>⌘ K</kbd>
       </label>
       <Link href={conFrente('/ajustes', frente?.atajo)} className="v-yo" aria-label="Ajustes">
