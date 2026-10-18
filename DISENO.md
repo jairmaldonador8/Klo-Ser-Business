@@ -231,3 +231,5 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Letra: Urbanist en toda la app. Títulos 600, texto 400, cifras grandes 300. Metadatos en mayúsculas chicas espaciadas (.14em). Mono solo para atajos.
 - Activo = blanco con negro (riel, píldoras, opciones). Botones de icono en cuadros carbón.
 - Klo sigue azul #1c36ee: es la mascota, no el acento.
+- Fondo con 4 luces (cobre, brasa, óxido, durazno) más intensas; los paneles son un poco translúcidos para que la luz se asome.
+- Frentes: sin raya de color. Su color vive en una luz suave desde la esquina superior izquierda, un filo de 1 px degradado que se funde en gris y la inicial como marca de agua que se desvanece. Tonos afinados: azul #6b80ff, violeta #a487ff, rosa #ff7d95, sol #f2b45a.

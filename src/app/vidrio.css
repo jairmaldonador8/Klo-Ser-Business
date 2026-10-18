@@ -352,11 +352,11 @@ details.v-t>summary:focus-visible{outline:2px solid var(--violeta);outline-offse
 .v-auras{display:block;contain:strict}
 .v-auras i{filter:none;opacity:1;will-change:transform;animation:v-flota 70s ease-in-out infinite alternate}
 .v-auras i:nth-child(1){width:min(1100px,95vmax);height:min(1100px,95vmax);left:-28vmax;top:-34vmax;
-  background:radial-gradient(closest-side,rgba(200,100,58,0.42) 0.0%,rgba(200,100,58,0.3612) 12.0%,rgba(200,100,58,0.2856) 24.0%,rgba(200,100,58,0.21) 35.0%,rgba(200,100,58,0.147) 45.0%,rgba(200,100,58,0.1008) 54.0%,rgba(200,100,58,0.063) 63.0%,rgba(200,100,58,0.0378) 71.0%,rgba(200,100,58,0.021) 79.0%,rgba(200,100,58,0.0092) 86.0%,rgba(200,100,58,0.0029) 93.0%,rgba(200,100,58,0.0) 100.0%)}
+  background:radial-gradient(closest-side,rgba(200,100,58,0.46) 0%,rgba(200,100,58,0.3956) 12%,rgba(200,100,58,0.3128) 24%,rgba(200,100,58,0.23) 35%,rgba(200,100,58,0.161) 45%,rgba(200,100,58,0.1104) 54%,rgba(200,100,58,0.069) 63%,rgba(200,100,58,0.0414) 71%,rgba(200,100,58,0.023) 79%,rgba(200,100,58,0.0101) 86%,rgba(200,100,58,0.0032) 93%,rgba(200,100,58,0.0) 100%)}
 .v-auras i:nth-child(2){width:min(900px,80vmax);height:min(900px,80vmax);right:-26vmax;left:auto;top:auto;bottom:-30vmax;
-  background:radial-gradient(closest-side,rgba(255,90,42,0.36) 0.0%,rgba(255,90,42,0.3096) 12.0%,rgba(255,90,42,0.2448) 24.0%,rgba(255,90,42,0.18) 35.0%,rgba(255,90,42,0.126) 45.0%,rgba(255,90,42,0.0864) 54.0%,rgba(255,90,42,0.054) 63.0%,rgba(255,90,42,0.0324) 71.0%,rgba(255,90,42,0.018) 79.0%,rgba(255,90,42,0.0079) 86.0%,rgba(255,90,42,0.0025) 93.0%,rgba(255,90,42,0.0) 100.0%);animation-duration:90s;animation-delay:-30s}
+  background:radial-gradient(closest-side,rgba(255,90,42,0.58) 0%,rgba(255,90,42,0.4988) 12%,rgba(255,90,42,0.3944) 24%,rgba(255,90,42,0.29) 35%,rgba(255,90,42,0.203) 45%,rgba(255,90,42,0.1392) 54%,rgba(255,90,42,0.087) 63%,rgba(255,90,42,0.0522) 71%,rgba(255,90,42,0.029) 79%,rgba(255,90,42,0.0128) 86%,rgba(255,90,42,0.0041) 93%,rgba(255,90,42,0.0) 100%);animation-duration:90s;animation-delay:-30s}
 .v-auras i:nth-child(3){width:min(760px,70vmax);height:min(760px,70vmax);right:-18vmax;left:auto;top:8vh;bottom:auto;
-  background:radial-gradient(closest-side,rgba(150,45,25,0.26) 0.0%,rgba(150,45,25,0.2236) 12.0%,rgba(150,45,25,0.1768) 24.0%,rgba(150,45,25,0.13) 35.0%,rgba(150,45,25,0.091) 45.0%,rgba(150,45,25,0.0624) 54.0%,rgba(150,45,25,0.039) 63.0%,rgba(150,45,25,0.0234) 71.0%,rgba(150,45,25,0.013) 79.0%,rgba(150,45,25,0.0057) 86.0%,rgba(150,45,25,0.0018) 93.0%,rgba(150,45,25,0.0) 100.0%);animation-duration:80s;animation-delay:-55s}
+  background:radial-gradient(closest-side,rgba(150,45,25,0.44) 0%,rgba(150,45,25,0.3784) 12%,rgba(150,45,25,0.2992) 24%,rgba(150,45,25,0.22) 35%,rgba(150,45,25,0.154) 45%,rgba(150,45,25,0.1056) 54%,rgba(150,45,25,0.066) 63%,rgba(150,45,25,0.0396) 71%,rgba(150,45,25,0.022) 79%,rgba(150,45,25,0.0097) 86%,rgba(150,45,25,0.0031) 93%,rgba(150,45,25,0.0) 100%);animation-duration:80s;animation-delay:-55s}
 @keyframes v-flota{
   33%{transform:translate3d(6vw,4vh,0) scale(1.08) rotate(20deg)}
   66%{transform:translate3d(-3vw,8vh,0) scale(.94) rotate(-14deg)}
@@ -389,7 +389,7 @@ a.v-t:hover::before{opacity:1}
 @media (max-width:700px){
   /* Teléfono: manchas más chicas y el riel opaco (aquí sí pasa contenido por debajo). */
   .v-auras i:nth-child(1){left:-45vmax;top:-40vmax}
-  .v-auras i:nth-child(3){display:none}
+  .v-auras i:nth-child(3){width:90vmax;height:90vmax;right:-40vmax;top:20vh}
   .v-riel{background:#000}
 }
 
@@ -397,7 +397,7 @@ a.v-t:hover::before{opacity:1}
    Paneles carbón elevados sobre el negro, un solo acento brasa, lienzo de
    puntos y letra Urbanist ligera. Klo sigue azul: es la mascota, no el acento. */
 :root{--brasa:#ff5a2a; --cobre:#c8643a; --carbon:#171514; --carbon-2:#1f1c1b;
-  --v-panel:linear-gradient(180deg,#1a1817,#121110);
+  --v-panel:linear-gradient(180deg,rgba(26,24,23,.8),rgba(18,17,16,.88));
   --v-elevado:inset 0 1px 0 rgba(255,255,255,.07),inset 0 0 0 1px rgba(255,255,255,.045),0 24px 48px -24px rgba(0,0,0,.9)}
 /* Lienzo de puntos, fijo y apagándose hacia abajo. */
 .v-auras::after{content:"";position:absolute;inset:0;
@@ -434,5 +434,28 @@ a.v-t[class*=v-color-]{box-shadow:var(--v-elevado),inset 0 2px 0 var(--c)}
 .v-pildoras a,.v-pildoras button{border-radius:11px}
 .v-pildoras a[aria-current="true"]{background:#fff;color:#000}
 .v-hoja,.v-toast{background:#141211}
+
+/* Cuarta luz: durazno tenue a media altura, para que el brillo cruce la pantalla. */
+.v-auras i:nth-child(4){width:min(820px,75vmax);height:min(820px,75vmax);left:18vw;top:38vh;
+  background:radial-gradient(closest-side,rgba(255,154,107,0.2) 0%,rgba(255,154,107,0.172) 12%,rgba(255,154,107,0.136) 24%,rgba(255,154,107,0.1) 35%,rgba(255,154,107,0.07) 45%,rgba(255,154,107,0.048) 54%,rgba(255,154,107,0.03) 63%,rgba(255,154,107,0.018) 71%,rgba(255,154,107,0.01) 79%,rgba(255,154,107,0.0044) 86%,rgba(255,154,107,0.0014) 93%,rgba(255,154,107,0.0) 100%);animation-duration:100s;animation-delay:-70s}
+
+/* ── Frentes (DISENO §12) ────────────────────────────────────────────────
+   Nada de raya de color: el color vive en una luz suave desde la esquina,
+   un filo degradado que se apaga y la inicial con desvanecido. Tonos afinados
+   para convivir con el carbón. */
+:root{--v-p-azul:#6b80ff; --v-p-violeta:#a487ff; --v-p-rosa:#ff7d95; --v-p-sol:#f2b45a}
+a.v-t[class*=v-color-]{box-shadow:var(--v-elevado);
+  background:radial-gradient(120% 90% at 0% 0%,color-mix(in srgb,var(--c) 16%,transparent),transparent 60%),var(--v-panel);
+  --g1:color-mix(in srgb,var(--c) 34%,transparent);--g2:color-mix(in srgb,var(--c) 14%,transparent);transition:transform .3s,box-shadow .3s}
+/* Filo: 1 px de su color arriba a la izquierda que se funde en gris. */
+a.v-t[class*=v-color-]::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--c) 75%,transparent),color-mix(in srgb,var(--c) 18%,transparent) 35%,rgba(255,255,255,.05) 65%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:.85;transition:opacity .3s}
+a.v-t[class*=v-color-]:hover{box-shadow:var(--v-elevado),0 18px 50px -22px color-mix(in srgb,var(--c) 55%,transparent)}
+a.v-t[class*=v-color-]:hover::after{opacity:1}
+/* La inicial, como marca de agua que se desvanece hacia abajo. */
+a.v-t[class*=v-color-] .v-ilus{opacity:1;font-weight:700;color:transparent;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--c) 38%,transparent),transparent 80%);-webkit-background-clip:text;background-clip:text}
+a.v-t[class*=v-color-] :is(.v-chip,.v-pila){background:rgba(255,255,255,.045);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
 }
 
