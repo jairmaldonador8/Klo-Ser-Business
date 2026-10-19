@@ -292,4 +292,4 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 
 ## 21. Lockup en Today (2026-10-19)
 
-- Entre la barra (campo de Klo) y los mosaicos, centrado: el wordmark oficial blanco (`/marca/blanco/03-wordmark.svg`, sin redibujar) y abajo «BUSINESS» espaciado (.62em) en degradado durazno→brasa, entre dos líneas finas que se desvanecen. Solo en Today.
+- Entre la barra (campo de Klo) y los mosaicos, alineado a la izquierda (Customize a la derecha, en la misma línea): el wordmark oficial blanco (`/marca/blanco/03-wordmark.svg`, sin redibujar) y abajo «BUSINESS» espaciado (.62em) en degradado durazno→brasa, entre dos líneas finas que se desvanecen. Solo en Today.
