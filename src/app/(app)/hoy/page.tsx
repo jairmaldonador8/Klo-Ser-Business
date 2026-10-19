@@ -1,13 +1,14 @@
 import Image from 'next/image'
+import { AgregarTareaHoy, MicroWins } from '@/components/hoy/micro-wins'
 import { RenglonTarea } from '@/components/tareas/renglon-tarea'
 import { EditorHoy, type ItemHoy } from '@/components/vidrio/editor-hoy'
-import { MosaicoKlo, MosaicoLista, MosaicoMedidor, MosaicoProyectos, MosaicoSimple } from '@/components/vidrio/mosaicos'
+import { MosaicoKlo, MosaicoLista, MosaicoMedidor, MosaicoProyectos, MosaicoSimple, MosaicoTareas } from '@/components/vidrio/mosaicos'
 import { contextoAhora, leerMisTareas, leerProyectos } from '@/lib/datos'
 import { etiquetaDia } from '@/lib/fechas'
 import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { calcularHoy, enRiesgo } from '@/lib/hoy/calcular'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
-import { hhmm, type Tarea } from '@/lib/tareas/esquema'
+import { hhmm, nombreClase, type Tarea } from '@/lib/tareas/esquema'
 import type { IdMosaico } from '@/lib/vista/registro'
 import { resolverVista } from '@/lib/vista/resolver'
 
@@ -54,6 +55,12 @@ export default async function Hoy({ searchParams }: Props) {
     leerProyectos(),
     contextoAhora(),
   ])
+  // Micro wins: los tuyos y cuáles ya palomeaste hoy (en tu zona).
+  const [{ data: microWins }, { data: hechosHoy }] = await Promise.all([
+    supabase.from('micro_wins').select('id, nombre').is('borrado_en', null).order('orden').order('creado_en'),
+    supabase.from('micro_wins_hechos').select('micro_win_id').eq('fecha', ctx.hoy),
+  ])
+  const palomeados = new Set((hechosHoy ?? []).map((h) => h.micro_win_id))
   const frentes: FrenteVista[] = (espacios ?? []).map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))
   const frente = frenteAbierto(frentes, typeof atajo === 'string' ? atajo : null)
   const mosaicos = resolverVista(perfil?.vista).mosaicos
@@ -89,11 +96,28 @@ export default async function Hoy({ searchParams }: Props) {
       case 'meta':
         return <MosaicoSimple key={id} titulo="Goal" vacio="Pick a project to spotlight it here." punteada i={i} />
       case 'de_un_toque': {
-        const lista = hoyCalc.deUnToque
+        const lista = hoyCalc.tareasHoy
+        const tope = 20
         return (
-          <MosaicoLista key={id} titulo="Quick wins" vacio="Nothing to check off." chip={lista.length ? `${lista.length}` : undefined} ancho={2} mas={mas(lista)} i={i}>
-            {renglones(lista, (t) => ({ detalle: detalle(t), vencida: vencida(t) }))}
-          </MosaicoLista>
+          <MosaicoTareas
+            key={id}
+            hechas={lista.filter((t) => t.completada_en).length}
+            total={lista.length}
+            microWins={<MicroWins inicial={(microWins ?? []).map((m) => ({ ...m, hecho: palomeados.has(m.id) }))} />}
+            accion={<AgregarTareaHoy espacioId={frente?.id} />}
+            mas={Math.max(0, lista.length - tope)}
+            i={i}
+          >
+            {lista.slice(0, tope).map((t) => (
+              <RenglonTarea
+                key={t.id}
+                tarea={t}
+                frente={frente ? undefined : frenteDe.get(t.espacio_id)}
+                detalle={vencida(t) ? detalle(t) : [rango(t), t.clase !== 'tarea' && nombreClase(t.clase)].filter(Boolean).join(' · ') || 'today'}
+                vencida={vencida(t)}
+              />
+            ))}
+          </MosaicoTareas>
         )
       }
       case 'tu_dia': {

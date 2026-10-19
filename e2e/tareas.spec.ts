@@ -13,20 +13,22 @@ test('capturar una tarea y palomearla', async ({ page }, info) => {
   await hoja.getByRole('button', { name: 'Save' }).click()
   await expect(hoja).toBeHidden()
 
-  const deUnToque = page.getByRole('region', { name: 'Quick wins' })
+  const deUnToque = page.getByRole('region', { name: 'Tasks' })
   const palomita = deUnToque.getByRole('button', { name: `Check off “${titulo}”` })
-  // El mosaico corta a 6 renglones («y N más»); la cuenta de pruebas se deja limpia, así que la nueva debe verse.
-  await expect(palomita, 'la tarea nueva no aparece en De un toque (¿tope de 6 renglones?)').toBeVisible()
+  // La cuenta de pruebas se deja limpia, así que la nueva debe verse.
+  await expect(palomita, 'la tarea nueva no aparece en Tasks').toBeVisible()
 
   await palomita.click()
   const zona = page.locator('.v-toast-zona')
   const toast = zona.getByText('Done', { exact: true })
   await expect(toast).toBeVisible()
-  // Marcada, deja De un toque (solo lista pendientes).
-  await expect(palomita).toHaveCount(0)
+  // Marcada, se queda en Tasks, tachada, hasta mañana.
+  await expect(palomita).toHaveAttribute('aria-pressed', 'true')
+  await expect(deUnToque.locator('.v-renglon.hecha').filter({ hasText: titulo })).toBeVisible()
 
-  // Deshacer la devuelve; así se puede abrir y borrar.
+  // Deshacer la devuelve a pendiente; así se puede abrir y borrar.
   await zona.getByRole('button', { name: 'Undo' }).click()
+  await expect(palomita).toHaveAttribute('aria-pressed', 'false')
   const texto = deUnToque.getByRole('button', { name: titulo, exact: false }).filter({ hasText: titulo })
   await expect(texto).toBeVisible()
 
@@ -60,4 +62,27 @@ test('una tarea para mañana aparece en Semana, en su día', async ({ page }, in
   await editar.getByRole('button', { name: 'Delete' }).click()
   await expect(editar).toBeHidden()
   await expect(page.getByText(titulo)).toHaveCount(0)
+})
+
+test('micro wins: agregar, palomear (se tacha) y quitar', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'cambia los micro wins de la cuenta: basta con un proyecto')
+  const nombre = `Prueba mw ${Date.now()}`
+  await page.goto('/hoy', { waitUntil: 'networkidle' })
+  const tareas = page.getByRole('region', { name: 'Tasks' })
+  await tareas.getByRole('button', { name: /^(Edit|\+ Add)$/ }).click()
+  await tareas.getByLabel('New micro win').fill(nombre)
+  await tareas.getByRole('button', { name: 'Add', exact: true }).click()
+  await tareas.getByRole('button', { name: 'Done', exact: true }).click()
+
+  const chip = tareas.getByRole('button', { name: nombre })
+  await expect(chip).toBeEnabled()
+  await chip.click()
+  await expect(chip).toHaveAttribute('aria-pressed', 'true')
+  // Sigue palomeado al recargar: quedó guardado para hoy.
+  await page.reload({ waitUntil: 'networkidle' })
+  await expect(tareas.getByRole('button', { name: nombre })).toHaveAttribute('aria-pressed', 'true')
+
+  await tareas.getByRole('button', { name: 'Edit', exact: true }).click()
+  await tareas.getByRole('button', { name: `Remove ${nombre}` }).click()
+  await expect(tareas.getByText(nombre)).toHaveCount(0)
 })

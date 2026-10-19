@@ -183,3 +183,28 @@ export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
     </section>
   )
 }
+
+type Tareas = { hechas: number; total: number; microWins: React.ReactNode; accion: React.ReactNode; mas?: number; i: number; children?: React.ReactNode[] }
+
+/** Tu lista de trabajo del día: micro wins arriba y tus tasks abajo; lo hecho se queda tachado hasta mañana. */
+export function MosaicoTareas({ hechas, total, microWins, accion, mas = 0, i, children = [] }: Tareas) {
+  return (
+    <section className="v-t c2 v-tareas" style={retraso(i)} aria-label="Tasks">
+      <div className="v-fila">
+        <h3>Tasks</h3>
+        <div className="v-fila" style={{ gap: 8 }}>
+          {total > 0 && (
+            <span className="v-chip">
+              {hechas} of {total} done
+            </span>
+          )}
+          {accion}
+        </div>
+      </div>
+      {microWins}
+      <span className="etq">Today</span>
+      {children.length ? <ul className="v-lista">{children}</ul> : <p className="v-sub">Nothing on your list yet. Plan your day with “+ Add task”.</p>}
+      {mas > 0 && <p className="v-sub">and {mas} more</p>}
+    </section>
+  )
+}

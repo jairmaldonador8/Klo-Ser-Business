@@ -293,3 +293,10 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 ## 21. Lockup en Today (2026-10-19)
 
 - Entre la barra (campo de Klo) y los mosaicos, alineado a la izquierda (Customize a la derecha, en la misma línea): el wordmark oficial blanco (`/marca/blanco/03-wordmark.svg`, sin redibujar) y abajo «BUSINESS» espaciado (.62em) en degradado durazno→brasa, entre dos líneas finas que se desvanecen. Solo en Today.
+
+## 22. Tasks y micro wins en Today (2026-10-19)
+
+- «Quick wins» pasa a ser **Tasks** (mismo id `de_un_toque`): la lista de trabajo del día. Lo vencido pendiente primero, luego todo lo de hoy (sin juntas; esas van en la agenda). Al palomear se tacha y se queda hasta el día siguiente; lo hecho otros días ya no sale. Palomita en brasa. «+ Add task» abre la hoja con fecha de hoy.
+- Arriba, **Micro wins**: hábitos diarios personales (migración 0006, `micro_wins` + `micro_wins_hechos` por fecha) en píldoras; palomeado = brasa y tachado; amanecen vacíos cada día. «Edit» agrega y quita (borrado suave; la historia queda para rachas).
+- Escritorio: Tasks 7×2; At risk y Goal 6; Agenda y Projects 5.
+- Ojo: en `vidrio.css` las líneas ~194–267 quedaron fuera de `@layer` y le ganan a todo lo que está en capa; para pisarlas hay que escribir fuera de capa.

@@ -21,7 +21,7 @@ export const MOSAICOS: readonly Mosaico[] = [
   { id: 'klo', nombre: 'Klo', descripcion: 'What Klo tells you and where to talk to it' },
   { id: 'en_riesgo', nombre: 'At risk', descripcion: 'Deliveries overdue or due in the next 2 days' },
   { id: 'meta', nombre: 'Goal', descripcion: 'Your spotlight project' },
-  { id: 'de_un_toque', nombre: 'Quick wins', descripcion: 'Untimed to-dos to check off' },
+  { id: 'de_un_toque', nombre: 'Tasks', descripcion: 'Your list for today, with your daily micro wins' },
   { id: 'tu_dia', nombre: 'Today’s agenda', descripcion: 'What has a time today, with “Now”' },
   { id: 'proyectos', nombre: 'Projects', descripcion: 'Active ones closest to their target date' },
 ]

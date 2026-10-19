@@ -42,3 +42,16 @@ describe('enRiesgo', () => {
     expect(r.map((x) => x.titulo)).toEqual(['y', 'x'])
   })
 })
+
+describe('tareasHoy', () => {
+  it('lo vencido pendiente primero, luego lo de hoy; lo hecho hoy se queda y lo de otro día no; sin juntas', () => {
+    const vencida = t({ fecha: '2026-10-16' })
+    const vencidaHechaAyer = t({ fecha: '2026-10-16', completada_en: '2026-10-17T18:00:00Z' })
+    const hoyTarde = t({ hora: '17:00' })
+    const hoyHecha = t({ completada_en: '2026-10-18T16:00:00Z' })
+    const junta = t({ clase: 'junta', hora: '12:00' })
+    const manana = t({ fecha: '2026-10-19' })
+    const r = calcularHoy([hoyTarde, manana, junta, hoyHecha, vencidaHechaAyer, vencida], ctx)
+    expect(r.tareasHoy).toEqual([vencida, hoyTarde, hoyHecha])
+  })
+})

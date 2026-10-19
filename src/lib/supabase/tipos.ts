@@ -75,6 +75,62 @@ export type Database = {
         }
         Relationships: []
       }
+      micro_wins: {
+        Row: {
+          borrado_en: string | null
+          creado_en: string
+          id: string
+          nombre: string
+          orden: number
+          user_id: string
+        }
+        Insert: {
+          borrado_en?: string | null
+          creado_en?: string
+          id?: string
+          nombre: string
+          orden?: number
+          user_id?: string
+        }
+        Update: {
+          borrado_en?: string | null
+          creado_en?: string
+          id?: string
+          nombre?: string
+          orden?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      micro_wins_hechos: {
+        Row: {
+          creado_en: string
+          fecha: string
+          micro_win_id: string
+          user_id: string
+        }
+        Insert: {
+          creado_en?: string
+          fecha: string
+          micro_win_id: string
+          user_id?: string
+        }
+        Update: {
+          creado_en?: string
+          fecha?: string
+          micro_win_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "micro_wins_hechos_micro_win_id_fkey"
+            columns: ["micro_win_id"]
+            isOneToOne: false
+            referencedRelation: "micro_wins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       miembros: {
         Row: {
           creado_en: string

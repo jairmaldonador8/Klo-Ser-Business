@@ -612,8 +612,9 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
   .v-editorial{grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:minmax(132px,auto);gap:16px}
   .v-editorial > [aria-label="Your day"]{grid-column:span 7;grid-row:span 2}
   .v-editorial > [aria-label="Klo"]{grid-column:span 5;grid-row:span 2;justify-content:center}
-  .v-editorial > :is([aria-label="At risk"],[aria-label="Goal"],[aria-label="Quick wins"]){grid-column:span 4}
-  .v-editorial > [aria-label="Today’s agenda"]{grid-column:span 7}
+  .v-editorial > [aria-label="Tasks"]{grid-column:span 7;grid-row:span 2}
+  .v-editorial > :is([aria-label="At risk"],[aria-label="Goal"]){grid-column:span 6}
+  .v-editorial > [aria-label="Today’s agenda"]{grid-column:span 5}
   .v-editorial > [aria-label="Projects"]{grid-column:span 5}
 }
 
@@ -632,8 +633,9 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
   .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Your day"]){grid-column:span 7;grid-row:span 2}
   .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Klo"]){grid-column:span 5;grid-row:span 2}
   .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Projects"]){grid-column:span 5}
-  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > :is([aria-label="At risk"],[aria-label="Goal"],[aria-label="Quick wins"])){grid-column:span 4}
-  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Today’s agenda"]){grid-column:span 7}
+  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Tasks"]){grid-column:span 7;grid-row:span 2}
+  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > :is([aria-label="At risk"],[aria-label="Goal"])){grid-column:span 6}
+  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Today’s agenda"]){grid-column:span 5}
 }
 /* El lugar que dejas: un hueco punteado del mismo tamaño. */
 .v-editable[data-arrastrando]{filter:none;z-index:0}
@@ -664,3 +666,36 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
   .v-lockup-hoy img{height:24px}
 }
 }
+
+/* ── Tasks y micro wins en Today (DISENO §22) ────────────────────────── */
+@layer components {
+.v-tareas{gap:12px}
+.v-tareas .etq,.v-microwins .etq{font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-3)}
+.v-tareas .etq b{color:#ff8a5c;font-weight:600}
+.v-mini{height:28px;padding:0 11px;border-radius:9px;font-size:12px;font-weight:500;color:var(--tinta);background:#1f1e1d;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);white-space:nowrap;transition:background .15s}
+.v-mini:hover{background:#2a2928}
+.v-mini:disabled{opacity:.5}
+.v-mini[aria-pressed="true"]{background:#fff;color:#000}
+.v-microwins{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:rgba(0,0,0,.2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.v-chips{display:flex;flex-wrap:wrap;gap:6px}
+/* Un micro win: píldora con su círculo; palomeado se llena de brasa y se tacha. */
+.v-microwin{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 13px 0 9px;border-radius:99px;font-size:13px;font-weight:500;color:var(--tinta);
+  background:#1b1a19;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:background .2s,color .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent}
+.v-microwin:hover{background:#242322}
+.v-microwin i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--tinta-3);display:grid;place-items:center;transition:background .2s,box-shadow .2s}
+.v-microwin[aria-pressed="true"]{color:rgba(255,236,226,.75);text-decoration:line-through;text-decoration-color:rgba(255,236,226,.45);
+  background:linear-gradient(in oklch 160deg,rgba(255,106,58,.32),rgba(200,70,30,.22));box-shadow:inset 0 0 0 1px rgba(255,120,70,.45)}
+.v-microwin[aria-pressed="true"] i{background:#ff5a2a;box-shadow:none}
+.v-microwin[aria-pressed="true"] i::after{content:"";width:7px;height:4px;margin-top:-2px;border:solid #fff;border-width:0 0 1.6px 1.6px;transform:rotate(-45deg)}
+.v-microwin:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.v-microwin.editando{padding-right:5px}
+.v-microwin.editando button{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;color:var(--tinta-2)}
+.v-microwin.editando button:hover{background:rgba(255,255,255,.1);color:#fff}
+.v-microwin-nuevo{display:flex;gap:6px;align-items:center}
+.v-microwin-nuevo .v-campo{height:32px;padding:0 12px;font-size:13px;width:170px;border-radius:99px}
+/* Lo hecho se queda en la lista, tachado y apagado, hasta mañana. */
+.v-tareas .v-renglon{transition:opacity .25s}
+.v-tareas .v-renglon.hecha{opacity:.55}
+}
+/* Fuera de capa a propósito: la palomita base (azul) vive fuera de @layer en la parte vieja del archivo y le ganaría. */
+.v-tareas .v-palomita[aria-pressed=true]{background:#ff5a2a}
