@@ -648,15 +648,13 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
 
 /* ── Lockup en Today (DISENO §21) ─────────────────────────────────────── */
 @layer components {
-.v-lockup-hoy{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:10px 0 0;align-self:flex-start;animation:v-entrar .7s var(--ease) both}
+.v-lockup-hoy{display:flex;flex-direction:column;align-items:center;gap:6px;margin:10px 0 0;align-self:flex-start;animation:v-entrar .7s var(--ease) both}
 .v-lockup-hoy img{height:28px;width:auto}
 .v-lockup-hoy span{display:flex;align-items:center;gap:10px;font-weight:600;font-size:8.5px;letter-spacing:.6em;text-transform:uppercase;padding-left:.62em;
   background:linear-gradient(in oklch 90deg,#ffb38a,#ff5a2a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .v-lockup-hoy span i{width:22px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,138,92,.6))}
 .v-lockup-hoy span i:last-child{background:linear-gradient(90deg,rgba(255,138,92,.6),transparent)}
-/* A la izquierda: «BUSINESS» arranca al ras del wordmark (sin la línea de entrada) y Personalizar queda a la derecha, en la misma línea. */
-.v-lockup-hoy span{padding-left:0}
-.v-lockup-hoy span i:first-child{display:none}
+/* El bloque va a la izquierda (con «BUSINESS» centrado bajo el wordmark) y Personalizar a la derecha, en la misma línea. */
 .v-lockup-hoy + .v-hoy .v-herramientas{margin-top:-46px}
 /* Editando, todo va a la derecha para no encimarse con el logo; en el teléfono, en su propia línea. */
 .v-lockup-hoy + .v-hoy .v-herramientas .v-sub{margin-right:0}
