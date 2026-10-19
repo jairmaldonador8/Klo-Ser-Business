@@ -306,3 +306,9 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Los spaces salen de la barra de abajo y viven en el riel izquierdo, bajo las secciones (cuadro con su inicial en su color; «All» con cuatro puntos). En teléfono, segundo renglón del riel con píldoras con nombre que se deslizan. El «+» queda flotante abajo a la derecha, en el color del space abierto.
 - Cada space trae su paleta (`--ac-claro/--ac/--ac-hondo/--ac-negro/--ac-texto` por `data-color`): Your day, Klo, índices, micro wins, palomitas, lockup y Calendar (hoy, «ahora»). En «All» sigue la brasa.
 - Al abrir un space: velo oscuro difuminado con el logo del space al centro (su inicial en un cuadro con su degradado; Klo en «All») y un anillo fino que gira en su color; dura lo que tarda en llegar y al menos 0.75 s. El cuadro tocado en el riel late mientras carga (`useLinkStatus`). Las secciones muestran el mismo logo con anillo en `loading.tsx`.
+
+## 24. Logos de los spaces (2026-10-19)
+
+- `espacios.logo` (migración 0007): ruta de la app o URL https de una marca **blanca y cuadrada**; se pinta sobre el degradado del color del space en el riel, la barra de arriba y la apertura. Sin logo, la inicial.
+- Los de Jair: Klo-Ser = monograma K oficial (`/marca/blanco/05-monograma-k.svg`); Personal brand = «VITA» recortado del wordmark de VITA Studio (`/espacios/vita-studio.png`, repo Vitastudios); Top Digital = isotipo de TOP-DIGITAL-SYSTEM sin su fondo degradado (`/espacios/top-digital.svg`).
+- Siguiente paso natural para multi-tenant: subir el logo desde Ajustes a Storage.

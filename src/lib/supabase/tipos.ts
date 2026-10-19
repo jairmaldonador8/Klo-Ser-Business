@@ -48,6 +48,7 @@ export type Database = {
           creado_por: string
           id: string
           inicial: string
+          logo: string | null
           nombre: string
           orden: number
         }
@@ -59,6 +60,7 @@ export type Database = {
           creado_por?: string
           id?: string
           inicial: string
+          logo?: string | null
           nombre: string
           orden?: number
         }
@@ -70,6 +72,7 @@ export type Database = {
           creado_por?: string
           id?: string
           inicial?: string
+          logo?: string | null
           nombre?: string
           orden?: number
         }

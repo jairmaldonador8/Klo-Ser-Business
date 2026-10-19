@@ -12,7 +12,7 @@ export default async function PaginaCalendario({ searchParams }: Props) {
   const { frente: atajo, fecha: f, vista: v } = await searchParams
   const supabase = await crearClienteServidor()
   const [{ data: espacios }, ctx] = await Promise.all([
-    supabase.from('espacios').select('id, nombre, inicial, atajo, color').order('orden'),
+    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo').order('orden'),
     contextoAhora(),
   ])
   const frentes: FrenteVista[] = (espacios ?? []).map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))

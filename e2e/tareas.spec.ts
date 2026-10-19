@@ -85,4 +85,8 @@ test('micro wins: agregar, palomear (se tacha) y quitar', async ({ page }, info)
   await tareas.getByRole('button', { name: 'Edit', exact: true }).click()
   await tareas.getByRole('button', { name: `Remove ${nombre}` }).click()
   await expect(tareas.getByText(nombre)).toHaveCount(0)
+  // Se quita al instante; tras recargar se confirma que quedó borrado en la base (y la cuenta queda limpia).
+  await page.waitForLoadState('networkidle')
+  await page.reload({ waitUntil: 'networkidle' })
+  await expect(tareas.getByText(nombre)).toHaveCount(0)
 })

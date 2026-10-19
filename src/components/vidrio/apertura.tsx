@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { createPortal } from 'react-dom'
 import type { FrenteVista } from '@/lib/frentes'
+import { MarcaEspacio } from './marca-espacio'
 
 /** Lo que se está abriendo: un space, o «All» (sin space). */
 export type Abriendo = { frente: FrenteVista | null }
@@ -16,7 +17,9 @@ export function MarcaCargando({ frente }: { frente: FrenteVista | null }) {
         <circle className="arco" cx="50" cy="50" r="46" pathLength="100" />
       </svg>
       {frente ? (
-        <b>{frente.inicial}</b>
+        <b className={frente.logo ? 'con-logo' : undefined}>
+          <MarcaEspacio frente={frente} />
+        </b>
       ) : (
         <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={40} height={48} unoptimized priority />
       )}

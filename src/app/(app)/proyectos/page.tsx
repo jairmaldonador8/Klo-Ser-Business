@@ -41,7 +41,7 @@ function Tarjeta({ p, frente, hoy, atajo }: { p: ProyectoLista; frente?: FrenteV
 export default async function Proyectos({ searchParams }: Props) {
   const { frente: crudo } = await searchParams
   const supabase = await crearClienteServidor()
-  const { data: espacios } = await supabase.from('espacios').select('id, nombre, inicial, atajo, color').order('orden')
+  const { data: espacios } = await supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo').order('orden')
   const frentes: FrenteVista[] = (espacios ?? []).map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))
   const frente = frenteAbierto(frentes, typeof crudo === 'string' ? crudo : null)
   const atajo = frente?.atajo ?? null

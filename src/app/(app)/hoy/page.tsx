@@ -49,7 +49,7 @@ export default async function Hoy({ searchParams }: Props) {
   const { data } = await supabase.auth.getClaims()
   const [{ data: perfil }, { data: espacios }, tareas, proyectos, ctx] = await Promise.all([
     supabase.from('perfiles').select('vista').eq('user_id', data!.claims.sub).single(),
-    supabase.from('espacios').select('id, nombre, inicial, atajo, color').order('orden'),
+    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo').order('orden'),
     // Todas: el panorama de frentes necesita las de cada uno; el frente abierto se filtra aquí.
     leerMisTareas(),
     leerProyectos(),

@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { Icono } from '@/components/armazon/iconos'
 import { Apertura, type Abriendo } from './apertura'
+import { MarcaEspacio } from './marca-espacio'
 import { frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { seccionActiva } from '@/lib/navegacion'
 import { conFrente } from '@/lib/rutas'
@@ -73,7 +74,9 @@ export function Riel({ secciones, frentes }: { secciones: Seccion[]; frentes: Fr
               style={{ '--c': `var(--v-p-${f.color})` } as React.CSSProperties}
               onClick={abrir(f)}
             >
-              <b aria-hidden>{f.inicial}</b>
+              <b aria-hidden className={f.logo ? 'con-logo' : undefined}>
+                <MarcaEspacio frente={f} />
+              </b>
               <span>{f.nombre}</span>
               <Cargando />
             </Link>

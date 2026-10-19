@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { conFrente } from '@/lib/rutas'
+import { MarcaEspacio } from './marca-espacio'
 import { fechaLarga, horaEn, saludoPorHora } from '@/lib/saludo'
 
 // ahora llega del servidor: si se calcula aquí, el HTML y el cliente pueden diferir (hidratación).
@@ -19,7 +20,9 @@ export function BarraArriba({ nombre, zona, frentes, ahora: ahoraIso }: Props) {
   return (
     <header className="v-barra">
       {frente ? (
-        <div className={`v-foto v-color-${frente.color}`}>{frente.inicial}</div>
+        <div className={`v-foto v-color-${frente.color}${frente.logo ? ' con-logo' : ''}`} data-color={frente.color}>
+          <MarcaEspacio frente={frente} />
+        </div>
       ) : (
         <div className="v-foto sol-klo">
           <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={28} height={34} unoptimized />
