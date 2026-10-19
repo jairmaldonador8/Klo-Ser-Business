@@ -317,3 +317,10 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 
 - Dentro de un space, Today muestra a la derecha del lockup Klo-Ser Business (con una línea fina en medio) el wordmark completo del space (`espacios.logo_ancho`, migración 0008), 34 px de alto (24 en teléfono), entrando desde la izquierda.
 - Los de Jair: Klo-Ser = wordmark oficial Klo-Ser Real Estate en azul (`marca/logos/azul/wordmark-real-estate.png`); Personal brand = VITASTUDIO completo en blanco; Top Digital = wordmark «Top Digital» de TOP-DIGITAL-SYSTEM. Falta el archivo «Somos Top Digital» (no existe en los repos).
+
+## 26. Calendario estilo Notion: arrastre fino (2026-10-19, ideas de calendarcn, MIT)
+
+- Mover: el original queda apagado, un **contorno** marca dónde caerá (ya ajustado a 15 min) y una **copia flotante** sigue al puntero sin saltos (portal al body, `transform` en cada cuadro, sin pasar por React), con la hora nueva. React solo re-pinta cuando cambia el bloque de 15 min o el día.
+- Autoscroll que acelera cerca de la orilla de arriba/abajo; dejar el evento medio segundo en la orilla izquierda/derecha pasa de página (cada 1.1 s) sin soltar.
+- Seleccionar arrastrando (hacia arriba o abajo) deja un **borrador** pintado que respira mientras llenas la hoja; se va al guardar o cancelar.
+- Estirar desde la orilla de arriba o de abajo; la contraria queda fija y, si la cruzas, se voltea; mínimo 15 min. Esc cancela.

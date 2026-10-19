@@ -31,9 +31,9 @@ test('crear en la rejilla, mover a otro día y borrar', async ({ page }, info) =
   // Arrastrarlo al día siguiente, a la misma hora.
   const r = (await evento.boundingBox())!
   const destino = await enHora(dia2!, 14 * 60)
-  await page.mouse.move(r.x + 10, r.y + 6)
+  await page.mouse.move(r.x + 10, r.y + r.height / 2) // del centro: las orillas de arriba y abajo estiran
   await page.mouse.down()
-  await page.mouse.move(destino.x, destino.y + 2, { steps: 8 })
+  await page.mouse.move(destino.x, destino.y + r.height / 2 - 4, { steps: 8 })
   await page.mouse.up()
   await expect(page.locator('.v-toast-zona').getByText('Moved', { exact: true })).toBeVisible()
   await expect(page.locator(`[data-dia="${dia2}"]`).getByRole('button', { name: new RegExp(titulo) })).toBeVisible()

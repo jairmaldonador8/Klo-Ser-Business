@@ -58,16 +58,19 @@ export function EventoHora({
         {rango(tarea)}
         {tarea.clase !== 'tarea' && !corto && <em> · {nombreClase(tarea.clase)}</em>}
       </small>
-      {!tarea.completada_en && (
-        <i
-          className="cal-estirar"
-          aria-hidden
-          onPointerDown={(e) => {
-            e.stopPropagation()
-            empezar(e, { tipo: 'estirar', tarea })
-          }}
-        />
-      )}
+      {/* Orillas para estirar: arriba cambia el inicio, abajo el fin (la contraria queda fija). */}
+      {!tarea.completada_en &&
+        (['inicio', 'fin'] as const).map((borde) => (
+          <i
+            key={borde}
+            className={`cal-estirar ${borde === 'inicio' ? 'arriba' : 'abajo'}`}
+            aria-hidden
+            onPointerDown={(e) => {
+              e.stopPropagation()
+              empezar(e, { tipo: 'estirar', tarea, borde })
+            }}
+          />
+        ))}
     </button>
   )
 }

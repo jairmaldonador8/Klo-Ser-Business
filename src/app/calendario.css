@@ -229,3 +229,41 @@
 .v-actividades .propia button{display:grid;place-items:center;width:18px;height:18px;border-radius:6px;color:var(--tinta-2)}
 .v-actividades .propia button:hover{background:rgba(255,255,255,.1);color:#fff}
 }
+
+/* ── Arrastre estilo Notion (DISENO §26) ─────────────────────────────────
+   Al mover: el original queda apagado, un contorno marca dónde caerá (ya ajustado a 15 min) y una copia
+   flota con el puntero, sin saltos. Al seleccionar, la zona queda como borrador mientras llenas la hoja. */
+@layer components {
+.cal-estirar{position:absolute;left:0;right:0;height:9px;cursor:ns-resize;touch-action:none;z-index:1}
+.cal-estirar.arriba{top:0;bottom:auto}
+.cal-estirar.abajo{bottom:0;top:auto}
+.cal-estirar::after{content:"";position:absolute;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:2px;background:currentColor;opacity:0;transition:opacity .15s}
+.cal-estirar.arriba::after{top:3px}
+.cal-estirar.abajo::after{bottom:3px}
+.cal-ev:hover .cal-estirar::after{opacity:.5}
+.cal-ev.corto .cal-estirar.arriba{display:none}
+
+/* Contorno: dónde va a caer. Sin relleno, con su hora. */
+.cal-ev.previa.contorno{background:color-mix(in oklch,var(--c) 10%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in oklch,var(--c) 85%,#fff);color:color-mix(in oklch,var(--c) 35%,#fff);
+  transition:top .09s cubic-bezier(.2,.8,.2,1),height .09s cubic-bezier(.2,.8,.2,1)}
+.cal-ev.previa.contorno b{opacity:.0}
+.cal-ficha.previa.contorno{background:color-mix(in oklch,var(--c) 10%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in oklch,var(--c) 85%,#fff)}
+/* Seleccionando o estirando: el bloque crece pegado a la rejilla, con un pequeño deslizamiento. */
+.cal-ev.previa:not(.contorno){transition:top .07s ease-out,height .07s ease-out}
+/* Borrador: la zona elegida se queda mientras llenas la hoja, respirando suave. */
+.cal-ev.previa.borrador{animation:cal-borrador 1.8s ease-in-out infinite}
+@keyframes cal-borrador{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+
+/* La copia que flota con el puntero. */
+.cal-flotante{position:fixed;left:0;top:0;z-index:90;pointer-events:none;will-change:transform;display:flex;flex-direction:column;gap:2px;overflow:hidden;
+  padding:6px 9px 6px 11px;border-radius:9px;color:color-mix(in oklch,var(--c) 18%,#fff);
+  background:linear-gradient(180deg,color-mix(in oklch,var(--c) 48%,#141312),color-mix(in oklch,var(--c) 36%,#121110));
+  box-shadow:inset 3px 0 0 var(--c),inset 0 1px 0 rgba(255,255,255,.14),0 0 0 1px rgba(0,0,0,.5),0 22px 44px -14px rgba(0,0,0,.9),0 0 0 4px color-mix(in oklch,var(--c) 18%,transparent);
+  opacity:.94;rotate:-1.2deg;animation:cal-levanta .14s ease-out both}
+.cal-flotante b{font-weight:600;font-size:12.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-flotante small{font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:#fff}
+.cal-flotante.chip{flex-direction:row;align-items:center;gap:8px;height:auto;padding:4px 9px}
+@keyframes cal-levanta{from{scale:.96;opacity:.6}}
+.cal-estirando,.cal-estirando *{cursor:ns-resize!important}
+@media (prefers-reduced-motion:reduce){.cal-flotante{animation:none;rotate:0deg}.cal-ev.previa,.cal-ev.previa.contorno{transition:none}.cal-ev.previa.borrador{animation:none}}
+}

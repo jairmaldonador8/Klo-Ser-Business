@@ -9,6 +9,9 @@ const SESION = 'test-results/.sesion.json'
 
 export default defineConfig({
   testDir: 'e2e',
+  // Un solo worker: comparten la cuenta de pruebas y, con el server de dev compilando y WebKit lento en
+  // Windows, en paralelo salían fallas intermitentes por tiempo (no de la app).
+  workers: 1,
   use: { baseURL: 'http://localhost:3200' },
   webServer: { command: 'npm run dev', url: 'http://localhost:3200/entrar', reuseExistingServer: true, timeout: 120_000 },
   projects: [

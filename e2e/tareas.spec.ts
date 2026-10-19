@@ -76,6 +76,8 @@ test('micro wins: agregar, palomear (se tacha) y quitar', async ({ page }, info)
 
   const chip = tareas.getByRole('button', { name: nombre })
   await expect(chip).toBeEnabled()
+  // Que termine de guardarse (el chip provisional se reemplaza por el guardado) antes de palomearlo.
+  await page.waitForLoadState('networkidle')
   await chip.click()
   await expect(chip).toHaveAttribute('aria-pressed', 'true')
   // Sigue palomeado al recargar: quedó guardado para hoy.

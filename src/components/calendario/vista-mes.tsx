@@ -70,7 +70,7 @@ export function VistaMes({ dias, fecha, tareas, metas, hoy, colorDe, empezar, pr
                 </button>
               )}
               {sobre && (
-                <span className="cal-ficha previa" style={colorVar(previa.color)}>
+                <span className="cal-ficha previa contorno" style={colorVar(previa.color)}>
                   {previa.titulo}
                 </span>
               )}

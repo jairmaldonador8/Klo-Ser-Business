@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { startTransition, useCallback, useEffect, useMemo, useOptimistic, useRef, useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 import { moverMeta, reprogramarTarea } from '@/app/(app)/calendario/acciones'
 import { useHoja } from '@/components/hoja/hoja-provider'
 import { useToast } from '@/components/tareas/toast'
@@ -9,6 +10,7 @@ import {
   aMinutos,
   ajustar,
   deMinutos,
+  horaCorta,
   dentro,
   diasVista,
   esVista,
@@ -139,8 +141,12 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
   const colores = useMemo(() => new Map(frentes.map((f) => [f.id, f.color])), [frentes])
   const colorDe = useCallback((id: string) => colores.get(id) ?? 'azul', [colores])
 
+  // La zona que seleccionaste se queda pintada (borrador) mientras llenas la hoja; al cerrarla se va.
+  const [borrador, setBorrador] = useState<{ dia: string; ini: number; fin: number } | null>(null)
+
   const nuevaEn = useCallback(
-    (dia: string, ini?: number, fin?: number) =>
+    (dia: string, ini?: number, fin?: number) => {
+      if (ini !== undefined && fin !== undefined) setBorrador({ dia, ini, fin })
       abrir({
         valores: {
           fecha: dia,
@@ -148,7 +154,9 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
           hora_fin: fin === undefined ? null : deMinutos(fin),
           ...(frente && { espacio_id: frente.id }),
         },
-      }),
+        alCerrar: () => setBorrador(null),
+      })
+    },
     [abrir, frente],
   )
 
@@ -170,6 +178,17 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     },
     [ponerTarea, avisar],
   )
+
+  /** Rango que deja estirar: la orilla contraria a la que tomaste queda fija; si la cruzas, se voltea. Mínimo 15 min. */
+  const rangoEstirado = useCallback((t: Tarea, borde: 'inicio' | 'fin', cursor: number): [number, number] => {
+    const ini = aMinutos(t.hora!)
+    const fin = t.hora_fin ? aMinutos(t.hora_fin) : ini + 30
+    const ancla = borde === 'fin' ? ini : fin
+    const a = Math.min(ancla, cursor)
+    const b = Math.max(ancla, cursor)
+    if (b - a >= 15) return [a, b]
+    return borde === 'fin' ? [ancla, Math.min(1439, ancla + 15)] : [Math.max(0, ancla - 15), ancla]
+  }, [])
 
   /** Lo que pasa al soltar. Devuelve false si no cambió nada (entonces cuenta como un toque). */
   const aplicar = useCallback(
@@ -195,7 +214,8 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       let nuevos: Campos
       if (o.tipo === 'estirar') {
         if (d.min === null || !t.hora) return false
-        nuevos = { ...antes, hora_fin: deMinutos(Math.max(aMinutos(t.hora) + 15, d.min)) }
+        const [a, b] = rangoEstirado(t, o.borde, d.min)
+        nuevos = { ...antes, hora: deMinutos(a), hora_fin: deMinutos(b) }
       } else if (d.zona === 'hora' && d.min !== null) {
         const dur = t.hora ? (t.hora_fin ? aMinutos(t.hora_fin) - aMinutos(t.hora) : null) : 60
         nuevos = { fecha: d.dia, hora: deMinutos(d.min), hora_fin: dur === null ? null : deMinutos(Math.min(d.min + dur, 1439)) }
@@ -206,14 +226,23 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
         nuevos = { ...antes, fecha: d.dia }
       }
       if (iguales(antes, nuevos)) return false
-      cambiar(t, nuevos, antes.fecha ? 'Moved' : 'Scheduled')
+      cambiar(t, nuevos, o.tipo === 'estirar' ? 'Resized' : antes.fecha ? 'Moved' : 'Scheduled')
       return true
     },
-    [cambiar, nuevaEn, ponerMeta, avisar],
+    [cambiar, nuevaEn, ponerMeta, avisar, rangoEstirado],
   )
 
   const [arrastre, setArrastre] = useState<{ origen: Origen; destino: Destino | null } | null>(null)
-  const scrollRef = useRef<HTMLElement | null>(null)
+  // La copia flotante sigue al puntero sin pasar por React (se mueve con transform en cada cuadro).
+  const flotante = useRef<HTMLDivElement | null>(null)
+  const [tamFlotante, setTamFlotante] = useState<{ w: number; h: number; chip: boolean } | null>(null)
+  // `ir` cambia en cada render; el arrastre lo lee de aquí para pasar de semana sin soltar.
+  const irRef = useRef<(v: Vista, f: string) => void>(() => {})
+  const pasoRef = useRef<{ vista: Vista; fecha: string }>({ vista, fecha })
+  useEffect(() => {
+    irRef.current = ir
+    pasoRef.current = { vista, fecha }
+  })
 
   /** Qué hay bajo el puntero. Crear y estirar se quedan en su día. */
   const destinoEn = useCallback((x: number, y: number, o: Origen): Destino | null => {
@@ -240,20 +269,75 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       if (e.button !== 0) return
       const tactil = e.pointerType !== 'mouse'
       const inicio = { x: e.clientX, y: e.clientY }
-      scrollRef.current = (e.currentTarget as HTMLElement).closest('.cal-scroll')
+      const puntero = { x: e.clientX, y: e.clientY }
+      const elemento = e.currentTarget as HTMLElement
+      const scroll = elemento.closest<HTMLElement>('.cal-scroll') ?? document.querySelector<HTMLElement>('.cal-scroll')
+      const principal = document.querySelector<HTMLElement>('.cal-principal')
+      // Dónde se tomó el elemento, para que la copia flotante no brinque al puntero.
+      const caja = elemento.getBoundingClientRect()
+      const agarre = { dx: e.clientX - caja.left, dy: e.clientY - caja.top }
+      const conCopia = origen.tipo === 'mover' || origen.tipo === 'meta'
       let activo = false
       let espera: ReturnType<typeof setTimeout> | undefined
+      let cuadro = 0
+      let clave = ''
+      let orilla: { lado: -1 | 1; desde: number; ultimo: number } | null = null
+
+      const actualizar = () => {
+        const d = destinoEn(puntero.x, puntero.y, origen)
+        const nueva = d ? `${d.dia}|${d.zona}|${d.min}` : '-'
+        // Solo se re-pinta React cuando cambia el bloque de 15 min o el día, no en cada pixel.
+        if (nueva !== clave) {
+          clave = nueva
+          setArrastre({ origen, destino: d })
+        }
+      }
+
+      const tic = () => {
+        if (!activo) return
+        cuadro = requestAnimationFrame(tic)
+        const f = flotante.current
+        if (f) f.style.transform = `translate3d(${puntero.x - agarre.dx}px, ${puntero.y - agarre.dy}px, 0)`
+        // Autoscroll: más rápido entre más cerca de la orilla (hasta 14 px por cuadro).
+        if (scroll) {
+          const r = scroll.getBoundingClientRect()
+          const zona = 64
+          const arriba = puntero.y - r.top
+          const abajo = r.bottom - puntero.y
+          const vel = arriba < zona ? -(1 - Math.max(0, arriba) / zona) * 14 : abajo < zona ? (1 - Math.max(0, abajo) / zona) * 14 : 0
+          if (vel) scroll.scrollTop += vel
+        }
+        // En la orilla izquierda o derecha medio segundo: pasa de página (y sigue cada 1.1 s) sin soltar.
+        if (conCopia && principal) {
+          const r = principal.getBoundingClientRect()
+          const lado = puntero.x < r.left + 36 ? -1 : puntero.x > r.right - 36 ? 1 : 0
+          const ahora = performance.now()
+          if (!lado) orilla = null
+          else if (!orilla || orilla.lado !== lado) orilla = { lado, desde: ahora, ultimo: 0 }
+          else if (ahora - orilla.desde > 500 && ahora - orilla.ultimo > 1100) {
+            orilla.ultimo = ahora
+            const { vista: v, fecha: f } = pasoRef.current
+            irRef.current(v, pasar(v, f, lado))
+          }
+        }
+        actualizar()
+      }
 
       const activar = () => {
         activo = true
         document.documentElement.classList.add('cal-arrastrando')
+        if (origen.tipo === 'estirar') document.documentElement.classList.add('cal-estirando')
         navigator.vibrate?.(8)
-        setArrastre({ origen, destino: destinoEn(inicio.x, inicio.y, origen) })
+        if (conCopia) setTamFlotante({ w: caja.width, h: caja.height, chip: origen.tipo === 'meta' || !(origen.tipo === 'mover' && origen.tarea.hora && elemento.classList.contains('cal-ev')) })
+        actualizar()
+        cuadro = requestAnimationFrame(tic)
       }
       // En el teléfono, arrastrar pide dejar el dedo un momento: si no, es scroll. Crear es solo con toque.
       if (tactil && origen.tipo !== 'crear') espera = setTimeout(activar, 280)
 
       const mover = (ev: PointerEvent) => {
+        puntero.x = ev.clientX
+        puntero.y = ev.clientY
         if (!activo) {
           const d = Math.hypot(ev.clientX - inicio.x, ev.clientY - inicio.y)
           if (tactil) {
@@ -263,64 +347,90 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
           if (d < 4) return
           activar()
         }
-        const s = scrollRef.current
-        if (s) {
-          const r = s.getBoundingClientRect()
-          if (ev.clientY < r.top + 36) s.scrollTop -= 14
-          else if (ev.clientY > r.bottom - 36) s.scrollTop += 14
-        }
-        setArrastre({ origen, destino: destinoEn(ev.clientX, ev.clientY, origen) })
       }
       const soltar = (ev: PointerEvent) => {
         const eraActivo = activo
+        puntero.x = ev.clientX
+        puntero.y = ev.clientY
+        const d = eraActivo ? destinoEn(ev.clientX, ev.clientY, origen) : null
         limpiar()
         if (!eraActivo) return alTocar?.()
-        const d = destinoEn(ev.clientX, ev.clientY, origen)
         if (!d || !aplicar(origen, d)) alTocar?.()
+      }
+      const tecla = (ev: KeyboardEvent) => {
+        if (ev.key === 'Escape') limpiar()
       }
       const bloquearScroll = (ev: TouchEvent) => {
         if (activo) ev.preventDefault()
       }
       function limpiar() {
         clearTimeout(espera)
+        cancelAnimationFrame(cuadro)
         activo = false
-        document.documentElement.classList.remove('cal-arrastrando')
+        document.documentElement.classList.remove('cal-arrastrando', 'cal-estirando')
         setArrastre(null)
+        setTamFlotante(null)
         window.removeEventListener('pointermove', mover)
         window.removeEventListener('pointerup', soltar)
         window.removeEventListener('pointercancel', limpiar)
+        window.removeEventListener('keydown', tecla)
         document.removeEventListener('touchmove', bloquearScroll)
       }
       window.addEventListener('pointermove', mover)
       window.addEventListener('pointerup', soltar)
       window.addEventListener('pointercancel', limpiar)
+      window.addEventListener('keydown', tecla)
       document.addEventListener('touchmove', bloquearScroll, { passive: false })
     },
     [destinoEn, aplicar],
   )
 
   const previa = useMemo((): Previa | null => {
-    if (!arrastre?.destino) return null
+    if (!arrastre?.destino) {
+      if (!borrador) return null
+      return { dia: borrador.dia, zona: 'hora', ini: borrador.ini, fin: borrador.fin, titulo: 'New task', color: frente?.color ?? 'azul', id: null, borrador: true }
+    }
     const { origen: o, destino: d } = arrastre
     if (o.tipo === 'crear') {
       if (d.min === null) return null
       return { dia: o.dia, zona: 'hora', ini: Math.min(o.desde, d.min), fin: Math.max(o.desde + 15, d.min), titulo: 'New task', color: frente?.color ?? 'azul', id: null }
     }
-    if (o.tipo === 'meta') return { dia: d.dia, zona: d.zona, ini: null, fin: null, titulo: o.meta.nombre, color: colorDe(o.meta.espacio_id), id: o.meta.id }
+    if (o.tipo === 'meta') return { dia: d.dia, zona: d.zona, ini: null, fin: null, titulo: o.meta.nombre, color: colorDe(o.meta.espacio_id), id: o.meta.id, contorno: true }
     const t = o.tarea
     const base = { titulo: t.titulo, color: colorDe(t.espacio_id), id: t.id }
     if (o.tipo === 'estirar') {
-      const ini = aMinutos(t.hora!)
-      return { ...base, dia: t.fecha!, zona: 'hora', ini, fin: Math.max(ini + 15, d.min ?? ini) }
+      const [ini, fin] = d.min === null ? [aMinutos(t.hora!), aMinutos(t.hora!) + 15] : rangoEstirado(t, o.borde, d.min)
+      return { ...base, dia: t.fecha!, zona: 'hora', ini, fin }
     }
     if (d.zona === 'hora' && d.min !== null) {
       const dur = t.hora && t.hora_fin ? aMinutos(t.hora_fin) - aMinutos(t.hora) : t.hora ? 30 : 60
-      return { ...base, dia: d.dia, zona: 'hora', ini: d.min, fin: d.min + dur }
+      return { ...base, dia: d.dia, zona: 'hora', ini: d.min, fin: d.min + dur, contorno: true }
     }
-    return { ...base, dia: d.dia, zona: d.zona, ini: null, fin: null }
-  }, [arrastre, colorDe, frente])
+    return { ...base, dia: d.dia, zona: d.zona, ini: null, fin: null, contorno: true }
+  }, [arrastre, borrador, colorDe, frente, rangoEstirado])
 
   const arrastrando = arrastre?.destino ? (arrastre.origen.tipo === 'meta' ? arrastre.origen.meta.id : arrastre.origen.tipo === 'crear' ? null : arrastre.origen.tarea.id) : null
+
+  // La copia que flota con el puntero (mover y metas): va al body para que ningún scroll la recorte.
+  const copia =
+    arrastre && tamFlotante && previa && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            ref={flotante}
+            className={`cal-flotante${tamFlotante.chip ? ' chip' : ''}`}
+            style={{ width: tamFlotante.w, height: tamFlotante.chip ? undefined : tamFlotante.h, '--c': `var(--v-p-${previa.color})` } as React.CSSProperties}
+            aria-hidden
+          >
+            <b>{previa.titulo}</b>
+            {previa.ini !== null && previa.fin !== null && (
+              <small>
+                {horaCorta(deMinutos(previa.ini))} – {horaCorta(deMinutos(previa.fin))}
+              </small>
+            )}
+          </div>,
+          document.body,
+        )
+      : null
 
   // ── Teclado: T hoy · D/X/W/M vista · ←/→ o J/K página · N nueva ─────
   useEffect(() => {
@@ -442,6 +552,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
           </p>
         </aside>
       </div>
+      {copia}
     </section>
   )
 }

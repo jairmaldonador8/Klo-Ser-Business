@@ -8,7 +8,7 @@ import { HojaTarea } from './hoja-tarea'
 
 export type ProyectoOpcion = { id: string; espacio_id: string; nombre: string }
 /** Lo que abre la hoja: una tarea existente, o valores para una nueva (frente abierto, texto de una nota…). */
-export type Apertura = { tarea?: Tarea; valores?: Partial<Tarea>; notaId?: string }
+export type Apertura = { tarea?: Tarea; valores?: Partial<Tarea>; notaId?: string; alCerrar?: () => void }
 
 const Contexto = createContext<(a?: Apertura) => void>(() => {})
 export const useHoja = () => useContext(Contexto)
@@ -42,7 +42,10 @@ export function HojaProvider({
             proyectos={proyectos}
             actividades={actividades}
             hoy={hoy}
-            cerrar={() => setAbierta(null)}
+            cerrar={() => {
+              abierta.alCerrar?.()
+              setAbierta(null)
+            }}
           />
         )}
       </Contexto.Provider>

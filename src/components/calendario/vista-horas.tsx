@@ -79,7 +79,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
               {x.sinHora.map((t) => (
                 <FichaDia key={t.id} tarea={t} color={colorDe(t.espacio_id)} empezar={empezar} fantasma={arrastrando === t.id} />
               ))}
-              {sobre && <span className="cal-ficha previa" style={colorVar(previa.color)}>{previa.titulo}</span>}
+              {sobre && <span className="cal-ficha previa contorno" style={colorVar(previa.color)}>{previa.titulo}</span>}
             </div>
           )
         })}
@@ -139,7 +139,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                   )
                 })}
                 {verPrevia && (
-                  <div className="cal-ev previa" style={{ top: pct(previa.ini!), height: pct(Math.max(15, previa.fin! - previa.ini!)), ...colorVar(previa.color) }}>
+                  <div className={`cal-ev previa${previa.contorno ? ' contorno' : ''}${previa.borrador ? ' borrador' : ''}`} style={{ top: pct(previa.ini!), height: pct(Math.max(15, previa.fin! - previa.ini!)), ...colorVar(previa.color) }}>
                     <b>{previa.titulo}</b>
                     <small>
                       {horaCorta(deMinutos(previa.ini!))} – {horaCorta(deMinutos(previa.fin!))}
