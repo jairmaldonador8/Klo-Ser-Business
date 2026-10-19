@@ -2,15 +2,15 @@
 
 import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { guardarActividades } from '@/app/(app)/ajustes/acciones'
-import { borrarTarea, completarTarea, crearEnVariosDias, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
-import { borrarDesdeAqui, cambiarDesdeAqui, crearRepetida, leerSerie, soloEsta } from '@/app/(app)/tareas/repetir'
+import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
+import { borrarDesdeAqui, borrarTodas, cambiarDesdeAqui, cambiarTodas, crearEnVariosDias, crearRepetida, leerSerie, soloEsta } from '@/app/(app)/tareas/repetir'
 import { mismaRegla } from '@/lib/repetir'
 import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
 import { COLORES_TAREA, NOMBRE_COLOR_TAREA } from '@/lib/tareas/colores'
 import { CLASES, hhmm, MAX_ACTIVIDAD, nombreClase, type Clase } from '@/lib/tareas/esquema'
-import type { Apertura, ProyectoOpcion } from './hoja-provider'
+import { useHojaViva, type Apertura, type ProyectoOpcion } from './hoja-provider'
 import { SelectorRepetir, type Repetir } from './selector-repetir'
 
 type Formulario = {
@@ -66,6 +66,9 @@ export function HojaTarea({
   const dias = !tarea && apertura.dias && apertura.dias.length > 1 ? apertura.dias : null
   const dialogo = useRef<HTMLDialogElement>(null)
   const [form, setForm] = useState(() => inicial(apertura, frentes, hoy))
+  // Cómo llegó: para saber si al salir hay algo que guardar.
+  const [original] = useState(() => JSON.stringify(inicial(apertura, frentes, hoy)))
+  const { poner: ponerVivo } = useHojaViva()
   const [aviso, setAviso] = useState('')
   // Repetición: la elegida y, si ya era de una serie, la que tenía (para saber si cambió).
   const [repetir, setRepetir] = useState<Repetir>(null)
@@ -132,6 +135,22 @@ export function HojaTarea({
     })
   }
 
+  // Vista previa en vivo: el calendario pinta el color, el título y la actividad mientras editas, antes de guardar.
+  useEffect(() => {
+    if (!tarea) return
+    ponerVivo({ color: form.color || null, titulo: form.titulo.trim() || tarea.titulo, clase: form.clase })
+  }, [tarea, form.color, form.titulo, form.clase, ponerVivo])
+
+  const cambio = JSON.stringify(form) !== original || repeticionCambio
+
+  /** Salir (clic fuera o Esc): lo editado se guarda solo; si es de un grupo, primero pregunta a cuáles. Cancel descarta. */
+  function salir() {
+    if (ocupada) return
+    if (alcance) return setAlcance(null)
+    if (!cambio || (!tarea && !form.titulo.trim())) return dialogo.current?.close()
+    guardar()
+  }
+
   function guardar() {
     if (dias) return correr(() => crearEnVariosDias(form, dias))
     if (!tarea) return correr(() => (repetir ? crearRepetida(form, repetir.regla, repetir.fin) : guardarTarea({ ...form, id: '' }, notaId)))
@@ -161,8 +180,12 @@ export function HojaTarea({
       className="v-hoja"
       aria-label={tarea ? 'Edit task' : 'New task'}
       onClose={cerrar}
-      // Tocar el fondo (fuera del panel) la cierra.
-      onClick={(e) => e.target === e.currentTarget && dialogo.current?.close()}
+      // Esc o tocar el fondo: salir guardando (ver `salir`).
+      onCancel={(e) => {
+        e.preventDefault()
+        salir()
+      }}
+      onClick={(e) => e.target === e.currentTarget && salir()}
     >
       <form
         className="cuerpo"
@@ -375,7 +398,7 @@ export function HojaTarea({
 
         {tarea && alcance ? (
           <div className="pie v-alcance" role="group" aria-label="Apply to">
-            <span className="v-sub">This task repeats. {alcance === 'borrar' ? 'Delete' : 'Apply changes to'}:</span>
+            <span className="v-sub">This task is part of a group. {alcance === 'borrar' ? 'Delete' : 'Apply changes to'}:</span>
             <button
               type="button"
               className="v-boton"
@@ -393,6 +416,14 @@ export function HojaTarea({
               }
             >
               This and following
+            </button>
+            <button
+              type="button"
+              className="v-boton"
+              disabled={ocupada}
+              onClick={() => correr(() => (alcance === 'borrar' ? borrarTodas(tarea.id) : cambiarTodas(tarea.id, form)))}
+            >
+              All
             </button>
             <button type="button" className="v-boton" onClick={() => setAlcance(null)}>
               Back

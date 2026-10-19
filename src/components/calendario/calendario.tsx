@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { startTransition, useCallback, useEffect, useMemo, useOptimistic, useRef, useState, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 import { moverMeta, reprogramarTarea } from '@/app/(app)/calendario/acciones'
-import { useHoja } from '@/components/hoja/hoja-provider'
+import { conVistaPrevia, useHoja, useHojaViva } from '@/components/hoja/hoja-provider'
 import { useToast } from '@/components/tareas/toast'
 import {
   ajustar,
@@ -131,7 +131,9 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     [params, hoy, rango, router],
   )
 
-  const visibles = useMemo(() => tareasVivas.filter((t) => !ocultos.has(t.espacio_id)), [tareasVivas, ocultos])
+  // Lo que editas en la hoja se ve en vivo aquí, antes de guardarlo.
+  const { vivo } = useHojaViva()
+  const visibles = useMemo(() => conVistaPrevia(tareasVivas, vivo).filter((t) => !ocultos.has(t.espacio_id)), [tareasVivas, ocultos, vivo])
   const metasVis = useMemo(() => metasVivas.filter((m) => !ocultos.has(m.espacio_id)), [metasVivas, ocultos])
   const sueltas = useMemo(
     () => sinFecha.filter((t) => !ocultos.has(t.espacio_id) && !tareasVivas.some((x) => x.id === t.id && x.fecha)),

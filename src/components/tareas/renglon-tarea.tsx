@@ -2,7 +2,7 @@
 
 import { startTransition, useOptimistic } from 'react'
 import { completarTarea } from '@/app/(app)/tareas/acciones'
-import { useHoja } from '@/components/hoja/hoja-provider'
+import { useHoja, useHojaViva } from '@/components/hoja/hoja-provider'
 import type { FrenteVista } from '@/lib/frentes'
 import type { Tarea } from '@/lib/tareas/esquema'
 import { useToast } from './toast'
@@ -21,6 +21,7 @@ type Props = {
 /** Renglón de tarea: la palomita la marca (con Deshacer) y el texto abre la hoja. */
 export function RenglonTarea({ tarea, frente, detalle, vencida, ahora }: Props) {
   const abrir = useHoja()
+  const seleccionada = useHojaViva().vivo.id === tarea.id
   const avisar = useToast()
   const [hecha, setHecha] = useOptimistic(tarea.completada_en !== null)
 
@@ -43,7 +44,7 @@ export function RenglonTarea({ tarea, frente, detalle, vencida, ahora }: Props) 
   }
 
   return (
-    <li className={`v-renglon${hecha ? ' hecha' : ''}`}>
+    <li className={`v-renglon${hecha ? ' hecha' : ''}${seleccionada ? ' seleccionada' : ''}`}>
       <button type="button" className="v-palomita" aria-pressed={hecha} aria-label={`Check off “${tarea.titulo}”`} onClick={palomear} />
       <button type="button" className="txt" onClick={() => abrir({ tarea })}>
         <b>{tarea.titulo}</b>

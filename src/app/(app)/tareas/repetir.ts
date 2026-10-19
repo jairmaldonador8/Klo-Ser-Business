@@ -228,3 +228,80 @@ export async function borrarDesdeAqui(tareaId: string): Promise<Resultado> {
   await supabase.from('tareas').update({ borrado_en: new Date().toISOString() }).eq('id', tareaId)
   return listo()
 }
+
+/**
+ * Calendarizar con ⇧/⌘: la misma task en varios días seguidos, una independiente por día. Quedan ligadas
+ * como una serie «cada día» del primero al último, así editarlas pregunta Only this / All como las que se repiten.
+ */
+export async function crearEnVariosDias(datos: unknown, fechas: unknown): Promise<Resultado> {
+  const dias = z.array(z.iso.date()).min(1).max(31).safeParse(fechas)
+  if (!dias.success) return { ok: false, mensaje: 'Check the days.' }
+  const unicos = [...new Set(dias.data)].sort()
+  const leida = esquemaTarea.safeParse({ ...(datos as object), id: '', fecha: unicos[0], fecha_fin: null })
+  if (!leida.success) return { ok: false, mensaje: leida.error.issues[0]?.message ?? 'Check the details.' }
+  const supabase = await crearClienteServidor()
+  const { data: sesion } = await supabase.auth.getClaims()
+  const { id: _i, ...campos } = leida.data
+  void _i
+  const ultimo = unicos[unicos.length - 1]
+  const { data: serie, error } = await supabase
+    .from('series')
+    .insert({ espacio_id: campos.espacio_id, regla: { freq: 'dia', cada: 1 }, inicio: unicos[0], hasta: ultimo, generado_hasta: ultimo })
+    .select('id')
+    .single()
+  if (error || !serie) {
+    console.error('crearEnVariosDias: serie', error)
+    return { ok: false, mensaje: 'Couldn’t create the tasks, try again.' }
+  }
+  const plantilla: Plantilla = { ...campos, responsable_id: sesion!.claims.sub }
+  const { error: e2 } = await supabase.from('tareas').insert(copias(plantilla, unicos, serie.id))
+  if (e2) {
+    console.error('crearEnVariosDias: tareas', e2)
+    await supabase.from('series').update({ borrado_en: new Date().toISOString() }).eq('id', serie.id)
+    return { ok: false, mensaje: 'Couldn’t create the tasks, try again.' }
+  }
+  return listo()
+}
+
+/**
+ * «All»: los cambios de esta task (título, actividad, color, horas, proyecto, space) a todas las de su serie,
+ * incluidas las pasadas. La fecha solo cambia en esta.
+ */
+export async function cambiarTodas(tareaId: string, datos: unknown): Promise<Resultado> {
+  if (!id.safeParse(tareaId).success) return { ok: false, mensaje: 'Check the details.' }
+  const leida = esquemaTarea.safeParse({ ...(datos as object), id: tareaId })
+  if (!leida.success) return { ok: false, mensaje: leida.error.issues[0]?.message ?? 'Check the details.' }
+  const supabase = await crearClienteServidor()
+  const actual = await tareaYSerie(supabase, tareaId)
+  if (!actual?.s) return { ok: false, mensaje: 'Couldn’t find that series.' }
+  const { id: _i, ...campos } = leida.data
+  void _i
+  if (campos.espacio_id !== actual.t.espacio_id) {
+    const { error } = await supabase.from('series').update({ espacio_id: campos.espacio_id }).eq('id', actual.s.id)
+    if (error) return { ok: false, mensaje: 'Couldn’t move the series, try again.' }
+  }
+  const comunes = { titulo: campos.titulo, clase: campos.clase, color: campos.color, hora: campos.hora, hora_fin: campos.hora_fin, proyecto_id: campos.proyecto_id, espacio_id: campos.espacio_id }
+  const { error: e1 } = await supabase.from('tareas').update(comunes).eq('serie_id', actual.s.id).is('borrado_en', null).neq('id', tareaId)
+  const { error: e2 } = await supabase.from('tareas').update(campos).eq('id', tareaId)
+  if (e1 || e2) {
+    console.error('cambiarTodas', e1 ?? e2)
+    return { ok: false, mensaje: 'Couldn’t update them all, try again.' }
+  }
+  return listo()
+}
+
+/** «All» al borrar: toda la serie (también las pasadas) y la serie misma. */
+export async function borrarTodas(tareaId: string): Promise<Resultado> {
+  if (!id.safeParse(tareaId).success) return { ok: false, mensaje: 'Check the details.' }
+  const supabase = await crearClienteServidor()
+  const actual = await tareaYSerie(supabase, tareaId)
+  if (!actual?.s) return { ok: false, mensaje: 'Couldn’t find that series.' }
+  const ahora = new Date().toISOString()
+  const { error } = await supabase.from('tareas').update({ borrado_en: ahora }).eq('serie_id', actual.s.id).is('borrado_en', null)
+  if (error) {
+    console.error('borrarTodas', error)
+    return { ok: false, mensaje: 'Couldn’t delete them, try again.' }
+  }
+  await supabase.from('series').update({ borrado_en: ahora }).eq('id', actual.s.id)
+  return listo()
+}

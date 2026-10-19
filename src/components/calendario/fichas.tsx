@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useHoja } from '@/components/hoja/hoja-provider'
+import { useHoja, useHojaViva } from '@/components/hoja/hoja-provider'
 import { horaCorta } from '@/lib/calendario/fechas'
 import { absoluto, etiquetaRango, extremos, type Tramo } from '@/lib/calendario/tramos'
 import { porcentaje } from '@/lib/proyectos/avance'
@@ -67,6 +67,7 @@ export function EventoHora({
   fantasma: boolean
 }) {
   const abrir = useHoja()
+  const seleccionada = useHojaViva().vivo.id === tarea.id
   const corto = fin - ini < 45
   const abrirla = () => abrir({ tarea })
   // Orillas que se pueden estirar: el inicio vive en el primer tramo; el fin, en el último.
@@ -75,7 +76,7 @@ export function EventoHora({
   return (
     <button
       type="button"
-      className={`cal-ev tramo-${tipo} clase-${esClaseBase(tarea.clase) ? tarea.clase : 'propia'}${tarea.completada_en ? ' hecha' : ''}${corto ? ' corto' : ''}${fantasma ? ' fantasma' : ''}`}
+      className={`cal-ev tramo-${tipo} clase-${esClaseBase(tarea.clase) ? tarea.clase : 'propia'}${tarea.completada_en ? ' hecha' : ''}${corto ? ' corto' : ''}${fantasma ? ' fantasma' : ''}${seleccionada ? ' seleccionada' : ''}`}
       style={{ ...estilo, ...colorVar(color) }}
       aria-label={`${tarea.titulo}, ${rango(tarea)}`}
       onPointerDown={(e) => {
@@ -110,12 +111,13 @@ export function EventoHora({
 /** Tarea en una celda de día (todo el día o mes). En el mes, las que tienen hora la muestran. */
 export function FichaDia({ tarea, color, empezar, fantasma, conHora }: { tarea: Tarea; color: string; empezar: Empezar; fantasma: boolean; conHora?: boolean }) {
   const abrir = useHoja()
+  const seleccionada = useHojaViva().vivo.id === tarea.id
   const abrirla = () => abrir({ tarea })
   const conReloj = conHora && tarea.hora
   return (
     <button
       type="button"
-      className={`cal-ficha${conReloj ? ' con-hora' : ''}${tarea.completada_en ? ' hecha' : ''}${fantasma ? ' fantasma' : ''}`}
+      className={`cal-ficha${conReloj ? ' con-hora' : ''}${tarea.completada_en ? ' hecha' : ''}${fantasma ? ' fantasma' : ''}${seleccionada ? ' seleccionada' : ''}`}
       style={colorVar(color)}
       onPointerDown={(e) => {
         e.stopPropagation()

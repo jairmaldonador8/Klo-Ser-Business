@@ -348,3 +348,9 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 ## 31. Color propio de una task (2026-10-19)
 
 - Cada task puede llevar su color (`tareas.color`, migración 0011): Ember, Gold, Mint, Sky, Blue, Lavender, Pink, Red, Graphite (`lib/tareas/colores.ts`, variables `--v-p-<clave>` como los frentes). Sin color propio, el de su space. Se elige en la hoja (fila «Color»; el primer círculo, mitad de color, es «Space color») y se respeta en semana, mes, all day, arrastre y repeticiones.
+
+## 32. Hoja viva: foco, vista previa y guardar al salir (2026-10-19)
+
+- Con la hoja abierta, un velo (dentro de `.v-escena`) apaga la app y la task abierta queda encima con un anillo de su color (en listas, sube su mosaico y se marca el renglón). El `::backdrop` del diálogo es transparente.
+- Vista previa en vivo: color, título y actividad se pintan en el calendario mientras editas (`useHojaViva`/`conVistaPrevia`), sin guardar.
+- Salir (clic fuera o Esc) guarda solo; si la task es de un grupo pregunta **Only this / This and following / All**. Cancel descarta. Las copias de ⇧/⌘ nacen ligadas (serie «cada día» del primero al último).
