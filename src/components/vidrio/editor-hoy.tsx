@@ -3,16 +3,28 @@
 import {
   closestCenter,
   DndContext,
+  DragOverlay,
   KeyboardSensor,
   MouseSensor,
+  pointerWithin,
   TouchSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
+  type CollisionDetection,
+  type DragOverEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core'
-import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable'
+import {
+  arrayMove,
+  defaultAnimateLayoutChanges,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  type AnimateLayoutChanges,
+  type SortingStrategy,
+} from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { guardarMosaicos } from '@/app/(app)/ajustes/acciones'
 import { MOSAICOS } from '@/lib/vista/registro'
 import { acomodarMosaicos } from '@/lib/vista/resolver'
@@ -20,6 +32,16 @@ import { acomodarMosaicos } from '@/lib/vista/resolver'
 export type ItemHoy = { id: string; nombre: string; clase: string; obligatorio?: boolean; visible: boolean; nodo: React.ReactNode }
 
 type Props = { items: ItemHoy[]; editable: boolean }
+
+// Los mosaicos son de tamaños distintos: en vez de estirarlos para que quepan en el hueco de otro
+// (eso los deformaba), el orden cambia en vivo y la rejilla se reacomoda sola; cada mosaico se
+// desliza a su lugar nuevo y el que arrastras flota encima tal cual.
+const sinTransformar: SortingStrategy = () => null
+const siempreAnimar: AnimateLayoutChanges = (args) => defaultAnimateLayoutChanges({ ...args, wasDragging: true })
+const TRANSICION = { duration: 340, easing: 'cubic-bezier(.16,1,.3,1)' }
+
+/** Con puntero: solo cuenta el mosaico bajo el dedo (en los huecos no pasa nada). Con teclado, el más cercano. */
+const deteccion: CollisionDetection = (args) => (args.pointerCoordinates ? pointerWithin(args) : closestCenter(args))
 
 /** Hoy en mosaicos. Con «Personalizar», se arrastran para acomodarlos y se ocultan con ×. */
 export function EditorHoy({ items, editable }: Props) {
@@ -32,6 +54,10 @@ export function EditorHoy({ items, editable }: Props) {
   const [ocultos, setOcultos] = useState(inicialOcultos)
   const [aviso, setAviso] = useState('')
   const [guardando, empezar] = useTransition()
+  const [activo, setActivo] = useState<string | null>(null)
+  // Tras un intercambio, el mismo mosaico no vuelve a intercambiarse hasta que el puntero salga de él:
+  // si no, al reacomodarse queda otra vez bajo el puntero y los dos tiemblan de ida y vuelta.
+  const ultimo = useRef<string | null>(null)
 
   const sensores = useSensors(
     // Mouse y touch por separado: con PointerSensor, deslizar en el teléfono arrastraría.
@@ -41,9 +67,22 @@ export function EditorHoy({ items, editable }: Props) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  function alSoltar({ active, over }: DragEndEvent) {
-    if (!over || active.id === over.id) return
-    setVisibles((lista) => arrayMove(lista, lista.indexOf(String(active.id)), lista.indexOf(String(over.id))))
+  function alEmpezar({ active }: DragStartEvent) {
+    setActivo(String(active.id))
+    ultimo.current = null
+  }
+
+  function alPasar({ active, over }: DragOverEvent) {
+    const sobre = over ? String(over.id) : null
+    if (!sobre || sobre === active.id) return void (ultimo.current = null)
+    if (sobre === ultimo.current) return
+    ultimo.current = sobre
+    setVisibles((lista) => arrayMove(lista, lista.indexOf(String(active.id)), lista.indexOf(sobre)))
+  }
+
+  function alTerminar() {
+    setActivo(null)
+    ultimo.current = null
   }
 
   function ocultar(id: string) {
@@ -108,15 +147,30 @@ export function EditorHoy({ items, editable }: Props) {
       )}
 
       {editando ? (
-        <DndContext sensors={sensores} collisionDetection={closestCenter} onDragEnd={alSoltar}>
-          <SortableContext items={visibles} strategy={rectSortingStrategy}>
-            <div className="v-bento">
+        <DndContext
+          sensors={sensores}
+          collisionDetection={deteccion}
+          onDragStart={alEmpezar}
+          onDragOver={alPasar}
+          onDragEnd={alTerminar}
+          onDragCancel={alTerminar}
+        >
+          <SortableContext items={visibles} strategy={sinTransformar}>
+            {/* El mismo acomodo editorial que fuera de edición: lo que mueves es lo que vas a ver. */}
+            <div className="v-bento v-editorial editando">
               {visibles.map((id) => {
                 const x = porId.get(id)
                 return x && <Arrastrable key={id} item={x} onOcultar={() => ocultar(id)} />
               })}
             </div>
           </SortableContext>
+          <DragOverlay dropAnimation={{ duration: 260, easing: 'cubic-bezier(.16,1,.3,1)' }}>
+            {activo && porId.get(activo) && (
+              <div className="v-editable flotando">
+                <div className="v-editable-contenido">{porId.get(activo)!.nodo}</div>
+              </div>
+            )}
+          </DragOverlay>
         </DndContext>
       ) : (
         <div className="v-bento v-editorial">{visibles.map((id) => porId.get(id)?.nodo)}</div>
@@ -137,13 +191,18 @@ export function EditorHoy({ items, editable }: Props) {
 }
 
 function Arrastrable({ item, onOcultar }: { item: ItemHoy; onOcultar: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+    animateLayoutChanges: siempreAnimar,
+    transition: TRANSICION,
+  })
   return (
     <div
       ref={setNodeRef}
       className={`v-editable ${item.clase}`}
       data-arrastrando={isDragging || undefined}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      // Solo se traslada, nunca se escala: así no se deforma.
+      style={{ transform: CSS.Translate.toString(transform), transition }}
       {...attributes}
       {...listeners}
       aria-label={`Move ${item.nombre}`}

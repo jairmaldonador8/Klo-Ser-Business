@@ -280,3 +280,8 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 
 - La interfaz completa va en inglés (fechas `en-US`); frente = «space». Los selectores CSS por `aria-label` usan los nombres en inglés («Your day», «Quick wins»…).
 - La «clase» de una tarea se llama **Activity**: Task, Meeting, Workout, Delivery, Deep work, más las propias de cada persona (`perfiles.actividades`, migración 0005), que se agregan desde Settings o con el «＋» de la hoja. Una tarea con actividad propia guarda su nombre en `clase`.
+
+## 19. Personalizar orgánico (2026-10-19)
+
+- Al arrastrar un mosaico en Personalizar, nada se escala: el orden cambia en vivo, la rejilla se reacomoda y cada mosaico se desliza a su lugar (340 ms, curva `--ease`). El que arrastras flota encima con su tamaño real, levemente inclinado, y deja un hueco punteado.
+- Editando se conserva el acomodo editorial de Today, para que lo que mueves sea lo que vas a ver.
