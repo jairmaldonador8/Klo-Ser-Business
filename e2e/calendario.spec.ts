@@ -45,3 +45,30 @@ test('crear en la rejilla, mover a otro día y borrar', async ({ page }, info) =
   await expect(editar).toBeHidden()
   await expect(page.getByRole('button', { name: new RegExp(titulo) })).toHaveCount(0)
 })
+
+test('seleccionar hacia la derecha pinta varios días y la hoja crea una task por día', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'arrastrar con mouse: basta con escritorio')
+  await page.goto('/calendario?vista=semana', { waitUntil: 'networkidle' })
+  const columnas = page.locator('[data-zona="hora"]')
+  const [d1, d3] = await Promise.all([columnas.nth(1).getAttribute('data-dia'), columnas.nth(3).getAttribute('data-dia')])
+  const enHora = async (dia: string, min: number) => {
+    const col = page.locator(`[data-zona="hora"][data-dia="${dia}"]`)
+    const r = (await col.boundingBox())!
+    return { x: r.x + r.width / 2, y: r.y + (min / 1440) * r.height + 4 }
+  }
+  await columnas.first().evaluate((el) => el.closest('.cal-scroll')!.scrollTo(0, (8 * 60 / 1440) * el.scrollHeight))
+  const a = await enHora(d1!, 9 * 60)
+  const z = await enHora(d3!, 11 * 60)
+  await page.mouse.move(a.x, a.y)
+  await page.mouse.down()
+  await page.mouse.move(z.x, z.y, { steps: 12 })
+  await expect(page.locator('.cal-ev.previa')).toHaveCount(3)
+  await page.mouse.up()
+
+  const hoja = page.getByRole('dialog', { name: 'New task' })
+  await expect(hoja.getByRole('button', { name: 'Save 3 tasks' })).toBeVisible()
+  await expect(page.locator('.cal-ev.previa.borrador')).toHaveCount(3)
+  // Cancelar quita el borrador sin crear nada.
+  await hoja.getByRole('button', { name: 'Cancel' }).click()
+  await expect(page.locator('.cal-ev.previa')).toHaveCount(0)
+})

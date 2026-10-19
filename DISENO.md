@@ -324,3 +324,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Autoscroll que acelera cerca de la orilla de arriba/abajo; dejar el evento medio segundo en la orilla izquierda/derecha pasa de página (cada 1.1 s) sin soltar.
 - Seleccionar arrastrando (hacia arriba o abajo) deja un **borrador** pintado que respira mientras llenas la hoja; se va al guardar o cancelar.
 - Estirar desde la orilla de arriba o de abajo; la contraria queda fija y, si la cruzas, se voltea; mínimo 15 min. Esc cancela.
+
+## 27. Seleccionar varios días (2026-10-19)
+
+- En la rejilla de horas, la selección sigue al puntero de columna en columna (por geometría, sin brincos) y se pinta en cada día del tramo con la misma hora. Al soltar, la hoja muestra los días («3 days · same time each day») y «Save 3 tasks» crea una task por día (`crearEnVariosDias`, todo o nada). Cancelar quita el borrador.

@@ -35,6 +35,8 @@ export type Previa = {
   id: string | null
   contorno?: boolean
   borrador?: boolean
+  /** Seleccionando varios días: la zona se pinta en cada uno (misma hora). */
+  dias?: string[]
 }
 
 /** Empieza un arrastre desde un `pointerdown`; `alTocar` corre si fue un toque sin mover. */

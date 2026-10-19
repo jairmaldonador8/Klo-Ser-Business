@@ -142,12 +142,13 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
   const colorDe = useCallback((id: string) => colores.get(id) ?? 'azul', [colores])
 
   // La zona que seleccionaste se queda pintada (borrador) mientras llenas la hoja; al cerrarla se va.
-  const [borrador, setBorrador] = useState<{ dia: string; ini: number; fin: number } | null>(null)
+  const [borrador, setBorrador] = useState<{ dia: string; ini: number; fin: number; dias: string[] } | null>(null)
 
   const nuevaEn = useCallback(
-    (dia: string, ini?: number, fin?: number) => {
-      if (ini !== undefined && fin !== undefined) setBorrador({ dia, ini, fin })
+    (dia: string, ini?: number, fin?: number, varios?: string[]) => {
+      if (ini !== undefined && fin !== undefined) setBorrador({ dia, ini, fin, dias: varios ?? [dia] })
       abrir({
+        dias: varios,
         valores: {
           fecha: dia,
           hora: ini === undefined ? null : deMinutos(ini),
@@ -179,6 +180,17 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     [ponerTarea, avisar],
   )
 
+  /** Los días entre dos columnas de la vista (en cualquier orden), en orden de calendario. */
+  const tramo = useCallback(
+    (a: string, b: string) => {
+      const i = dias.indexOf(a)
+      const j = dias.indexOf(b)
+      if (i < 0 || j < 0) return [a]
+      return dias.slice(Math.min(i, j), Math.max(i, j) + 1)
+    },
+    [dias],
+  )
+
   /** Rango que deja estirar: la orilla contraria a la que tomaste queda fija; si la cruzas, se voltea. Mínimo 15 min. */
   const rangoEstirado = useCallback((t: Tarea, borde: 'inicio' | 'fin', cursor: number): [number, number] => {
     const ini = aMinutos(t.hora!)
@@ -197,7 +209,8 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
         if (d.min === null) return false
         const a = Math.min(o.desde, d.min)
         const b = Math.max(o.desde + 15, d.min)
-        nuevaEn(o.dia, a, Math.min(b, 1439))
+        const varios = tramo(o.dia, d.dia)
+        nuevaEn(varios[0], a, Math.min(b, 1439), varios.length > 1 ? varios : undefined)
         return true
       }
       if (o.tipo === 'meta') {
@@ -229,7 +242,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       cambiar(t, nuevos, o.tipo === 'estirar' ? 'Resized' : antes.fecha ? 'Moved' : 'Scheduled')
       return true
     },
-    [cambiar, nuevaEn, ponerMeta, avisar, rangoEstirado],
+    [cambiar, nuevaEn, ponerMeta, avisar, rangoEstirado, tramo],
   )
 
   const [arrastre, setArrastre] = useState<{ origen: Origen; destino: Destino | null } | null>(null)
@@ -244,16 +257,27 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     pasoRef.current = { vista, fecha }
   })
 
-  /** Qué hay bajo el puntero. Crear y estirar se quedan en su día. */
+  /** Qué hay bajo el puntero. Estirar se queda en su día; crear sigue al puntero de columna en columna. */
   const destinoEn = useCallback((x: number, y: number, o: Origen): Destino | null => {
-    const fijo = o.tipo === 'crear' ? o.dia : o.tipo === 'estirar' ? o.tarea.fecha : null
+    if (o.tipo === 'crear') {
+      // Por geometría (no por el elemento bajo el puntero): entre columnas, sobre la regla o fuera de la
+      // rejilla, la selección se pega a la columna más cercana y nunca brinca.
+      const cols = [...document.querySelectorAll<HTMLElement>('[data-zona="hora"]')]
+      if (!cols.length) return null
+      const cajas = cols.map((c) => c.getBoundingClientRect())
+      let i = cajas.findIndex((r) => x >= r.left && x < r.right)
+      if (i < 0) i = x < cajas[0].left ? 0 : cols.length - 1
+      const r = cajas[i]
+      return { dia: cols[i].dataset.dia!, zona: 'hora', min: Math.max(0, Math.min(1439, ajustar(((y - r.top) / r.height) * 1440))) }
+    }
+    const fijo = o.tipo === 'estirar' ? o.tarea.fecha : null
     const el = fijo
       ? document.querySelector<HTMLElement>(`[data-zona="hora"][data-dia="${fijo}"]`)
       : document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-dia]')
     if (!el) return null
     const zona = el.dataset.zona as Destino['zona']
     const dia = el.dataset.dia!
-    if (zona !== 'hora') return o.tipo === 'crear' || o.tipo === 'estirar' ? null : { dia, zona, min: null }
+    if (zona !== 'hora') return o.tipo === 'estirar' ? null : { dia, zona, min: null }
     const r = el.getBoundingClientRect()
     const crudo = ((y - r.top) / r.height) * 1440
     if (o.tipo === 'mover') {
@@ -388,12 +412,13 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
   const previa = useMemo((): Previa | null => {
     if (!arrastre?.destino) {
       if (!borrador) return null
-      return { dia: borrador.dia, zona: 'hora', ini: borrador.ini, fin: borrador.fin, titulo: 'New task', color: frente?.color ?? 'azul', id: null, borrador: true }
+      return { dia: borrador.dia, dias: borrador.dias, zona: 'hora', ini: borrador.ini, fin: borrador.fin, titulo: borrador.dias.length > 1 ? `New task · ${borrador.dias.length} days` : 'New task', color: frente?.color ?? 'azul', id: null, borrador: true }
     }
     const { origen: o, destino: d } = arrastre
     if (o.tipo === 'crear') {
       if (d.min === null) return null
-      return { dia: o.dia, zona: 'hora', ini: Math.min(o.desde, d.min), fin: Math.max(o.desde + 15, d.min), titulo: 'New task', color: frente?.color ?? 'azul', id: null }
+      const varios = tramo(o.dia, d.dia)
+      return { dia: o.dia, dias: varios, zona: 'hora', ini: Math.min(o.desde, d.min), fin: Math.max(o.desde + 15, d.min), titulo: varios.length > 1 ? `New task · ${varios.length} days` : 'New task', color: frente?.color ?? 'azul', id: null }
     }
     if (o.tipo === 'meta') return { dia: d.dia, zona: d.zona, ini: null, fin: null, titulo: o.meta.nombre, color: colorDe(o.meta.espacio_id), id: o.meta.id, contorno: true }
     const t = o.tarea
@@ -407,7 +432,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       return { ...base, dia: d.dia, zona: 'hora', ini: d.min, fin: d.min + dur, contorno: true }
     }
     return { ...base, dia: d.dia, zona: d.zona, ini: null, fin: null, contorno: true }
-  }, [arrastre, borrador, colorDe, frente, rangoEstirado])
+  }, [arrastre, borrador, colorDe, frente, rangoEstirado, tramo])
 
   const arrastrando = arrastre?.destino ? (arrastre.origen.tipo === 'meta' ? arrastre.origen.meta.id : arrastre.origen.tipo === 'crear' ? null : arrastre.origen.tarea.id) : null
 

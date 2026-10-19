@@ -102,7 +102,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                 return { id: t.id, ini, fin: finEfectivo(ini, t.hora_fin ? aMinutos(t.hora_fin) : null) }
               }),
             )
-            const verPrevia = previa && previa.zona === 'hora' && previa.dia === d && previa.ini !== null
+            const verPrevia = previa && previa.zona === 'hora' && (previa.dias ?? [previa.dia]).includes(d) && previa.ini !== null
             return (
               <div
                 key={d}

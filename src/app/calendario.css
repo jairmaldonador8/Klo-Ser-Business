@@ -267,3 +267,12 @@
 .cal-estirando,.cal-estirando *{cursor:ns-resize!important}
 @media (prefers-reduced-motion:reduce){.cal-flotante{animation:none;rotate:0deg}.cal-ev.previa,.cal-ev.previa.contorno{transition:none}.cal-ev.previa.borrador{animation:none}}
 }
+
+/* Selección de varios días (DISENO §27). */
+@layer components {
+.cal-ev.previa:not(.contorno){animation:cal-aparece .12s ease-out}
+.cal-ev.previa.borrador{animation:cal-aparece .12s ease-out,cal-borrador 1.8s ease-in-out .12s infinite}
+@keyframes cal-aparece{from{opacity:0;transform:scaleY(.96)}}
+.v-hoja .v-dia-chip{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:500;color:var(--tinta);background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+@media (prefers-reduced-motion:reduce){.cal-ev.previa:not(.contorno),.cal-ev.previa.borrador{animation:none}}
+}
