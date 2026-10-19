@@ -8,6 +8,7 @@ import { mismaRegla } from '@/lib/repetir'
 import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
+import { COLORES_TAREA, NOMBRE_COLOR_TAREA } from '@/lib/tareas/colores'
 import { CLASES, hhmm, MAX_ACTIVIDAD, nombreClase, type Clase } from '@/lib/tareas/esquema'
 import type { Apertura, ProyectoOpcion } from './hoja-provider'
 import { SelectorRepetir, type Repetir } from './selector-repetir'
@@ -22,6 +23,8 @@ type Formulario = {
   /** Si termina otro día; vacío = el mismo día. */
   fecha_fin: string
   proyecto_id: string
+  /** '' = el color de su space. */
+  color: string
 }
 
 function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[], hoy: string): Formulario {
@@ -37,6 +40,7 @@ function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[], hoy:
     hora_fin: hhmm(base.hora_fin ?? null) ?? '',
     fecha_fin: base.fecha_fin ?? '',
     proyecto_id: base.proyecto_id ?? '',
+    color: base.color ?? '',
   }
 }
 
@@ -314,6 +318,33 @@ export function HojaTarea({
             </div>
           )
         )}
+
+        <span className="etq">Color</span>
+        <div className="v-colores" role="radiogroup" aria-label="Color">
+          {/* Sin color propio: el de su space. */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={form.color === ''}
+            aria-label="Space color"
+            title="Space color"
+            className="auto"
+            style={{ '--c': `var(--v-p-${frentes.find((f) => f.id === form.espacio_id)?.color ?? 'azul'})` } as React.CSSProperties}
+            onClick={() => poner('color', '')}
+          />
+          {COLORES_TAREA.map((c) => (
+            <button
+              key={c}
+              type="button"
+              role="radio"
+              aria-checked={form.color === c}
+              aria-label={NOMBRE_COLOR_TAREA[c]}
+              title={NOMBRE_COLOR_TAREA[c]}
+              style={{ '--c': `var(--v-p-${c})` } as React.CSSProperties}
+              onClick={() => poner('color', c)}
+            />
+          ))}
+        </div>
 
         {delFrente.length > 0 && (
           <>

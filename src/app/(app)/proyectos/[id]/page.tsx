@@ -27,7 +27,7 @@ export default async function DetalleProyecto({ params, searchParams }: Props) {
       .maybeSingle(),
     supabase
       .from('tareas')
-      .select('id, espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, serie_id, proyecto_id, completada_en')
+      .select('id, espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, serie_id, color, proyecto_id, completada_en')
       .eq('proyecto_id', id)
       .is('borrado_en', null)
       .order('fecha', { nullsFirst: false })

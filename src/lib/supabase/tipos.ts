@@ -366,6 +366,7 @@ export type Database = {
           actualizado_en: string
           borrado_en: string | null
           clase: string
+          color: string | null
           completada_en: string | null
           creado_en: string
           creado_por: string
@@ -385,6 +386,7 @@ export type Database = {
           actualizado_en?: string
           borrado_en?: string | null
           clase?: string
+          color?: string | null
           completada_en?: string | null
           creado_en?: string
           creado_por?: string
@@ -404,6 +406,7 @@ export type Database = {
           actualizado_en?: string
           borrado_en?: string | null
           clase?: string
+          color?: string | null
           completada_en?: string | null
           creado_en?: string
           creado_por?: string

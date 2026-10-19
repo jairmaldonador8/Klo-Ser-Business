@@ -119,7 +119,7 @@ export function PorCalendarizar({ tareas, colorDe, empezar, arrastrando }: { tar
             <button
               type="button"
               className={`cal-suelta${arrastrando === t.id ? ' fantasma' : ''}`}
-              style={colorVar(colorDe(t.espacio_id))}
+              style={colorVar((t.color ?? colorDe(t.espacio_id)))}
               onPointerDown={(e) => empezar(e, { tipo: 'mover', tarea: t, agarre: 0 }, () => abrir({ tarea: t }))}
               onClick={(e) => e.detail === 0 && abrir({ tarea: t })}
             >

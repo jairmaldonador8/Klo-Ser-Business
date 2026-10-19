@@ -64,7 +64,7 @@ export function VistaMes({ dias, fecha, tareas, metas, hoy, colorDe, empezar, pr
                 <BanderaMeta key={m.id} meta={m} colorDe={colorDe} empezar={empezar} fantasma={arrastrando === m.id} />
               ))}
               {tareasVis.map((t) => (
-                <FichaDia key={t.id} tarea={t} color={colorDe(t.espacio_id)} empezar={empezar} fantasma={arrastrando === t.id} conHora />
+                <FichaDia key={t.id} tarea={t} color={(t.color ?? colorDe(t.espacio_id))} empezar={empezar} fantasma={arrastrando === t.id} conHora />
               ))}
               {total > visibles && (
                 <button type="button" className="cal-mas" onClick={() => irADia(d)}>

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { COLORES_TAREA } from './colores'
 
 /** Las actividades de siempre (clave en la base → nombre). Cada quien suma las suyas (`perfiles.actividades`),
  *  y una tarea con actividad propia guarda su nombre tal cual en `clase`. */
@@ -38,6 +39,8 @@ export type Tarea = {
   fecha_fin: string | null
   /** Si se repite: su serie (cada repetición es una task propia). */
   serie_id: string | null
+  /** Color propio (paleta de lib/tareas/colores); null = el de su frente. */
+  color: string | null
   proyecto_id: string | null
   completada_en: string | null
 }
@@ -55,6 +58,7 @@ export const esquemaTarea = z
     hora,
     hora_fin: hora,
     fecha_fin: z.preprocess(vacioANulo, z.iso.date().nullable()).optional().transform((v) => v ?? null),
+    color: z.preprocess(vacioANulo, z.enum(COLORES_TAREA).nullable()).optional().transform((v) => v ?? null),
     proyecto_id: z.preprocess(vacioANulo, z.uuid().nullable()),
   })
   .refine((t) => !t.hora || t.fecha, { message: 'To set a time, set a date.', path: ['hora'] })

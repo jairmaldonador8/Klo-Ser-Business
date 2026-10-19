@@ -13,8 +13,19 @@ import { esquemaTarea } from '@/lib/tareas/esquema'
 // La plantilla de las repeticiones nuevas es la última task de la serie (así «this and following» se hereda).
 
 type Supabase = Awaited<ReturnType<typeof crearClienteServidor>>
-const CAMPOS_PLANTILLA = 'espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, proyecto_id, responsable_id'
-type Plantilla = { espacio_id: string; titulo: string; clase: string; fecha: string | null; hora: string | null; hora_fin: string | null; fecha_fin: string | null; proyecto_id: string | null; responsable_id: string }
+const CAMPOS_PLANTILLA = 'espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, color, proyecto_id, responsable_id'
+type Plantilla = {
+  espacio_id: string
+  titulo: string
+  clase: string
+  fecha: string | null
+  hora: string | null
+  hora_fin: string | null
+  fecha_fin: string | null
+  color: string | null
+  proyecto_id: string | null
+  responsable_id: string
+}
 
 const id = z.uuid()
 const listo = (): Resultado => {
@@ -33,6 +44,7 @@ function copias(p: Plantilla, fechas: string[], serieId: string) {
     hora: p.hora,
     hora_fin: p.hora_fin,
     fecha_fin: dias > 0 ? sumarDias(fecha, dias) : null,
+    color: p.color,
     proyecto_id: p.proyecto_id,
     responsable_id: p.responsable_id,
     serie_id: serieId,

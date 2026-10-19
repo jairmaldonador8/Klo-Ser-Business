@@ -498,7 +498,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     }
     if (o.tipo === 'meta') return { dia: d.dia, zona: d.zona, ini: null, fin: null, titulo: o.meta.nombre, color: colorDe(o.meta.espacio_id), id: o.meta.id, contorno: true }
     const t = o.tarea
-    const base = { titulo: t.titulo, color: colorDe(t.espacio_id), id: t.id }
+    const base = { titulo: t.titulo, color: (t.color ?? colorDe(t.espacio_id)), id: t.id }
     if (o.tipo === 'estirar') {
       const [a, b] = rangoEstirado(t, o.borde, d)
       return deRango(a, b, base)

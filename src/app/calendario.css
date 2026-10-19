@@ -317,3 +317,16 @@
 /* Fuera de capa: los campos de la hoja crecen con flex en una regla vieja sin capa; en Repeat van a su medida. */
 .v-hoja .v-repetir-custom .grupo input[type="number"]{flex:0 0 auto;width:68px}
 .v-hoja .v-repetir-custom .grupo select{flex:0 0 auto;width:auto;min-width:110px}
+
+/* ── Color propio de una task (DISENO §31) ───────────────────────────────
+   Misma convención que los frentes: --v-p-<clave>. Tonos que respiran sobre el negro. */
+:root{--v-p-brasa:#ff7a4a;--v-p-oro:#f2c14e;--v-p-menta:#5fd3a8;--v-p-cielo:#56b8f5;--v-p-lavanda:#a98bff;--v-p-rojo:#f2555a;--v-p-grafito:#9b9a98}
+@layer components {
+.v-colores{display:flex;flex-wrap:wrap;gap:8px}
+.v-colores button{position:relative;width:26px;height:26px;border-radius:50%;background:var(--c);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 0 1px rgba(0,0,0,.4);transition:transform .15s var(--ease)}
+.v-colores button:hover{transform:scale(1.1)}
+.v-colores button[aria-checked="true"]{box-shadow:0 0 0 2px #0a0a0b,0 0 0 4px #fff}
+.v-colores button.auto{background:conic-gradient(var(--c) 0 50%,transparent 50% 100%),#1b1a19;box-shadow:inset 0 0 0 1.5px var(--c)}
+.v-colores button.auto[aria-checked="true"]{box-shadow:inset 0 0 0 1.5px var(--c),0 0 0 2px #0a0a0b,0 0 0 4px #fff}
+.v-colores button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+}

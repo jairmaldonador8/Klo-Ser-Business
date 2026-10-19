@@ -344,3 +344,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - La hoja tiene **Repeat**: menú armado para el día elegido (Every day · Every weekday/weekend day · Every week on Sat · Every 2 weeks on Sat · Every month on the 24th · Every month on the 4th Sat · Every year on Oct 24) y **Custom…** (cada N días/semanas/meses/años, días de la semana, mes por número o posición, termina nunca / en fecha / tras N veces). Reglas y etiquetas en `lib/repetir.ts`.
 - Modelo (migración 0010): `series` (regla, inicio, hasta/conteo, `generado_hasta`) + `tareas.serie_id`. Cada repetición es una **task real** (se palomea, se mueve y se borra sola); la app genera 180 días adelante y `extenderSeries()` (al abrir Today y Calendar) extiende cuando quedan menos de 90. La plantilla de las nuevas es la última task de la serie.
 - Editar o borrar una que se repite pregunta **Only this / This and following**; cambiar la regla aplica a esta y las siguientes. En el calendario llevan ↻. Week muestra solo la próxima repetición de cada serie en «Later»; el avance de proyectos no cuenta repeticiones futuras.
+
+## 31. Color propio de una task (2026-10-19)
+
+- Cada task puede llevar su color (`tareas.color`, migración 0011): Ember, Gold, Mint, Sky, Blue, Lavender, Pink, Red, Graphite (`lib/tareas/colores.ts`, variables `--v-p-<clave>` como los frentes). Sin color propio, el de su space. Se elige en la hoja (fila «Color»; el primer círculo, mitad de color, es «Space color») y se respeta en semana, mes, all day, arrastre y repeticiones.

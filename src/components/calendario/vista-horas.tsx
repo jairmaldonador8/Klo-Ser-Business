@@ -86,7 +86,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                 <BanderaMeta key={m.id} meta={m} colorDe={colorDe} empezar={empezar} fantasma={arrastrando === m.id} />
               ))}
               {x.sinHora.map((t) => (
-                <FichaDia key={t.id} tarea={t} color={colorDe(t.espacio_id)} empezar={empezar} fantasma={arrastrando === t.id} />
+                <FichaDia key={t.id} tarea={t} color={(t.color ?? colorDe(t.espacio_id))} empezar={empezar} fantasma={arrastrando === t.id} />
               ))}
               {sobre && <span className="cal-ficha previa contorno" style={colorVar(previa.color)}>{previa.titulo}</span>}
             </div>
@@ -134,7 +134,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                       tipo={tipo}
                       ini={ini}
                       fin={fin}
-                      color={colorDe(t.espacio_id)}
+                      color={(t.color ?? colorDe(t.espacio_id))}
                       empezar={empezar}
                       fantasma={arrastrando === t.id}
                       estilo={{
