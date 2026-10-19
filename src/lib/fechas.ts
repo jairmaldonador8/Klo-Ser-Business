@@ -23,18 +23,15 @@ function diferencia(fecha: string, hoy: string): number {
 
 export function etiquetaDia(fecha: string, hoy: string): string {
   const n = diferencia(fecha, hoy)
-  if (n === 0) return 'hoy'
-  if (n === 1) return 'mañana'
-  if (n === -1) return 'ayer'
-  return n > 0 ? `en ${n} días` : `hace ${-n} días`
+  if (n === 0) return 'today'
+  if (n === 1) return 'tomorrow'
+  if (n === -1) return 'yesterday'
+  return n > 0 ? `in ${n} days` : `${-n} days ago`
 }
 
-/** «martes 20 de oct»: para encabezar un día de la agenda. */
+/** «Tuesday, Oct 20»: para encabezar un día de la agenda. */
 export function nombreDia(fecha: string): string {
-  return new Intl.DateTimeFormat('es-MX', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'short' })
-    .format(new Date(`${fecha}T12:00:00Z`))
-    .replace(/,/g, '')
-    .replace(/\.$/, '')
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'short' }).format(new Date(`${fecha}T12:00:00Z`))
 }
 
 export { diferencia as diasEntre }

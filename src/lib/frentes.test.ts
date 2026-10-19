@@ -45,7 +45,7 @@ describe('prepararFrentes', () => {
     expect(r.ok && r.frentes[0].atajo).toBe('top2')
   })
   it('pide al menos uno', () => {
-    expect(prepararFrentes(['', ' '])).toEqual({ ok: false, mensaje: 'Escribe al menos un frente.' })
+    expect(prepararFrentes(['', ' '])).toEqual({ ok: false, mensaje: 'Write at least one space.' })
   })
   it('pone tope', () => {
     const muchos = Array.from({ length: MAX_FRENTES + 1 }, (_, i) => `Frente ${i}`)

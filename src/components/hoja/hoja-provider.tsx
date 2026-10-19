@@ -17,11 +17,13 @@ export const useHoja = () => useContext(Contexto)
 export function HojaProvider({
   frentes,
   proyectos,
+  actividades,
   hoy,
   children,
 }: {
   frentes: FrenteVista[]
   proyectos: ProyectoOpcion[]
+  actividades: string[]
   hoy: string
   children: React.ReactNode
 }) {
@@ -38,6 +40,7 @@ export function HojaProvider({
             apertura={abierta}
             frentes={frentes}
             proyectos={proyectos}
+            actividades={actividades}
             hoy={hoy}
             cerrar={() => setAbierta(null)}
           />

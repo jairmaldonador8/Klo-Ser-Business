@@ -4,7 +4,7 @@ import { sumarDias } from '@/lib/fechas'
 
 export const VISTAS = ['dia', '3dias', 'semana', 'mes'] as const
 export type Vista = (typeof VISTAS)[number]
-export const NOMBRE_VISTA: Record<Vista, string> = { dia: 'Día', '3dias': '3 días', semana: 'Semana', mes: 'Mes' }
+export const NOMBRE_VISTA: Record<Vista, string> = { dia: 'Day', '3dias': '3 days', semana: 'Week', mes: 'Month' }
 
 export const esVista = (v: unknown): v is Vista => typeof v === 'string' && (VISTAS as readonly string[]).includes(v)
 export const esFecha = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v))
@@ -59,24 +59,24 @@ export const dentro = (dias: readonly string[], r: { desde: string; hasta: strin
   dias[0] >= r.desde && dias[dias.length - 1] <= r.hasta
 
 const mes = (f: string, conAnio: boolean) =>
-  new Intl.DateTimeFormat('es-MX', { timeZone: 'UTC', month: 'long', ...(conAnio && { year: 'numeric' }) })
-    .format(utc(f))
-    .replace(' de ', ' ')
+  new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'long', ...(conAnio && { year: 'numeric' }) }).format(utc(f))
 
-/** «octubre 2026», o «oct – nov 2026» si la vista cruza meses. */
+/** «October 2026», o «Oct – Nov 2026» si la vista cruza meses. */
 export function tituloVista(vista: Vista, fecha: string): string {
   if (vista === 'mes') return mes(fecha, true)
   const dias = diasVista(vista, fecha)
   const a = dias[0]
   const b = dias[dias.length - 1]
   if (a.slice(0, 7) === b.slice(0, 7)) return mes(a, true)
-  const corto = (f: string) => new Intl.DateTimeFormat('es-MX', { timeZone: 'UTC', month: 'short' }).format(utc(f)).replace('.', '')
+  const corto = mesCorto
   return a.slice(0, 4) === b.slice(0, 4) ? `${corto(a)} – ${corto(b)} ${b.slice(0, 4)}` : `${corto(a)} ${a.slice(0, 4)} – ${corto(b)} ${b.slice(0, 4)}`
 }
 
-/** «lun», «mar»… */
-export const diaCorto = (fecha: string) =>
-  new Intl.DateTimeFormat('es-MX', { timeZone: 'UTC', weekday: 'short' }).format(utc(fecha)).replace('.', '')
+/** «Mon», «Tue»… */
+export const diaCorto = (fecha: string) => new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'short' }).format(utc(fecha))
+
+/** «Oct». */
+export const mesCorto = (fecha: string) => new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short' }).format(utc(fecha))
 
 export const numeroDia = (fecha: string) => Number(fecha.slice(8, 10))
 

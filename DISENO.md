@@ -275,3 +275,8 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Brasa solo para hoy (círculo del día) y la línea de «ahora». Metas de proyectos = bandera brasa en su fecha meta, con su % de avance.
 - Se arrastra para crear (rejilla), mover (entre horas, días o al renglón «todo el día»), estirar (orilla de abajo) y calendarizar (desde «Por calendarizar»). En teléfono, mantener el dedo un momento para arrastrar. Cada movida trae «Deshacer».
 - Panel lateral: mini mes, por calendarizar, metas con avance y cuánto falta, y calendarios que se prenden y apagan. Atajos: T, D/X/W/M, ←/→, N.
+
+## 18. Inglés y actividades (2026-10-19)
+
+- La interfaz completa va en inglés (fechas `en-US`); frente = «space». Los selectores CSS por `aria-label` usan los nombres en inglés («Your day», «Quick wins»…).
+- La «clase» de una tarea se llama **Activity**: Task, Meeting, Workout, Delivery, Deep work, más las propias de cada persona (`perfiles.actividades`, migración 0005), que se agregan desde Settings o con el «＋» de la hoja. Una tarea con actividad propia guarda su nombre en `clase`.

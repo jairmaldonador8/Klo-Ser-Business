@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { esColor } from '@/lib/frentes'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
+import { limpiarActividades } from '@/lib/tareas/esquema'
 import { MOSAICOS, SECCIONES } from '@/lib/vista/registro'
 import { esquemaVista, leerVista, resolverLista } from '@/lib/vista/resolver'
 
@@ -10,7 +11,7 @@ export type Resultado = { ok: true } | { ok: false; mensaje: string }
 
 export async function guardarVista(vista: unknown): Promise<Resultado> {
   const leida = esquemaVista.safeParse(vista)
-  if (!leida.success) return { ok: false, mensaje: 'No entendí ese cambio, recarga la página.' }
+  if (!leida.success) return { ok: false, mensaje: 'I didn’t get that change, reload the page.' }
 
   // Se guarda ya resuelta: sin ids ajenos y con lo obligatorio visible.
   const limpia = {
@@ -19,12 +20,12 @@ export async function guardarVista(vista: unknown): Promise<Resultado> {
   }
   const supabase = await crearClienteServidor()
   const { data } = await supabase.auth.getClaims()
-  if (!data?.claims) return { ok: false, mensaje: 'Tu sesión terminó; vuelve a entrar.' }
+  if (!data?.claims) return { ok: false, mensaje: 'Your session ended; sign in again.' }
 
   const { error } = await supabase.from('perfiles').update({ vista: limpia }).eq('user_id', data.claims.sub)
   if (error) {
     console.error('guardarVista', error)
-    return { ok: false, mensaje: 'No pude guardar, inténtalo otra vez.' }
+    return { ok: false, mensaje: 'Couldn’t save, try again.' }
   }
   revalidatePath('/', 'layout')
   return { ok: true }
@@ -34,7 +35,7 @@ export async function guardarVista(vista: unknown): Promise<Resultado> {
 export async function guardarMosaicos(mosaicos: unknown): Promise<Resultado> {
   const supabase = await crearClienteServidor()
   const { data } = await supabase.auth.getClaims()
-  if (!data?.claims) return { ok: false, mensaje: 'Tu sesión terminó; vuelve a entrar.' }
+  if (!data?.claims) return { ok: false, mensaje: 'Your session ended; sign in again.' }
   const { data: perfil } = await supabase.from('perfiles').select('vista').eq('user_id', data.claims.sub).single()
   return guardarVista({ ...leerVista(perfil?.vista), mosaicos_hoy: mosaicos })
 }
@@ -43,11 +44,11 @@ export async function guardarFrente(id: string, cambios: { nombre?: string; colo
   const datos: { nombre?: string; color?: string } = {}
   if (cambios.nombre !== undefined) {
     const nombre = cambios.nombre.trim().replace(/\s+/g, ' ')
-    if (!nombre || nombre.length > 40) return { ok: false, mensaje: 'El nombre va de 1 a 40 letras.' }
+    if (!nombre || nombre.length > 40) return { ok: false, mensaje: 'The name must be 1 to 40 characters.' }
     datos.nombre = nombre
   }
   if (cambios.color !== undefined) {
-    if (!esColor(cambios.color)) return { ok: false, mensaje: 'Ese color no está en la paleta.' }
+    if (!esColor(cambios.color)) return { ok: false, mensaje: 'That color isn’t in the palette.' }
     datos.color = cambios.color
   }
 
@@ -56,7 +57,7 @@ export async function guardarFrente(id: string, cambios: { nombre?: string; colo
   const { data, error } = await supabase.from('espacios').update(datos).eq('id', id).select('id')
   if (error || !data?.length) {
     if (error) console.error('guardarFrente', error)
-    return { ok: false, mensaje: 'Solo quien es dueño del frente puede cambiarlo.' }
+    return { ok: false, mensaje: 'Only the space owner can change it.' }
   }
   revalidatePath('/', 'layout')
   return { ok: true }
@@ -69,7 +70,22 @@ export async function ordenarFrentes(ids: string[]): Promise<Resultado> {
     ids.map((id, orden) => supabase.from('espacios').update({ orden }).eq('id', id).select('id')),
   )
   if (resultados.some((r) => r.error || !r.data?.length)) {
-    return { ok: false, mensaje: 'Solo quien es dueño de los frentes puede reordenarlos.' }
+    return { ok: false, mensaje: 'Only the owner of the spaces can reorder them.' }
+  }
+  revalidatePath('/', 'layout')
+  return { ok: true }
+}
+
+/** Tus actividades propias (además de las de siempre). Las tareas que ya las usan conservan su nombre. */
+export async function guardarActividades(lista: unknown): Promise<Resultado> {
+  if (!Array.isArray(lista) || lista.some((x) => typeof x !== 'string')) return { ok: false, mensaje: 'I didn’t get that change, reload the page.' }
+  const supabase = await crearClienteServidor()
+  const { data } = await supabase.auth.getClaims()
+  if (!data?.claims) return { ok: false, mensaje: 'Your session ended; sign in again.' }
+  const { error } = await supabase.from('perfiles').update({ actividades: limpiarActividades(lista) }).eq('user_id', data.claims.sub)
+  if (error) {
+    console.error('guardarActividades', error)
+    return { ok: false, mensaje: 'Couldn’t save, try again.' }
   }
   revalidatePath('/', 'layout')
   return { ok: true }

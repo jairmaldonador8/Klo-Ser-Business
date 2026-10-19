@@ -22,7 +22,7 @@ export default async function Notas({ searchParams }: Props) {
   const frentes: FrenteVista[] = (espacios ?? []).map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))
   const frente = frenteAbierto(frentes, typeof atajo === 'string' ? atajo : null)
 
-  const formato = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short', timeZone: ctx.zona })
+  const formato = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', timeZone: ctx.zona })
   const notas: NotaVista[] = (filas ?? [])
     .filter((n) => !frente || n.espacio_id === frente.id)
     .map((n) => ({ id: n.id, espacio_id: n.espacio_id, texto: n.texto, fecha: formato.format(new Date(n.creado_en)) }))
@@ -31,7 +31,7 @@ export default async function Notas({ searchParams }: Props) {
     <section className="v-bento">
       <ListaNotas key={frente?.id ?? 'todos'} notas={notas} frentes={frentes} abierto={frente?.id ?? null}>
         {notas.length === 0 && (
-          <Vacio antes="Aquí van tus ideas" palabra="sueltas" texto="Escribe lo que se te ocurra y aquí aparece, acomodado por frente." />
+          <Vacio antes="Your loose" palabra="ideas" texto="Write down whatever comes to mind and it shows up here, sorted by space." />
         )}
       </ListaNotas>
     </section>

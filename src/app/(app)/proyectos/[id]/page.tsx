@@ -46,14 +46,14 @@ export default async function DetalleProyecto({ params, searchParams }: Props) {
   const color = frente && esColor(frente.color) ? frente.color : 'azul'
 
   const vencida = (t: Tarea) => !t.completada_en && t.fecha !== null && t.fecha < ctx.hoy
-  const detalle = (t: Tarea) => (t.fecha ? `${etiquetaDia(t.fecha, ctx.hoy)}${t.hora ? ' ' + hhmm(t.hora) : ''}` : 'sin fecha')
+  const detalle = (t: Tarea) => (t.fecha ? `${etiquetaDia(t.fecha, ctx.hoy)}${t.hora ? ' ' + hhmm(t.hora) : ''}` : 'no date')
 
   return (
     <section className="v-bento">
-      <section className="v-t c2 r2" aria-label="Datos del proyecto">
+      <section className="v-t c2 r2" aria-label="Project details">
         <div className="v-fila">
           <Link href={conFrente('/proyectos', atajo)} className="v-chip">
-            ← Proyectos
+            ← Projects
           </Link>
           {frente && (
             <span className="v-chip">
@@ -77,24 +77,24 @@ export default async function DetalleProyecto({ params, searchParams }: Props) {
         />
       </section>
 
-      <section className="v-t c2" aria-label="Avance">
+      <section className="v-t c2" aria-label="Progress">
         <div className="v-fila">
-          <h3>Avance</h3>
+          <h3>Progress</h3>
           <span className="v-sub">{textoFaltan(p.fecha_meta, ctx.hoy)}</span>
         </div>
         <div className="v-fila" style={{ alignItems: 'flex-end' }}>
           <span className="v-cifra">{porcentaje(x)}</span>
           <span className="v-sub">{cuenta({ ...proyecto, ...conteo })}</span>
         </div>
-        <div className="v-barra-avance" role="progressbar" aria-label={`Avance de ${p.nombre}`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
+        <div className="v-barra-avance" role="progressbar" aria-label={`${p.nombre} progress`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
           <i style={{ width: `${x * 100}%` }} />
         </div>
         <ControlesProyecto id={p.id} estado={p.estado} manual={modo === 'manual'} />
       </section>
 
-      <section className="v-t c2" aria-label="Tareas del proyecto">
+      <section className="v-t c2" aria-label="Project tasks">
         <div className="v-fila">
-          <h3>Tareas</h3>
+          <h3>Tasks</h3>
           {p.estado === 'activo' && <AgregarTarea espacioId={p.espacio_id} proyectoId={p.id} />}
         </div>
         {tareas.length ? (
@@ -105,7 +105,7 @@ export default async function DetalleProyecto({ params, searchParams }: Props) {
           </ul>
         ) : (
           <p className="v-sub">
-            {modo === 'tareas' ? 'Agrega tareas y el avance se mide con las que palomees.' : 'Aún no hay tareas ligadas a este proyecto.'}
+            {modo === 'tareas' ? 'Add tasks and progress follows the ones you check off.' : 'No tasks linked to this project yet.'}
           </p>
         )}
       </section>

@@ -69,7 +69,7 @@ export function EditorHoy({ items, editable }: Props) {
   }
 
   function listo() {
-    setAviso('Guardando…')
+    setAviso('Saving…')
     empezar(async () => {
       const r = await guardarMosaicos(acomodarMosaicos(visibles, ocultos))
       if (r.ok) {
@@ -85,23 +85,23 @@ export function EditorHoy({ items, editable }: Props) {
         <div className="v-herramientas">
           {editando ? (
             <>
-              <span className="v-sub">Arrastra para acomodar · × para ocultar</span>
+              <span className="v-sub">Drag to arrange · × to hide</span>
               <span className="v-aviso" role="status">
                 {aviso}
               </span>
               <button type="button" className="v-boton chico" onClick={restablecer}>
-                Restablecer
+                Reset
               </button>
               <button type="button" className="v-boton chico" onClick={cancelar}>
-                Cancelar
+                Cancel
               </button>
               <button type="button" className="v-boton chico primario" onClick={listo} disabled={guardando}>
-                Listo
+                Done
               </button>
             </>
           ) : (
             <button type="button" className="v-boton chico" onClick={() => setEditando(true)}>
-              ✎ Personalizar
+              ✎ Customize
             </button>
           )}
         </div>
@@ -123,8 +123,8 @@ export function EditorHoy({ items, editable }: Props) {
       )}
 
       {editando && ocultos.length > 0 && (
-        <section className="v-ocultos" aria-label="Mosaicos ocultos">
-          <span className="v-sub">Ocultos · toca para regresarlos</span>
+        <section className="v-ocultos" aria-label="Hidden tiles">
+          <span className="v-sub">Hidden · tap to bring them back</span>
           {ocultos.map((id) => (
             <button key={id} type="button" className="v-chip" onClick={() => mostrar(id)}>
               ＋ {porId.get(id)?.nombre}
@@ -146,14 +146,14 @@ function Arrastrable({ item, onOcultar }: { item: ItemHoy; onOcultar: () => void
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
-      aria-label={`Mover ${item.nombre}`}
+      aria-label={`Move ${item.nombre}`}
     >
       <div className="v-editable-contenido">{item.nodo}</div>
       {!item.obligatorio && (
         <button
           type="button"
           className="v-quitar"
-          aria-label={`Ocultar ${item.nombre}`}
+          aria-label={`Hide ${item.nombre}`}
           onPointerDown={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}

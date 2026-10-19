@@ -20,7 +20,7 @@ export async function completarBienvenida(_previo: EstadoBienvenida, datos: Form
   })
   if (error) {
     console.error('completar_bienvenida', error)
-    return { mensaje: 'No pude guardar tus frentes, inténtalo otra vez.' }
+    return { mensaje: 'Couldn’t save your spaces, try again.' }
   }
   redirect('/hoy')
 }

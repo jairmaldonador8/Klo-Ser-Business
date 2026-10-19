@@ -16,7 +16,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
   if (!data?.claims) redirect('/entrar')
 
   const [{ data: perfil }, { data: espacios }, { data: proyectos }] = await Promise.all([
-    supabase.from('perfiles').select('nombre, zona_horaria, vista').eq('user_id', data.claims.sub).single(),
+    supabase.from('perfiles').select('nombre, zona_horaria, vista, actividades').eq('user_id', data.claims.sub).single(),
     supabase.from('espacios').select('id, nombre, inicial, atajo, color').order('orden'),
     supabase.from('proyectos').select('id, espacio_id, nombre').eq('estado', 'activo').order('nombre'),
   ])
@@ -40,7 +40,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
         <i />
       </div>
       {/* La hoja de edición se abre desde cualquier parte (el +, un renglón, una nota). */}
-      <HojaProvider frentes={frentes} proyectos={proyectos ?? []} hoy={fechaEn(ahora, zona)}>
+      <HojaProvider frentes={frentes} proyectos={proyectos ?? []} actividades={perfil?.actividades ?? []} hoy={fechaEn(ahora, zona)}>
         <div className="v-escena">
           <Suspense>
             <Riel secciones={secciones} />

@@ -21,10 +21,10 @@ export default async function Bienvenida() {
           <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={60} height={72} unoptimized />
         </div>
         <h1 className="titulo text-3xl">
-          ¿En qué <span className="text-amanecer">frentes</span> trabajas?
+          What <span className="text-amanecer">spaces</span> do you work in?
         </h1>
         <p className="text-tinta-2">
-          Cada frente es un espacio: tu empresa, tu agencia, tu marca. Cámbiales el nombre; luego puedes agregar más.
+          Each space is one area of your work: your company, your agency, your brand. Rename them; you can add more later.
         </p>
         <FormaBienvenida nombreInicial={perfil?.nombre ?? ''} />
       </div>

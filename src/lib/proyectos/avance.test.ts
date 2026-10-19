@@ -32,20 +32,20 @@ describe('porcentaje', () => {
 
 describe('textoFaltan', () => {
   it('dice cuánto falta o cuánto lleva vencida', () => {
-    expect(textoFaltan(null, '2026-10-18')).toBe('sin fecha meta')
-    expect(textoFaltan('2026-10-18', '2026-10-18')).toBe('la meta es hoy')
-    expect(textoFaltan('2026-10-19', '2026-10-18')).toBe('falta 1 día')
-    expect(textoFaltan('2026-10-31', '2026-10-18')).toBe('faltan 13 días')
-    expect(textoFaltan('2026-10-17', '2026-10-18')).toBe('meta vencida hace 1 día')
-    expect(textoFaltan('2026-10-15', '2026-10-18')).toBe('meta vencida hace 3 días')
+    expect(textoFaltan(null, '2026-10-18')).toBe('no target date')
+    expect(textoFaltan('2026-10-18', '2026-10-18')).toBe('due today')
+    expect(textoFaltan('2026-10-19', '2026-10-18')).toBe('1 day left')
+    expect(textoFaltan('2026-10-31', '2026-10-18')).toBe('13 days left')
+    expect(textoFaltan('2026-10-17', '2026-10-18')).toBe('overdue by 1 day')
+    expect(textoFaltan('2026-10-15', '2026-10-18')).toBe('overdue by 3 days')
   })
 })
 
 describe('cuenta', () => {
   it('por tareas cuenta hechas de total; por cifra, la cifra', () => {
-    expect(cuenta({ modo_avance: 'tareas', total: 3, hechas: 1 })).toBe('1 de 3 tareas')
-    expect(cuenta({ modo_avance: 'tareas', total: 1, hechas: 0 })).toBe('0 de 1 tarea')
-    expect(cuenta({ modo_avance: 'tareas', total: 0, hechas: 0 })).toBe('sin tareas todavía')
-    expect(cuenta({ modo_avance: 'manual', cifra_actual: 12, cifra_meta: 60, total: 0, hechas: 0 })).toBe('12 de 60')
+    expect(cuenta({ modo_avance: 'tareas', total: 3, hechas: 1 })).toBe('1 of 3 tasks')
+    expect(cuenta({ modo_avance: 'tareas', total: 1, hechas: 0 })).toBe('0 of 1 task')
+    expect(cuenta({ modo_avance: 'tareas', total: 0, hechas: 0 })).toBe('no tasks yet')
+    expect(cuenta({ modo_avance: 'manual', cifra_actual: 12, cifra_meta: 60, total: 0, hechas: 0 })).toBe('12 of 60')
   })
 })

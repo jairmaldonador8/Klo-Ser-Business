@@ -53,7 +53,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
       <div className="cal-cabdias">
         <span />
         {dias.map((d) => (
-          <button key={d} type="button" className={`cal-cabdia${d === hoy ? ' hoy' : ''}`} onClick={() => irADia(d)} aria-label={`Ver el ${d}`}>
+          <button key={d} type="button" className={`cal-cabdia${d === hoy ? ' hoy' : ''}`} onClick={() => irADia(d)} aria-label={`Go to ${d}`}>
             <small>{diaCorto(d)}</small>
             <b>{numeroDia(d)}</b>
           </button>
@@ -61,7 +61,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
       </div>
 
       <div className="cal-todo-dia">
-        <span className="cal-etq-todo">todo el día</span>
+        <span className="cal-etq-todo">all day</span>
         {dias.map((d) => {
           const x = porDia.get(d)!
           const sobre = previa && previa.zona === 'dia' && previa.dia === d
@@ -147,7 +147,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                   </div>
                 )}
                 {d === hoy && ahora && (
-                  <div className="cal-ahora" style={{ top: pct(aMinutos(ahora)) }} aria-label={`Ahora, ${horaCorta(ahora)}`}>
+                  <div className="cal-ahora" style={{ top: pct(aMinutos(ahora)) }} aria-label={`Now, ${horaCorta(ahora)}`}>
                     <i />
                   </div>
                 )}

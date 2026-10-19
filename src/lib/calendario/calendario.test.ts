@@ -56,10 +56,10 @@ describe('fechas del calendario', () => {
   })
 
   it('títulos', () => {
-    expect(tituloVista('mes', '2026-10-19')).toBe('octubre 2026')
-    expect(tituloVista('semana', '2026-10-19')).toBe('octubre 2026')
-    expect(tituloVista('semana', '2026-10-28')).toBe('oct – nov 2026')
-    expect(tituloVista('semana', '2026-12-30')).toBe('dic 2026 – ene 2027')
+    expect(tituloVista('mes', '2026-10-19')).toBe('October 2026')
+    expect(tituloVista('semana', '2026-10-19')).toBe('October 2026')
+    expect(tituloVista('semana', '2026-10-28')).toBe('Oct – Nov 2026')
+    expect(tituloVista('semana', '2026-12-30')).toBe('Dec 2026 – Jan 2027')
   })
 
   it('horas y minutos', () => {

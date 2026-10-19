@@ -23,7 +23,7 @@ export function EditarProyecto({ id, inicial }: { id: string; inicial: FormProye
       const r = await editarProyecto(id, datos)
       if (!r.ok) return setAviso(r.mensaje)
       guardado.current = huella
-      setAviso('Guardado')
+      setAviso('Saved')
     })
   }
 
@@ -54,7 +54,7 @@ export function ControlesProyecto({ id, estado, manual }: { id: string; estado: 
       const r = await sumarCifra(id, 1)
       if (!r.ok) return avisar(r.mensaje)
       // Si el Deshacer falla, te lo decimos: antes se perdía en silencio.
-      avisar('Sumaste 1', () =>
+      avisar('Added 1', () =>
         startTransition(async () => {
           const d = await sumarCifra(id, -1)
           if (!d.ok) avisar(d.mensaje)
@@ -86,20 +86,20 @@ export function ControlesProyecto({ id, estado, manual }: { id: string; estado: 
         </button>
       )}
       {estadoVista === 'activo' ? (
-        <button type="button" className="v-boton chico" onClick={() => cambiar('pausado', 'Proyecto en pausa')}>
-          Pausar
+        <button type="button" className="v-boton chico" onClick={() => cambiar('pausado', 'Project paused')}>
+          Pause
         </button>
       ) : (
-        <button type="button" className="v-boton chico" onClick={() => cambiar('activo', 'Proyecto activo otra vez')}>
-          Reactivar
+        <button type="button" className="v-boton chico" onClick={() => cambiar('activo', 'Project active again')}>
+          Reactivate
         </button>
       )}
       {estadoVista !== 'cerrado' && (
-        <button type="button" className="v-boton chico" onClick={() => cambiar('cerrado', 'Proyecto archivado')}>
-          Archivar
+        <button type="button" className="v-boton chico" onClick={() => cambiar('cerrado', 'Project archived')}>
+          Archive
         </button>
       )}
-      {estadoVista !== 'activo' && <span className="v-sub">{estadoVista === 'pausado' ? 'En pausa' : 'Archivado'}</span>}
+      {estadoVista !== 'activo' && <span className="v-sub">{estadoVista === 'pausado' ? 'Paused' : 'Archived'}</span>}
     </div>
   )
 }
@@ -108,7 +108,7 @@ export function AgregarTarea({ espacioId, proyectoId }: { espacioId: string; pro
   const abrir = useHoja()
   return (
     <button type="button" className="v-boton chico" onClick={() => abrir({ valores: { espacio_id: espacioId, proyecto_id: proyectoId } })}>
-      Agregar tarea
+      Add task
     </button>
   )
 }

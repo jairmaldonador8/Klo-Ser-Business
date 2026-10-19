@@ -219,3 +219,13 @@
 }
 @media (prefers-reduced-motion:reduce){.cal[aria-busy="true"] .cal-carga{animation:none}}
 }
+
+/* Actividades (hoja y Settings). */
+@layer components {
+.v-hoja .grupo .v-campo.chico{width:160px;padding:7px 12px;font-size:13px}
+.v-actividades{display:flex;flex-wrap:wrap;gap:6px}
+.v-actividades .v-chip{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:500}
+.v-actividades .propia{padding-right:6px;background:rgba(255,90,42,.12);box-shadow:inset 0 0 0 1px rgba(255,106,58,.3)}
+.v-actividades .propia button{display:grid;place-items:center;width:18px;height:18px;border-radius:6px;color:var(--tinta-2)}
+.v-actividades .propia button:hover{background:rgba(255,255,255,.1);color:#fff}
+}

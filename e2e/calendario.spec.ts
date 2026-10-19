@@ -17,11 +17,11 @@ test('crear en la rejilla, mover a otro día y borrar', async ({ page }, info) =
   }
   const p = await enHora(dia1!, 14 * 60)
   await page.mouse.click(p.x, p.y)
-  const hoja = page.getByRole('dialog', { name: 'Nueva tarea' })
-  await expect(hoja.getByLabel('Hora de inicio')).toHaveValue('14:00')
-  await expect(hoja.getByLabel('Hora de fin')).toHaveValue('15:00')
-  await hoja.getByLabel('Título').fill(titulo)
-  await hoja.getByRole('button', { name: 'Guardar' }).click()
+  const hoja = page.getByRole('dialog', { name: 'New task' })
+  await expect(hoja.getByLabel('Start time')).toHaveValue('14:00')
+  await expect(hoja.getByLabel('End time')).toHaveValue('15:00')
+  await hoja.getByLabel('Title').fill(titulo)
+  await hoja.getByRole('button', { name: 'Save' }).click()
   await expect(hoja).toBeHidden()
 
   const evento = page.getByRole('button', { name: new RegExp(titulo) })
@@ -35,13 +35,13 @@ test('crear en la rejilla, mover a otro día y borrar', async ({ page }, info) =
   await page.mouse.down()
   await page.mouse.move(destino.x, destino.y + 2, { steps: 8 })
   await page.mouse.up()
-  await expect(page.locator('.v-toast-zona').getByText('Movida', { exact: true })).toBeVisible()
+  await expect(page.locator('.v-toast-zona').getByText('Moved', { exact: true })).toBeVisible()
   await expect(page.locator(`[data-dia="${dia2}"]`).getByRole('button', { name: new RegExp(titulo) })).toBeVisible()
 
   // Tocarlo abre la hoja; se borra para dejar limpia la cuenta.
   await page.locator(`[data-dia="${dia2}"]`).getByRole('button', { name: new RegExp(titulo) }).click()
-  const editar = page.getByRole('dialog', { name: 'Editar tarea' })
-  await editar.getByRole('button', { name: 'Borrar' }).click()
+  const editar = page.getByRole('dialog', { name: 'Edit task' })
+  await editar.getByRole('button', { name: 'Delete' }).click()
   await expect(editar).toBeHidden()
   await expect(page.getByRole('button', { name: new RegExp(titulo) })).toHaveCount(0)
 })

@@ -11,7 +11,7 @@ const caveat = Caveat({ variable: '--font-caveat', subsets: ['latin'], weight: [
 
 export const metadata: Metadata = {
   title: 'Klo-Ser Business',
-  description: 'El sistema con el que organizas tu trabajo de founder.',
+  description: 'The system you run your founder work with.',
   appleWebApp: { capable: true, title: 'Business', statusBarStyle: 'black-translucent' },
 }
 
@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es-MX" className={`${urbanist.variable} ${mono.variable} ${caveat.variable}`}>
+    <html lang="en" className={`${urbanist.variable} ${mono.variable} ${caveat.variable}`}>
       <body>{children}</body>
     </html>
   )

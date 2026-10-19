@@ -10,15 +10,15 @@ export function FormaEntrar() {
 
   return (
     <form action={accion} className="flex w-full flex-col gap-3 text-left">
-      <input name="correo" type="email" required autoComplete="email" placeholder="Tu correo" aria-label="Correo" className={CAMPO} />
-      <input name="contrasena" type="password" required autoComplete="current-password" placeholder="Contraseña" aria-label="Contraseña" className={CAMPO} />
+      <input name="correo" type="email" required autoComplete="email" placeholder="Your email" aria-label="Email" className={CAMPO} />
+      <input name="contrasena" type="password" required autoComplete="current-password" placeholder="Password" aria-label="Password" className={CAMPO} />
       {estado.mensaje && (
         <p className="px-2 text-sm text-tinta-2" role="alert">
           {estado.mensaje}
         </p>
       )}
       <button type="submit" className="btn-amanecer mt-2 justify-center" disabled={enviando}>
-        {enviando ? 'Entrando…' : 'Entrar'}
+        {enviando ? 'Signing in…' : 'Sign in'}
       </button>
     </form>
   )

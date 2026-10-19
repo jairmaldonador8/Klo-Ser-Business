@@ -40,6 +40,7 @@ Lee primero, en este orden:
 
 ## Voz
 
-Español de México, directo y cálido. Mensajes de la app en segunda persona («Te quedan 3
-entregas hoy»). Klo habla corto, como un socio que te cuida la agenda — sin «te late» ni
-«chance» en textos formales que salgan hacia clientes.
+**La app va en inglés** (decisión de Jair, 2026-10-19): todo texto visible, avisos y fechas (`en-US`).
+El código, la base, los comentarios y los docs siguen en español. Directo y cálido, en segunda
+persona («You have 3 left today»). Klo habla corto, como un socio que te cuida la agenda.
+Frente = «space» en la interfaz.

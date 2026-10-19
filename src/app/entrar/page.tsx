@@ -24,7 +24,7 @@ export default async function Entrar() {
           <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={72} height={86} unoptimized />
         </div>
         <h1 className="titulo text-2xl">
-          Tu trabajo de founder, en <span className="text-amanecer">un solo lugar</span>
+          Your founder work, in <span className="text-amanecer">one place</span>
         </h1>
         <FormaEntrar />
       </div>

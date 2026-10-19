@@ -25,10 +25,10 @@ export function prepararFrentes(
   ocupados: string[] = [],
 ): { ok: true; frentes: FrenteNuevo[] } | { ok: false; mensaje: string } {
   const limpios = nombres.map((n) => n.trim().replace(/\s+/g, ' ')).filter(Boolean)
-  if (limpios.length === 0) return { ok: false, mensaje: 'Escribe al menos un frente.' }
-  if (limpios.length > MAX_FRENTES) return { ok: false, mensaje: `Por ahora caben hasta ${MAX_FRENTES} frentes.` }
+  if (limpios.length === 0) return { ok: false, mensaje: 'Write at least one space.' }
+  if (limpios.length > MAX_FRENTES) return { ok: false, mensaje: `For now you can have up to ${MAX_FRENTES} spaces.` }
   const largo = limpios.find((n) => n.length > MAX_NOMBRE)
-  if (largo) return { ok: false, mensaje: `«${largo.slice(0, 20)}…» es muy largo: máximo ${MAX_NOMBRE} letras.` }
+  if (largo) return { ok: false, mensaje: `“${largo.slice(0, 20)}…” is too long: ${MAX_NOMBRE} characters max.` }
 
   const usados = new Set(ocupados)
   const frentes = limpios.map((nombre) => {

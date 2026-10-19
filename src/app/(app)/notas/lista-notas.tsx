@@ -50,7 +50,7 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
       const r = await borrarNota(n.id)
       if (!r.ok) return avisar(r.mensaje)
       // Si el Deshacer falla, te lo decimos: antes se perdía en silencio.
-      avisar('Nota borrada', () =>
+      avisar('Note deleted', () =>
         empezar(async () => {
           const d = await borrarNota(n.id, false)
           if (!d.ok) avisar(d.mensaje)
@@ -62,7 +62,7 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
   // El título de una tarea llega a 200 letras: cortarla en silencio perdería parte de la idea.
   function volverTarea(n: NotaVista) {
     const titulo = n.texto.trim()
-    if (titulo.length > LARGO_TITULO) return avisar('Esta nota es larga: acórtala a 200 letras para volverla tarea.')
+    if (titulo.length > LARGO_TITULO) return avisar('This note is long: trim it to 200 characters to make it a task.')
     abrir({ valores: { titulo, espacio_id: n.espacio_id }, notaId: n.id })
   }
 
@@ -73,15 +73,15 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
           className="v-campo"
           rows={3}
           maxLength={4000}
-          placeholder="Escribe una idea…"
-          aria-label="Nueva nota"
+          placeholder="Write an idea…"
+          aria-label="New note"
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
           onKeyDown={(e) => (e.metaKey || e.ctrlKey) && e.key === 'Enter' && guardar()}
         />
         <div className="v-fila" style={{ marginTop: 10 }}>
           {!abierto && frentes.length > 1 ? (
-            <select className="v-campo" style={{ flex: '0 1 200px' }} aria-label="Frente de la nota" value={espacio} onChange={(e) => setEspacio(e.target.value)}>
+            <select className="v-campo" style={{ flex: '0 1 200px' }} aria-label="Note space" value={espacio} onChange={(e) => setEspacio(e.target.value)}>
               {frentes.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.nombre}
@@ -92,7 +92,7 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
             <span />
           )}
           <button type="button" className="v-boton primario chico" disabled={!texto.trim()} onClick={guardar}>
-            Guardar nota
+            Save note
           </button>
         </div>
         {error && (
@@ -121,7 +121,7 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
                 maxLength={4000}
                 autoFocus
                 defaultValue={n.texto}
-                aria-label="Editar nota"
+                aria-label="Edit note"
                 onBlur={(e) => guardarEdicion(n, e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') setEditando(null)
@@ -133,17 +133,17 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
             )}
             <div className="acciones">
               <button type="button" className="v-boton chico" onClick={() => setEditando(n.id)}>
-                Editar
+                Edit
               </button>
               <button type="button" className="v-boton chico" onClick={() => borrar(n)}>
-                Borrar
+                Delete
               </button>
               <button
                 type="button"
                 className="v-boton chico"
                 onClick={() => volverTarea(n)}
               >
-                Volver tarea
+                Make it a task
               </button>
             </div>
           </article>

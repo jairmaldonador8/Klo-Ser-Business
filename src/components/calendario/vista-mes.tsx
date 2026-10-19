@@ -1,6 +1,6 @@
 'use client'
 
-import { aMinutos, diaCorto, numeroDia, serie } from '@/lib/calendario/fechas'
+import { aMinutos, diaCorto, mesCorto, numeroDia, serie } from '@/lib/calendario/fechas'
 import type { Tarea } from '@/lib/tareas/esquema'
 import { BanderaMeta, colorVar, FichaDia } from './fichas'
 import type { ColorDe, Empezar, Meta, Previa } from './tipos'
@@ -55,8 +55,8 @@ export function VistaMes({ dias, fecha, tareas, metas, hoy, colorDe, empezar, pr
               data-zona="mes"
               onClick={(e) => e.target === e.currentTarget && nuevaEn(d)}
             >
-              <button type="button" className="cal-mes-num" onClick={() => irADia(d)} aria-label={`Ver el ${d}`}>
-                {numeroDia(d) === 1 ? `1 ${new Intl.DateTimeFormat('es-MX', { timeZone: 'UTC', month: 'short' }).format(new Date(`${d}T12:00:00Z`)).replace('.', '')}` : numeroDia(d)}
+              <button type="button" className="cal-mes-num" onClick={() => irADia(d)} aria-label={`Go to ${d}`}>
+                {numeroDia(d) === 1 ? `${mesCorto(d)} 1` : numeroDia(d)}
               </button>
               {metasVis.map((m) => (
                 <BanderaMeta key={m.id} meta={m} colorDe={colorDe} empezar={empezar} fantasma={arrastrando === m.id} />
@@ -66,7 +66,7 @@ export function VistaMes({ dias, fecha, tareas, metas, hoy, colorDe, empezar, pr
               ))}
               {total > visibles && (
                 <button type="button" className="cal-mas" onClick={() => irADia(d)}>
-                  +{total - visibles} más
+                  +{total - visibles} more
                 </button>
               )}
               {sobre && (

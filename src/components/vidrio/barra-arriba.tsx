@@ -29,20 +29,20 @@ export function BarraArriba({ nombre, zona, frentes, ahora: ahoraIso }: Props) {
         <h1>{frente ? frente.nombre : saludoPorHora(horaEn(ahora, zona), nombre)}</h1>
         <small>
           {fechaLarga(ahora, zona)}
-          {frente ? ' · frente' : ''}
+          {frente ? ' · space' : ''}
         </small>
       </div>
       {/* La captura de Klo se enciende en la Parte 3. */}
       <label className="v-klo-campo">
         <span className="v-orbe" />
         {/* Las extensiones del navegador le inyectan atributos al input. */}
-        <input suppressHydrationWarning placeholder="Díselo a Klo: «mañana entrego los carruseles a las 5»" disabled aria-label="Díselo a Klo" />
+        <input suppressHydrationWarning placeholder="Tell Klo: “deliver the carousels tomorrow at 5”" disabled aria-label="Tell Klo" />
         <kbd>⌘ K</kbd>
       </label>
-      <Link href={conFrente('/ajustes', frente?.atajo)} className="v-yo" aria-label="Ajustes">
+      <Link href={conFrente('/ajustes', frente?.atajo)} className="v-yo" aria-label="Settings">
         <i>{inicial}</i>
         <span>
-          Hola, <b>{nombre?.trim().split(/\s+/)[0] || 'tú'}</b>
+          Hi, <b>{nombre?.trim().split(/\s+/)[0] || 'there'}</b>
         </span>
       </Link>
     </header>

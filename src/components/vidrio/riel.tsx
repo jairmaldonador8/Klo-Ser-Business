@@ -12,7 +12,7 @@ export function Riel({ secciones }: { secciones: Seccion[] }) {
   const frente = useSearchParams().get('frente')
 
   return (
-    <nav className="v-riel" aria-label="Secciones">
+    <nav className="v-riel" aria-label="Sections">
       {secciones.map((s) => (
         <Link key={s.id} href={conFrente(s.ruta, frente)} aria-label={s.nombre} aria-current={s.ruta === activa ? 'page' : undefined}>
           <Icono nombre={s.id} />

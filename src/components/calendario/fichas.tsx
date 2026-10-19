@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useHoja } from '@/components/hoja/hoja-provider'
 import { aMinutos, horaCorta } from '@/lib/calendario/fechas'
 import { porcentaje } from '@/lib/proyectos/avance'
-import { hhmm, NOMBRE_CLASE, type Tarea } from '@/lib/tareas/esquema'
+import { esClaseBase, hhmm, nombreClase, type Tarea } from '@/lib/tareas/esquema'
 import type { ColorDe, Empezar, Meta } from './tipos'
 
 export const colorVar = (color: string) => ({ '--c': `var(--v-p-${color})` }) as React.CSSProperties
@@ -47,7 +47,7 @@ export function EventoHora({
   return (
     <button
       type="button"
-      className={`cal-ev clase-${tarea.clase}${tarea.completada_en ? ' hecha' : ''}${corto ? ' corto' : ''}${fantasma ? ' fantasma' : ''}`}
+      className={`cal-ev clase-${esClaseBase(tarea.clase) ? tarea.clase : 'propia'}${tarea.completada_en ? ' hecha' : ''}${corto ? ' corto' : ''}${fantasma ? ' fantasma' : ''}`}
       style={{ ...estilo, ...colorVar(color) }}
       aria-label={`${tarea.titulo}, ${rango(tarea)}`}
       onPointerDown={(e) => empezar(e, { tipo: 'mover', tarea, agarre: minutoEn(e) - ini }, abrirla)}
@@ -56,7 +56,7 @@ export function EventoHora({
       <b>{tarea.titulo}</b>
       <small>
         {rango(tarea)}
-        {tarea.clase !== 'tarea' && !corto && <em> · {NOMBRE_CLASE[tarea.clase]}</em>}
+        {tarea.clase !== 'tarea' && !corto && <em> · {nombreClase(tarea.clase)}</em>}
       </small>
       {!tarea.completada_en && (
         <i
@@ -103,7 +103,7 @@ export function BanderaMeta({ meta, colorDe, empezar, fantasma }: { meta: Meta; 
       type="button"
       className={`cal-meta${fantasma ? ' fantasma' : ''}`}
       style={colorVar(colorDe(meta.espacio_id))}
-      title={`Meta: ${meta.nombre} · ${porcentaje(meta.avance)}`}
+      title={`Goal: ${meta.nombre} · ${porcentaje(meta.avance)}`}
       onPointerDown={(e) => {
         e.stopPropagation()
         empezar(e, { tipo: 'meta', meta }, ir)

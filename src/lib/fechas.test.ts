@@ -15,17 +15,17 @@ describe('fechas', () => {
     expect(sumarDias('2026-10-01', -1)).toBe('2026-09-30')
   })
   it('nombra el día relativo a hoy', () => {
-    expect(etiquetaDia('2026-10-18', '2026-10-18')).toBe('hoy')
-    expect(etiquetaDia('2026-10-19', '2026-10-18')).toBe('mañana')
-    expect(etiquetaDia('2026-10-17', '2026-10-18')).toBe('ayer')
-    expect(etiquetaDia('2026-10-20', '2026-10-18')).toBe('en 2 días')
-    expect(etiquetaDia('2026-10-14', '2026-10-18')).toBe('hace 4 días')
+    expect(etiquetaDia('2026-10-18', '2026-10-18')).toBe('today')
+    expect(etiquetaDia('2026-10-19', '2026-10-18')).toBe('tomorrow')
+    expect(etiquetaDia('2026-10-17', '2026-10-18')).toBe('yesterday')
+    expect(etiquetaDia('2026-10-20', '2026-10-18')).toBe('in 2 days')
+    expect(etiquetaDia('2026-10-14', '2026-10-18')).toBe('4 days ago')
   })
 })
 
 describe('nombreDia', () => {
   it('nombra el día para la agenda', () => {
-    expect(nombreDia('2026-10-20')).toBe('martes 20 de oct')
-    expect(nombreDia('2026-12-31')).toBe('jueves 31 de dic')
+    expect(nombreDia('2026-10-20')).toBe('Tuesday, Oct 20')
+    expect(nombreDia('2026-12-31')).toBe('Thursday, Dec 31')
   })
 })

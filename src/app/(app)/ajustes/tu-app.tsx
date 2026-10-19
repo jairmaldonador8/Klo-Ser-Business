@@ -19,13 +19,13 @@ export function TuApp(props: Props) {
   function guardar(nuevasSecciones: Item[], nuevosMosaicos: Item[]) {
     setSecciones(nuevasSecciones)
     setMosaicos(nuevosMosaicos)
-    setAviso('Guardando…')
+    setAviso('Saving…')
     empezar(async () => {
       const r = await guardarVista({
         secciones: soloPreferencias(nuevasSecciones),
         mosaicos_hoy: soloPreferencias(nuevosMosaicos),
       })
-      setAviso(r.ok ? 'Guardado' : r.mensaje)
+      setAviso(r.ok ? 'Saved' : r.mensaje)
     })
   }
 
@@ -37,15 +37,15 @@ export function TuApp(props: Props) {
           <li key={x.id} className={`v-renglon ${x.visible ? '' : 'oculto'}`}>
             <span className="txt">
               <b>{x.nombre}</b>
-              <small>{x.obligatorio ? 'Siempre visible' : (x.descripcion ?? '')}</small>
+              <small>{x.obligatorio ? 'Always visible' : (x.descripcion ?? '')}</small>
             </span>
-            <button type="button" className="v-flecha" aria-label={`Subir ${x.nombre}`} disabled={n === 0} onClick={() => cambiar(mover(items, x.id, -1))}>
+            <button type="button" className="v-flecha" aria-label={`Move ${x.nombre} up`} disabled={n === 0} onClick={() => cambiar(mover(items, x.id, -1))}>
               ↑
             </button>
             <button
               type="button"
               className="v-flecha"
-              aria-label={`Bajar ${x.nombre}`}
+              aria-label={`Move ${x.nombre} down`}
               disabled={n === items.length - 1}
               onClick={() => cambiar(mover(items, x.id, 1))}
             >
@@ -56,7 +56,7 @@ export function TuApp(props: Props) {
               role="switch"
               className="v-interruptor"
               aria-checked={x.visible}
-              aria-label={`Mostrar ${x.nombre}`}
+              aria-label={`Show ${x.nombre}`}
               disabled={x.obligatorio}
               onClick={() => cambiar(items.map((y) => (y.id === x.id ? { ...y, visible: !y.visible } : y)))}
             />
@@ -68,8 +68,8 @@ export function TuApp(props: Props) {
 
   return (
     <>
-      {lista('Secciones del riel', secciones, (l) => guardar(l, mosaicos))}
-      {lista('Mosaicos de Hoy', mosaicos, (l) => guardar(secciones, l))}
+      {lista('Sidebar sections', secciones, (l) => guardar(l, mosaicos))}
+      {lista('Today tiles', mosaicos, (l) => guardar(secciones, l))}
       <p className="v-aviso" role="status" style={{ gridColumn: '1 / -1' }}>
         {aviso}
       </p>

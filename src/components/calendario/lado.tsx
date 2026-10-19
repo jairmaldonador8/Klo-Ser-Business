@@ -5,7 +5,7 @@ import { useHoja } from '@/components/hoja/hoja-provider'
 import { diaCorto, numeroDia, primeroDeMes, rejillaMes, serie, sumarMeses, tituloVista } from '@/lib/calendario/fechas'
 import type { FrenteVista } from '@/lib/frentes'
 import { textoFaltan } from '@/lib/proyectos/avance'
-import { NOMBRE_CLASE, type Tarea } from '@/lib/tareas/esquema'
+import { nombreClase, type Tarea } from '@/lib/tareas/esquema'
 import { colorVar } from './fichas'
 import type { ColorDe, Empezar, Meta } from './tipos'
 
@@ -29,13 +29,13 @@ export function MiniMes({ fecha, visibles, hoy, conAlgo, elegir }: { fecha: stri
   const mes = ancla.slice(0, 7)
 
   return (
-    <section className="cal-mini" aria-label="Elegir fecha">
+    <section className="cal-mini" aria-label="Pick a date">
       <header>
         <b>{tituloVista('mes', ancla)}</b>
-        <button type="button" className="cal-icono" aria-label="Mes anterior" onClick={() => setAncla(sumarMeses(ancla, -1))}>
+        <button type="button" className="cal-icono" aria-label="Previous month" onClick={() => setAncla(sumarMeses(ancla, -1))}>
           <Flecha dir={-1} />
         </button>
-        <button type="button" className="cal-icono" aria-label="Mes siguiente" onClick={() => setAncla(sumarMeses(ancla, 1))}>
+        <button type="button" className="cal-icono" aria-label="Next month" onClick={() => setAncla(sumarMeses(ancla, 1))}>
           <Flecha dir={1} />
         </button>
       </header>
@@ -63,8 +63,8 @@ export function MiniMes({ fecha, visibles, hoy, conAlgo, elegir }: { fecha: stri
 /** Los frentes como calendarios: se prenden y apagan sin salir de «Todos». */
 export function Calendarios({ frentes, ocultos, alternar }: { frentes: FrenteVista[]; ocultos: Set<string>; alternar: (id: string) => void }) {
   return (
-    <section className="cal-bloque" aria-label="Calendarios">
-      <h4>Calendarios</h4>
+    <section className="cal-bloque" aria-label="Calendars">
+      <h4>Calendars</h4>
       {frentes.map((f) => (
         <label key={f.id} className="cal-cal" style={colorVar(f.color)}>
           <input type="checkbox" checked={!ocultos.has(f.id)} onChange={() => alternar(f.id)} />
@@ -80,11 +80,11 @@ export function Calendarios({ frentes, ocultos, alternar }: { frentes: FrenteVis
 export function Metas({ metas, hoy, colorDe, ir }: { metas: Meta[]; hoy: string; colorDe: ColorDe; ir: (fecha: string) => void }) {
   const proximas = [...metas].sort((a, b) => a.fecha_meta.localeCompare(b.fecha_meta))
   return (
-    <section className="cal-bloque" aria-label="Metas">
+    <section className="cal-bloque" aria-label="Goals">
       <h4>
-        Metas <span>{proximas.length || ''}</span>
+        Goals <span>{proximas.length || ''}</span>
       </h4>
-      {proximas.length === 0 && <p className="cal-vacio">Ponle fecha meta a un proyecto y aparece aquí.</p>}
+      {proximas.length === 0 && <p className="cal-vacio">Give a project a target date and it shows up here.</p>}
       {proximas.map((m) => (
         <button key={m.id} type="button" className="cal-meta-fila" style={colorVar(colorDe(m.espacio_id))} onClick={() => ir(m.fecha_meta)}>
           <span className="nombre">{m.nombre}</span>
@@ -104,14 +104,14 @@ export function Metas({ metas, hoy, colorDe, ir }: { metas: Meta[]; hoy: string;
 export function PorCalendarizar({ tareas, colorDe, empezar, arrastrando }: { tareas: Tarea[]; colorDe: ColorDe; empezar: Empezar; arrastrando: string | null }) {
   const abrir = useHoja()
   return (
-    <section className="cal-bloque" aria-label="Por calendarizar">
+    <section className="cal-bloque" aria-label="To schedule">
       <h4>
-        Por calendarizar <span>{tareas.length || ''}</span>
+        To schedule <span>{tareas.length || ''}</span>
       </h4>
       {tareas.length === 0 ? (
-        <p className="cal-vacio">Todo tiene fecha.</p>
+        <p className="cal-vacio">Everything has a date.</p>
       ) : (
-        <p className="cal-vacio">Arrástralas al calendario.</p>
+        <p className="cal-vacio">Drag them onto the calendar.</p>
       )}
       <ul className="cal-suelta-lista">
         {tareas.map((t) => (
@@ -125,7 +125,7 @@ export function PorCalendarizar({ tareas, colorDe, empezar, arrastrando }: { tar
             >
               <i aria-hidden />
               <span>{t.titulo}</span>
-              {t.clase !== 'tarea' && <small>{NOMBRE_CLASE[t.clase]}</small>}
+              {t.clase !== 'tarea' && <small>{nombreClase(t.clase)}</small>}
             </button>
           </li>
         ))}

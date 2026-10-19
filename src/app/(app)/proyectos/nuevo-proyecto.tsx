@@ -22,50 +22,50 @@ export function CamposProyecto({ form, poner, prefijo, alSalir }: Campos) {
   return (
     <>
       <label className="etq" htmlFor={`${prefijo}-nombre`}>
-        Nombre
+        Name
       </label>
       <input
         id={`${prefijo}-nombre`}
         className="v-campo"
         maxLength={80}
-        placeholder="Por ejemplo, Lanzar la tienda"
+        placeholder="For example, Launch the store"
         value={form.nombre}
         onChange={(e) => poner('nombre', e.target.value)}
         onBlur={alSalir}
       />
 
       <label className="etq" htmlFor={`${prefijo}-meta`}>
-        Meta
+        Goal
       </label>
       <input
         id={`${prefijo}-meta`}
         className="v-campo"
         maxLength={200}
-        placeholder="¿Qué quieres lograr?"
+        placeholder="What do you want to achieve?"
         value={form.meta}
         onChange={(e) => poner('meta', e.target.value)}
         onBlur={alSalir}
       />
 
       <label className="etq" htmlFor={`${prefijo}-fecha`}>
-        Fecha meta
+        Target date
       </label>
       <input id={`${prefijo}-fecha`} type="date" className="v-campo" value={form.fecha_meta} onChange={(e) => poner('fecha_meta', e.target.value)} onBlur={alSalir} />
 
-      <span className="etq">Cómo mides el avance</span>
-      <div className="grupo" aria-label="Cómo mides el avance">
+      <span className="etq">How you track progress</span>
+      <div className="grupo" aria-label="How you track progress">
         <button type="button" className="v-boton chico" aria-pressed={form.modo_avance === 'tareas'} onClick={() => poner('modo_avance', 'tareas')}>
-          Por tareas
+          By tasks
         </button>
         <button type="button" className="v-boton chico" aria-pressed={form.modo_avance === 'manual'} onClick={() => poner('modo_avance', 'manual')}>
-          Por cifra
+          By number
         </button>
       </div>
 
       {form.modo_avance === 'manual' && (
         <>
           <label className="etq" htmlFor={`${prefijo}-cifra`}>
-            Cifra meta
+            Target number
           </label>
           <input
             id={`${prefijo}-cifra`}
@@ -73,7 +73,7 @@ export function CamposProyecto({ form, poner, prefijo, alSalir }: Campos) {
             inputMode="decimal"
             min={1}
             className="v-campo"
-            placeholder="Por ejemplo, 60"
+            placeholder="For example, 60"
             value={form.cifra_meta}
             onChange={(e) => poner('cifra_meta', e.target.value)}
             onBlur={alSalir}
@@ -109,15 +109,15 @@ export function NuevoProyecto({ frentes, abierto, atajo, activos }: Props) {
   }
 
   return (
-    <section className="v-t c2" aria-label="Nuevo proyecto">
+    <section className="v-t c2" aria-label="New project">
       <div className="v-fila">
         <div>
-          <h3>Tus proyectos</h3>
-          <p className="v-sub">{activos === 0 ? 'Aún no tienes proyectos activos.' : activos === 1 ? '1 activo' : `${activos} activos`}</p>
+          <h3>Your projects</h3>
+          <p className="v-sub">{activos === 0 ? 'No active projects yet.' : `${activos} active`}</p>
         </div>
         {!abiertoForm && (
           <button type="button" className="v-boton primario chico" onClick={() => setAbiertoForm(true)}>
-            Nuevo proyecto
+            New project
           </button>
         )}
       </div>
@@ -128,8 +128,8 @@ export function NuevoProyecto({ frentes, abierto, atajo, activos }: Props) {
 
           {frentes.length > 1 && (
             <>
-              <span className="etq">Frente</span>
-              <div className="grupo" role="radiogroup" aria-label="Frente">
+              <span className="etq">Space</span>
+              <div className="grupo" role="radiogroup" aria-label="Space">
                 {frentes.map((f) => (
                   <button key={f.id} type="button" role="radio" className="v-boton chico" aria-checked={espacio === f.id} onClick={() => setEspacio(f.id)}>
                     <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 6 }}>
@@ -147,7 +147,7 @@ export function NuevoProyecto({ frentes, abierto, atajo, activos }: Props) {
           </p>
           <div className="v-fila" style={{ justifyContent: 'flex-start' }}>
             <button type="submit" className="v-boton primario chico" disabled={ocupado || !form.nombre.trim()}>
-              {ocupado ? 'Creando…' : 'Crear proyecto'}
+              {ocupado ? 'Creating…' : 'Create project'}
             </button>
             <button
               type="button"
@@ -158,7 +158,7 @@ export function NuevoProyecto({ frentes, abierto, atajo, activos }: Props) {
                 setAviso('')
               }}
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         </form>

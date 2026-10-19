@@ -38,7 +38,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   setAviso(null)
                 }}
               >
-                Deshacer
+                Undo
               </button>
             )}
           </div>

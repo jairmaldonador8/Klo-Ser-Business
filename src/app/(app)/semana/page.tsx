@@ -5,7 +5,7 @@ import { etiquetaDia } from '@/lib/fechas'
 import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { agruparPendientes, type Grupo } from '@/lib/semana/agrupar'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
-import { hhmm, NOMBRE_CLASE, type Tarea } from '@/lib/tareas/esquema'
+import { hhmm, nombreClase, type Tarea } from '@/lib/tareas/esquema'
 
 type Props = { searchParams: Promise<{ frente?: string | string[] }> }
 
@@ -30,17 +30,17 @@ export default async function Semana({ searchParams }: Props) {
 
   const rango = (t: Tarea) => [hhmm(t.hora), hhmm(t.hora_fin)].filter(Boolean).join('–')
   const detalle = (g: Grupo, t: Tarea): string => {
-    if (g.clave === 'vencidas') return `vencida · ${etiquetaDia(t.fecha!, ctx.hoy)}`
+    if (g.clave === 'vencidas') return `overdue · ${etiquetaDia(t.fecha!, ctx.hoy)}`
     if (g.clave === 'despues') return etiquetaDia(t.fecha!, ctx.hoy)
-    if (g.clave === 'sin-fecha') return NOMBRE_CLASE[t.clase]
-    return rango(t) || NOMBRE_CLASE[t.clase]
+    if (g.clave === 'sin-fecha') return nombreClase(t.clase)
+    return rango(t) || nombreClase(t.clase)
   }
 
   return (
     <section className="v-bento v-agenda">
       {grupos.map((g, i) => {
-        const doble = ANCHO_DOBLE.has(g.clave) || g.marca === 'hoy'
-        const vacio = g.marca === 'hoy' ? 'Nada pendiente hoy.' : 'Libre.'
+        const doble = ANCHO_DOBLE.has(g.clave) || g.marca === 'today'
+        const vacio = g.marca === 'today' ? 'Nothing left today.' : 'Free.'
         return (
           <MosaicoLista
             key={g.clave}

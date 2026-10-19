@@ -19,7 +19,7 @@ export function VacioKlo({
   accion,
   chico = false,
   className,
-  lema = 'Lo grande empieza en algún lado.',
+  lema = 'Big things start somewhere.',
 }: {
   titulo: string
   /** La línea de abajo: qué significa el vacío y qué hacer. */

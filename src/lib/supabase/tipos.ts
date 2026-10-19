@@ -154,6 +154,7 @@ export type Database = {
       }
       perfiles: {
         Row: {
+          actividades: string[]
           actualizado_en: string
           creado_en: string
           espacio_predeterminado_id: string | null
@@ -163,6 +164,7 @@ export type Database = {
           zona_horaria: string
         }
         Insert: {
+          actividades?: string[]
           actualizado_en?: string
           creado_en?: string
           espacio_predeterminado_id?: string | null
@@ -172,6 +174,7 @@ export type Database = {
           zona_horaria?: string
         }
         Update: {
+          actividades?: string[]
           actualizado_en?: string
           creado_en?: string
           espacio_predeterminado_id?: string | null

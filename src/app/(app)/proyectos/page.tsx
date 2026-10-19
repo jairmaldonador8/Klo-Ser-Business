@@ -9,7 +9,7 @@ import { NuevoProyecto } from './nuevo-proyecto'
 
 type Props = { searchParams: Promise<{ frente?: string | string[] }> }
 
-const ESTADO: Record<string, string> = { activo: 'Activo', pausado: 'En pausa', cerrado: 'Archivado' }
+const ESTADO: Record<string, string> = { activo: 'Active', pausado: 'Paused', cerrado: 'Archived' }
 
 function Tarjeta({ p, frente, hoy, atajo }: { p: ProyectoLista; frente?: FrenteVista; hoy: string; atajo: string | null }) {
   const x = avance(p, p)
@@ -27,7 +27,7 @@ function Tarjeta({ p, frente, hoy, atajo }: { p: ProyectoLista; frente?: FrenteV
         <span className="v-chip">{p.estado === 'activo' ? porcentaje(x) : ESTADO[p.estado]}</span>
       </div>
       {p.meta && <p className="v-sub">{p.meta}</p>}
-      <div className="v-barra-avance" role="progressbar" aria-label={`Avance de ${p.nombre}`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
+      <div className="v-barra-avance" role="progressbar" aria-label={`${p.nombre} progress`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
         <i style={{ width: `${x * 100}%` }} />
       </div>
       <div className="v-fila">
@@ -59,7 +59,7 @@ export default async function Proyectos({ searchParams }: Props) {
       {resto.length > 0 && (
         <details className="v-t c2">
           <summary>
-            <h3>Pausados y archivados</h3>
+            <h3>Paused and archived</h3>
             <span className="v-sub" style={{ marginLeft: 'auto' }}>
               {resto.length}
             </span>
@@ -81,7 +81,7 @@ export default async function Proyectos({ searchParams }: Props) {
       )}
       {proyectos.length === 0 && (
         <div className="c2">
-          <Vacio antes="Tus metas, con" palabra="avance" texto="Cada proyecto con su meta, su fecha y su siguiente paso." />
+          <Vacio antes="Your goals, with" palabra="progress" texto="Every project with its goal, its date and its next step." />
         </div>
       )}
     </section>

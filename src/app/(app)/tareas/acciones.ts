@@ -13,7 +13,7 @@ function listo(id?: string): Resultado {
 
 export async function guardarTarea(datos: unknown, notaId?: string): Promise<Resultado> {
   const leida = esquemaTarea.safeParse(datos)
-  if (!leida.success) return { ok: false, mensaje: leida.error.issues[0]?.message ?? 'Revisa los datos.' }
+  if (!leida.success) return { ok: false, mensaje: leida.error.issues[0]?.message ?? 'Check the details.' }
   const { id, ...campos } = leida.data
   const supabase = await crearClienteServidor()
   const consulta = id
@@ -22,7 +22,7 @@ export async function guardarTarea(datos: unknown, notaId?: string): Promise<Res
   const { data, error } = await consulta
   if (error || !data) {
     console.error('guardarTarea', error)
-    return { ok: false, mensaje: 'No pude guardar la tarea, inténtalo otra vez.' }
+    return { ok: false, mensaje: 'Couldn’t save the task, try again.' }
   }
   if (notaId) {
     // Liga la nota solo si sigue suelta: si no se puede, la tarea se borra (suave) para no dejar
@@ -38,7 +38,7 @@ export async function guardarTarea(datos: unknown, notaId?: string): Promise<Res
     if (errorNota || !nota) {
       console.error('guardarTarea: ligar nota', errorNota)
       if (!id) await supabase.from('tareas').update({ borrado_en: new Date().toISOString() }).eq('id', data.id)
-      return { ok: false, mensaje: 'No pude volver la nota tarea: recarga e inténtalo otra vez.' }
+      return { ok: false, mensaje: 'Couldn’t turn the note into a task: reload and try again.' }
     }
   }
   return listo(data.id)
@@ -47,7 +47,7 @@ export async function guardarTarea(datos: unknown, notaId?: string): Promise<Res
 export async function completarTarea(id: string, hecha: boolean): Promise<Resultado> {
   const supabase = await crearClienteServidor()
   const { error } = await supabase.from('tareas').update({ completada_en: hecha ? new Date().toISOString() : null }).eq('id', id)
-  if (error) return { ok: false, mensaje: 'No pude marcarla, inténtalo otra vez.' }
+  if (error) return { ok: false, mensaje: 'Couldn’t check it off, try again.' }
   return listo()
 }
 
@@ -55,7 +55,7 @@ export async function completarTarea(id: string, hecha: boolean): Promise<Result
 export async function borrarTarea(id: string, borrar = true): Promise<Resultado> {
   const supabase = await crearClienteServidor()
   const { error } = await supabase.from('tareas').update({ borrado_en: borrar ? new Date().toISOString() : null }).eq('id', id)
-  if (error) return { ok: false, mensaje: borrar ? 'No pude borrarla, inténtalo otra vez.' : 'No pude deshacerlo, inténtalo otra vez.' }
+  if (error) return { ok: false, mensaje: borrar ? 'Couldn’t delete it, try again.' : 'Couldn’t undo it, try again.' }
   // Si venía de una nota, la nota regresa a la lista para no perder la idea.
   if (borrar) {
     const { error: errorNota } = await supabase.from('notas').update({ convertida_en_tarea_id: null }).eq('convertida_en_tarea_id', id)

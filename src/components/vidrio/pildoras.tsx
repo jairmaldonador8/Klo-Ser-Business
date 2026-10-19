@@ -14,11 +14,11 @@ export function Pildoras({ frentes }: { frentes: FrenteVista[] }) {
   const abrir = useHoja()
 
   return (
-    <nav className="v-pildoras" aria-label="Frentes">
+    <nav className="v-pildoras" aria-label="Spaces">
       {frentes.length > 1 && (
         <>
           <Link href={ruta} aria-current={!abierto}>
-            Todos
+            All
           </Link>
           {frentes.map((f) => (
             <Link key={f.id} href={conFrente(ruta, f.atajo)} aria-current={abierto?.id === f.id}>
@@ -29,7 +29,7 @@ export function Pildoras({ frentes }: { frentes: FrenteVista[] }) {
         </>
       )}
       {/* El + abre la hoja a mano; con Klo (Parte 3) abrirá la captura. */}
-      <button type="button" className="mas" aria-label="Nuevo" onClick={() => abrir({ valores: abierto ? { espacio_id: abierto.id } : {} })}>
+      <button type="button" className="mas" aria-label="New" onClick={() => abrir({ valores: abierto ? { espacio_id: abierto.id } : {} })}>
         <Icono nombre="mas" />
       </button>
     </nav>

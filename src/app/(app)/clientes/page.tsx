@@ -3,7 +3,7 @@ import { Vacio } from '@/components/armazon/vacio'
 export default function Clientes() {
   return (
     <section className="vista">
-      <Vacio antes="Tus clientes y sus" palabra="entregas" texto="Qué se le entrega a cada quien este mes y cómo va." />
+      <Vacio antes="Your clients and their" palabra="deliveries" texto="What each client gets this month and how it’s going." />
     </section>
   )
 }

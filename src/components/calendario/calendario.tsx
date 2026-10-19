@@ -186,7 +186,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
         startTransition(async () => {
           ponerMeta({ id: o.meta.id, fecha: d.dia })
           const r = await moverMeta(o.meta.id, d.dia)
-          avisar(r.ok ? 'Meta movida' : r.mensaje)
+          avisar(r.ok ? 'Goal moved' : r.mensaje)
         })
         return true
       }
@@ -206,7 +206,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
         nuevos = { ...antes, fecha: d.dia }
       }
       if (iguales(antes, nuevos)) return false
-      cambiar(t, nuevos, antes.fecha ? 'Movida' : 'Calendarizada')
+      cambiar(t, nuevos, antes.fecha ? 'Moved' : 'Scheduled')
       return true
     },
     [cambiar, nuevaEn, ponerMeta, avisar],
@@ -304,7 +304,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     const { origen: o, destino: d } = arrastre
     if (o.tipo === 'crear') {
       if (d.min === null) return null
-      return { dia: o.dia, zona: 'hora', ini: Math.min(o.desde, d.min), fin: Math.max(o.desde + 15, d.min), titulo: 'Nueva tarea', color: frente?.color ?? 'azul', id: null }
+      return { dia: o.dia, zona: 'hora', ini: Math.min(o.desde, d.min), fin: Math.max(o.desde + 15, d.min), titulo: 'New task', color: frente?.color ?? 'azul', id: null }
     }
     if (o.tipo === 'meta') return { dia: d.dia, zona: d.zona, ini: null, fin: null, titulo: o.meta.nombre, color: colorDe(o.meta.espacio_id), id: o.meta.id }
     const t = o.tarea
@@ -353,28 +353,28 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
   const pendientes = visibles.filter((t) => !t.completada_en && dias.includes(t.fecha!)).length
 
   return (
-    <section className="cal" aria-label="Calendario" aria-busy={cargando}>
+    <section className="cal" aria-label="Calendar" aria-busy={cargando}>
       <header className="cal-cab">
         <div className="cal-titulo">
           <h2>{titulo.charAt(0).toUpperCase() + titulo.slice(1)}</h2>
           <small>
-            {pendientes === 0 ? 'Nada pendiente aquí' : `${pendientes} ${pendientes === 1 ? 'pendiente' : 'pendientes'}`}
+            {pendientes === 0 ? 'Nothing pending here' : `${pendientes} pending`}
             {frente ? ` · ${frente.nombre}` : ''}
           </small>
         </div>
         <div className="cal-mandos">
-          <button type="button" className="cal-boton" onClick={() => ir(vista, hoy)} title="Hoy (T)">
-            Hoy
+          <button type="button" className="cal-boton" onClick={() => ir(vista, hoy)} title="Today (T)">
+            Today
           </button>
           <div className="cal-flechas">
-            <button type="button" className="cal-icono" aria-label="Anterior" title="Anterior (←)" onClick={() => ir(vista, pasar(vista, fecha, -1))}>
+            <button type="button" className="cal-icono" aria-label="Previous" title="Previous (←)" onClick={() => ir(vista, pasar(vista, fecha, -1))}>
               <Flecha dir={-1} />
             </button>
-            <button type="button" className="cal-icono" aria-label="Siguiente" title="Siguiente (→)" onClick={() => ir(vista, pasar(vista, fecha, 1))}>
+            <button type="button" className="cal-icono" aria-label="Next" title="Next (→)" onClick={() => ir(vista, pasar(vista, fecha, 1))}>
               <Flecha dir={1} />
             </button>
           </div>
-          <div className="cal-vistas" role="radiogroup" aria-label="Vista">
+          <div className="cal-vistas" role="radiogroup" aria-label="View">
             {VISTAS.map((v) => (
               <button
                 key={v}
@@ -388,11 +388,11 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
               </button>
             ))}
           </div>
-          <button type="button" className="cal-boton primario" onClick={() => nuevaEn(dias.includes(hoy) ? hoy : dias[0])} title="Nueva (N)">
+          <button type="button" className="cal-boton primario" onClick={() => nuevaEn(dias.includes(hoy) ? hoy : dias[0])} title="New (N)">
             <svg viewBox="0 0 16 16" aria-hidden>
               <path d="M8 3v10M3 8h10" />
             </svg>
-            <span>Nueva</span>
+            <span>New</span>
           </button>
         </div>
         <i className="cal-carga" aria-hidden />
@@ -438,7 +438,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
           <Metas metas={metasVis} hoy={hoy} colorDe={colorDe} ir={(f) => ir(vista === 'dia' || vista === '3dias' ? vista : 'semana', f)} />
           {!frente && frentes.length > 1 && <Calendarios frentes={frentes} ocultos={ocultos} alternar={alternar} />}
           <p className="cal-atajos">
-            <kbd>T</kbd> hoy · <kbd>D</kbd> <kbd>X</kbd> <kbd>W</kbd> <kbd>M</kbd> vista · <kbd>←</kbd> <kbd>→</kbd> · <kbd>N</kbd> nueva
+            <kbd>T</kbd> today · <kbd>D</kbd> <kbd>X</kbd> <kbd>W</kbd> <kbd>M</kbd> view · <kbd>←</kbd> <kbd>→</kbd> · <kbd>N</kbd> new
           </p>
         </aside>
       </div>

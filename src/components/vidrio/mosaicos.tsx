@@ -32,15 +32,15 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
   })
 
   return (
-    <section className="v-t c2 r2" style={retraso(i)} aria-label="Tu día">
+    <section className="v-t c2 r2" style={retraso(i)} aria-label="Your day">
       <div className="v-fila">
-        <h3>Tu día</h3>
+        <h3>Your day</h3>
         <span className="v-chip">
-          {hechas} de {total} hechas
+          {hechas} of {total} done
         </span>
       </div>
       <div className="v-medidor">
-        <svg viewBox="0 0 340 190" role="img" aria-label={`${pendientes} por hacer hoy`}>
+        <svg viewBox="0 0 340 190" role="img" aria-label={`${pendientes} to do today`}>
           <defs>
             <linearGradient id="v-amanecer" x1="0" x2="1">
               <stop offset="0" stopColor="#c8643a" />
@@ -64,21 +64,21 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
           <circle cx={170 + 130 * Math.cos(angulo)} cy={170 + 130 * Math.sin(angulo)} r={10} fill="#fff" stroke="#000" strokeWidth={4} />
         </svg>
         <div className="centro">
-          <small>por hacer hoy</small>
+          <small>to do today</small>
           <b>{pendientes}</b>
         </div>
       </div>
       <p className="v-sub" style={{ textAlign: 'center' }}>
         {siguiente ? (
           <>
-            Lo siguiente: <b style={{ color: 'var(--tinta)', fontWeight: 500 }}>{siguiente}</b>
+            Up next: <b style={{ color: 'var(--tinta)', fontWeight: 500 }}>{siguiente}</b>
           </>
         ) : total === 0 ? (
-          'Nada pendiente hoy. Captura con el +.'
+          'Nothing left today. Capture with the +.'
         ) : pendientes === 0 ? (
-          '¡Todo listo por hoy!'
+          'All done for today!'
         ) : (
-          `Te quedan ${pendientes} por hacer hoy.`
+          `You have ${pendientes} left today.`
         )}
       </p>
     </section>
@@ -93,8 +93,8 @@ export function MosaicoKlo({ frase, i }: { frase: string; i: number }) {
           <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={56} height={66} unoptimized />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
-          <span className="v-sub">Klo te dice</span>
-          <h3>«{frase}»</h3>
+          <span className="v-sub">Klo says</span>
+          <h3>“{frase}”</h3>
           <div className="v-ondas" aria-hidden>
             {Array.from({ length: 14 }, (_, n) => (
               <i key={n} style={{ animationDelay: `${n * 80}ms` }} />
@@ -113,18 +113,18 @@ type Frente = { frente: FrenteVista; ruta: string; resumen?: ResumenFrente; proy
 /** Cómo va el frente: lo de hoy y lo pendiente, y abajo lo vencido o en riesgo y sus proyectos. */
 export function MosaicoFrente({ frente, ruta, resumen, proyectos = 0, i }: Frente) {
   const { hoy, riesgo, pendientes, vencidas } = resumen ?? { hoy: 0, riesgo: 0, pendientes: 0, vencidas: 0 }
-  const estado = vencidas ? plural(vencidas, 'vencida', 'vencidas') : riesgo ? `${riesgo} en riesgo` : 'Al día'
+  const estado = vencidas ? `${vencidas} overdue` : riesgo ? `${riesgo} at risk` : 'On track'
   return (
     <Link href={conFrente(ruta, frente.atajo)} className={`v-t v-color-${frente.color}`} style={retraso(i)}>
       <div style={{ minWidth: 0 }}>
         <h3>{frente.nombre}</h3>
         <div className="v-sub">
-          {estado} · {plural(proyectos, 'proyecto activo', 'proyectos activos')}
+          {estado} · {plural(proyectos, 'active project', 'active projects')}
         </div>
       </div>
       <div className="v-pila" style={{ marginTop: 'auto' }}>
         <span>
-          {hoy} hoy · {plural(pendientes, 'pendiente', 'pendientes')}
+          {hoy} today · {pendientes} pending
         </span>
       </div>
       <span className="v-ilus" aria-hidden>
@@ -161,7 +161,7 @@ export function MosaicoLista({ titulo, vacio, ancho = 1, chip, mas = 0, i, child
         {chip && <span className="v-chip">{chip}</span>}
       </div>
       {children.length ? <ul className="v-lista">{children}</ul> : <p className="v-sub">{vacio}</p>}
-      {mas > 0 && <p className="v-sub">y {mas} más</p>}
+      {mas > 0 && <p className="v-sub">and {mas} more</p>}
     </section>
   )
 }
@@ -172,12 +172,12 @@ type Proyectos = { proyectos: ProyectoLista[]; hoy: string; frente?: FrenteVista
 export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
   const ruta = conFrente('/proyectos', frente?.atajo)
   return (
-    <section className={`v-t c2 ${proyectos.length ? '' : 'punteada'}`} style={retraso(i)} aria-label="Proyectos">
+    <section className={`v-t c2 ${proyectos.length ? '' : 'punteada'}`} style={retraso(i)} aria-label="Projects">
       <div className="v-fila">
-        <h3>Proyectos</h3>
+        <h3>Projects</h3>
         {proyectos.length > 0 && (
           <Link href={ruta} className="v-chip">
-            Ver todos →
+            See all →
           </Link>
         )}
       </div>
@@ -192,7 +192,7 @@ export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
                   <b>{p.nombre}</b>
                   <span className="v-sub">{porcentaje(x)}</span>
                 </div>
-                <div className="v-barra-avance" role="progressbar" aria-label={`Avance de ${p.nombre}`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
+                <div className="v-barra-avance" role="progressbar" aria-label={`${p.nombre} progress`} aria-valuenow={Math.floor(x * 100)} aria-valuemin={0} aria-valuemax={100}>
                   <i style={{ width: `${x * 100}%` }} />
                 </div>
                 <small className="v-sub">{textoFaltan(p.fecha_meta, hoy)}</small>
@@ -203,9 +203,9 @@ export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
         </ul>
       ) : (
         <p className="v-sub">
-          {frente ? `${frente.nombre} aún no tiene proyectos activos. ` : 'Aún no tienes proyectos activos. '}
+          {frente ? `${frente.nombre} has no active projects yet. ` : 'No active projects yet. '}
           <Link href={ruta} style={{ color: 'var(--tinta)', textDecoration: 'underline' }}>
-            Nuevo proyecto
+            New project
           </Link>
         </p>
       )}
