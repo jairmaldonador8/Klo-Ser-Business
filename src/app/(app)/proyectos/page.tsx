@@ -18,7 +18,7 @@ function Tarjeta({ p, frente, hoy, atajo }: { p: ProyectoLista; frente?: FrenteV
       <div className="v-fila">
         <div className="v-fila" style={{ justifyContent: 'flex-start', minWidth: 0 }}>
           {frente && (
-            <span className={`v-foto v-color-${frente.color}`} style={{ width: 28, height: 28, fontSize: 14, borderRadius: 9 }} title={frente.nombre}>
+            <span className={`v-foto v-color-${frente.color}`} style={{ width: 28, height: 28, fontSize: 14, borderRadius: 7 }} title={frente.nombre}>
               {frente.inicial}
             </span>
           )}

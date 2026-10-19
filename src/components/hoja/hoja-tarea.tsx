@@ -181,7 +181,7 @@ export function HojaTarea({
                   // Al cambiar de frente se limpia el proyecto: era de otro frente.
                   onClick={() => setForm((x) => (x.espacio_id === f.id ? x : { ...x, espacio_id: f.id, proyecto_id: '' }))}
                 >
-                  <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 6 }}>
+                  <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 5 }}>
                     {f.inicial}
                   </span>
                   {f.nombre}

@@ -108,7 +108,7 @@ export function ListaNotas({ notas, frentes, abierto, children }: Props) {
           <article key={n.id} className="v-t v-nota c2">
             <div className="v-fila" style={{ justifyContent: 'flex-start' }}>
               {f && (
-                <span className={`v-foto v-color-${f.color}`} style={{ width: 24, height: 24, fontSize: 12, borderRadius: 8 }} title={f.nombre}>
+                <span className={`v-foto v-color-${f.color}`} style={{ width: 24, height: 24, fontSize: 12, borderRadius: 6 }} title={f.nombre}>
                   {f.inicial}
                 </span>
               )}

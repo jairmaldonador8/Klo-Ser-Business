@@ -835,3 +835,26 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
 }
 @media (prefers-reduced-motion:reduce){.v-wordmark-espacio{animation:none}}
 }
+
+/* ── Radios premium (DISENO §28) ──────────────────────────────────────
+   Menos redondo, más sobrio: una sola escala para toda la app. Fuera de capa a propósito: tiene que ganarle
+   a las reglas viejas que también viven fuera de capa. Lo circular (palomitas, avatares, el círculo de hoy,
+   interruptores) se queda circular. */
+:root{--r-tarjeta-p:14px;--r-caja:10px;--r-control:8px;--r-chip:6px;--r-evento:5px}
+:is(.v-t,a.v-t[class*=v-color-],.v-t.punteada,.v-editable,.v-editable[data-arrastrando]::after,.v-ocultos,.cal-principal,.v-apertura .v-marca-carga > b){border-radius:var(--r-tarjeta-p)}
+:is(.v-microwins,.v-renglon,.cal-meta-fila,.cal-suelta,.v-toast,.v-klo-campo,.cal-vistas,.cal-flechas,.v-foto,.v-mas-flotante,.v-marca-carga > b){border-radius:var(--r-caja)}
+:is(.v-boton,.btn-amanecer,.cal-boton,.v-mini,.v-campo,.v-flecha,.v-riel a,.v-hoja .grupo button,.v-microwin,.v-microwin-nuevo .v-campo,.v-toast button,.v-riel-espacios a){border-radius:var(--r-control)}
+:is(.v-chip,.v-pila,.cal-vistas button,.cal-icono,.cal-mini-rejilla button,.cal-mes-num,.cal-mas,.v-riel-espacios a b,.v-latido,.v-actividades .propia button){border-radius:var(--r-chip)}
+:is(.cal-ev,.cal-flotante,.cal-ficha,.cal-meta,.cal-ficha.previa){border-radius:var(--r-evento)}
+/* Lo de varios días conserva su unión plana en la medianoche. */
+.cal-ev.tramo-inicio{border-radius:var(--r-evento) var(--r-evento) 2px 2px}
+.cal-ev.tramo-fin{border-radius:2px 2px var(--r-evento) var(--r-evento)}
+.cal-ev.tramo-medio{border-radius:2px}
+.cal-mini-rejilla button.visible{border-radius:0}
+.cal-mini-rejilla button.visible:nth-child(7n+1){border-radius:var(--r-chip) 0 0 var(--r-chip)}
+.cal-mini-rejilla button.visible:nth-child(7n){border-radius:0 var(--r-chip) var(--r-chip) 0}
+.cal-mes-celda.hoy .cal-mes-num{border-radius:var(--r-chip)}
+@media (max-width:700px){
+  :is(.v-t,a.v-t[class*=v-color-],.v-t.punteada,.v-editable,.cal-principal){border-radius:12px}
+  .v-riel-espacios a{border-radius:var(--r-control)}
+}

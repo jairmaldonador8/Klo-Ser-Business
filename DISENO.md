@@ -330,3 +330,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Una task puede terminar otro día (`tareas.fecha_fin`, migración 0009): lunes 5 pm → martes 4 pm es **un solo evento**. En la rejilla se pinta en tramos por día (sin esquinas en la medianoche) y su etiqueta dice «Mon 5 pm – Tue 4 pm»; en el mes y en «todo el día» sale en cada día que toca.
 - Seleccionar en diagonal hacia la derecha (o la izquierda) crea ese evento continuo: el bloque donde empezaste cuenta. Mover conserva la duración completa (se puede tomar de cualquier tramo y cruzar la medianoche); estirar puede cruzar días. La copia flotante de un evento largo mide a lo mucho 140 px.
 - La hoja muestra «＋ Ends another day» y, si aplica, «Ends» con su fecha. Se descartó crear una task por día (Jair: «no quiero que se dupliquen las cosas»).
+
+## 28. Radios premium (2026-10-19)
+
+- Menos redondo, más sobrio, con una sola escala (`--r-*`, al final de `vidrio.css`, fuera de capa para ganarle a lo viejo): tarjetas 14 px (12 en teléfono), cajas internas 10, botones y campos 8, chips 6, eventos 5. Lo circular se queda circular (palomitas, avatares, el círculo de hoy, interruptores).

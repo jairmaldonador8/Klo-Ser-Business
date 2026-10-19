@@ -132,7 +132,7 @@ export function NuevoProyecto({ frentes, abierto, atajo, activos }: Props) {
               <div className="grupo" role="radiogroup" aria-label="Space">
                 {frentes.map((f) => (
                   <button key={f.id} type="button" role="radio" className="v-boton chico" aria-checked={espacio === f.id} onClick={() => setEspacio(f.id)}>
-                    <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 6 }}>
+                    <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 5 }}>
                       {f.inicial}
                     </span>
                     {f.nombre}

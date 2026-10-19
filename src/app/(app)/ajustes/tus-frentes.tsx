@@ -47,7 +47,7 @@ export function TusFrentes({ frentes: iniciales }: { frentes: FrenteVista[] }) {
       <ul className="v-lista">
         {frentes.map((f, n) => (
           <li key={f.id} className="v-renglon" style={{ flexWrap: 'wrap' }}>
-            <span className={`v-foto v-color-${f.color}`} style={{ width: 34, height: 34, fontSize: 15, borderRadius: 11 }}>
+            <span className={`v-foto v-color-${f.color}`} style={{ width: 34, height: 34, fontSize: 15, borderRadius: 8 }}>
               {f.inicial}
             </span>
             <input
