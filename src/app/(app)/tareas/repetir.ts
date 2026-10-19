@@ -162,6 +162,10 @@ export async function cambiarDesdeAqui(tareaId: string, datos: unknown, reglaCru
   const actual = await tareaYSerie(supabase, tareaId)
   if (!actual) return { ok: false, mensaje: 'Couldn’t find that task.' }
 
+  // Las que ya palomeaste después de esta se respetan: no se vuelven a crear y pasan a la serie nueva.
+  const { data: hechas } = actual.s
+    ? await supabase.from('tareas').select('id, fecha').eq('serie_id', actual.s.id).is('borrado_en', null).not('completada_en', 'is', null).gt('fecha', actual.t.fecha!)
+    : { data: [] as { id: string; fecha: string | null }[] }
   // 1) Lo que venía después de esta se va (las pendientes); la serie vieja termina aquí.
   if (actual.s) {
     const e = await cortarDesde(supabase, actual.s, actual.t.fecha!, false)
@@ -185,7 +189,9 @@ export async function cambiarDesdeAqui(tareaId: string, datos: unknown, reglaCru
     const { error, serieId, fechas } = await nacerSerie(supabase, plantilla, regla.data, fin.data, hoy)
     if (error || !serieId) return { ok: false, mensaje: 'Couldn’t update the series, try again.' }
     await supabase.from('tareas').update({ serie_id: serieId }).eq('id', tareaId)
-    const siguientes = fechas.filter((f) => f > campos.fecha!)
+    const ocupadas = new Set((hechas ?? []).map((h) => h.fecha))
+    const siguientes = fechas.filter((f) => f > campos.fecha! && !ocupadas.has(f))
+    if (hechas?.length) await supabase.from('tareas').update({ serie_id: serieId }).in('id', hechas.map((h) => h.id))
     if (siguientes.length) {
       const { error: e3 } = await supabase.from('tareas').insert(copias(plantilla, siguientes, serieId))
       if (e3) console.error('cambiarDesdeAqui: copias', e3)
@@ -303,5 +309,51 @@ export async function borrarTodas(tareaId: string): Promise<Resultado> {
     return { ok: false, mensaje: 'Couldn’t delete them, try again.' }
   }
   await supabase.from('series').update({ borrado_en: ahora }).eq('id', actual.s.id)
+  return listo()
+}
+
+/**
+ * Cambiar solo cómo termina la calendarización (Never / On date / After N) aplica a toda la serie: si se alarga,
+ * se generan las que faltan (hasta el horizonte); si se acorta, se quitan las pendientes que sobran.
+ */
+export async function cambiarFin(tareaId: string, finCrudo: unknown): Promise<Resultado> {
+  const fin = esquemaFin.safeParse(finCrudo ?? {})
+  if (!id.safeParse(tareaId).success || !fin.success) return { ok: false, mensaje: 'Check the repeat options.' }
+  const [supabase, { hoy }] = await Promise.all([crearClienteServidor(), contextoAhora()])
+  const actual = await tareaYSerie(supabase, tareaId)
+  if (!actual?.s) return { ok: false, mensaje: 'Couldn’t find that series.' }
+  const { data: s } = await supabase.from('series').select('id, regla, inicio, generado_hasta').eq('id', actual.s.id).single()
+  const regla = esquemaRegla.safeParse(s?.regla)
+  if (!s || !regla.success) return { ok: false, mensaje: 'Couldn’t read the series.' }
+  if (fin.data.hasta && fin.data.hasta < s.inicio) return { ok: false, mensaje: 'It can’t end before it starts.' }
+
+  const tope = sumarDias(hoy > s.inicio ? hoy : s.inicio, HORIZONTE)
+  // Las fechas que la serie debe tener con el final nuevo (hasta el horizonte).
+  const validas = new Set(fechasDe(regla.data, s.inicio, tope, fin.data))
+  const ultimaValida = [...validas].pop() ?? s.inicio
+
+  // Se acorta: fuera las pendientes que ya no caben.
+  const { data: actuales } = await supabase.from('tareas').select('id, fecha, completada_en').eq('serie_id', s.id).is('borrado_en', null)
+  const sobran = (actuales ?? []).filter((t) => t.fecha && !t.completada_en && !validas.has(t.fecha)).map((t) => t.id)
+  if (sobran.length) {
+    const { error } = await supabase.from('tareas').update({ borrado_en: new Date().toISOString() }).in('id', sobran)
+    if (error) return { ok: false, mensaje: 'Couldn’t update the series, try again.' }
+  }
+  // Se alarga: las que faltan, copiando la última.
+  const tiene = new Set((actuales ?? []).map((t) => t.fecha))
+  const faltan = [...validas].filter((f) => !tiene.has(f))
+  if (faltan.length) {
+    const { data: ultima } = await supabase.from('tareas').select(CAMPOS_PLANTILLA).eq('serie_id', s.id).is('borrado_en', null).order('fecha', { ascending: false }).limit(1).maybeSingle()
+    if (ultima) {
+      const { error } = await supabase.from('tareas').insert(copias(ultima as Plantilla, faltan, s.id))
+      if (error) {
+        console.error('cambiarFin: copias', error)
+        return { ok: false, mensaje: 'Couldn’t extend the series, try again.' }
+      }
+    }
+  }
+  const generado = fin.data.hasta || fin.data.conteo ? ultimaValida : tope
+  const { error } = await supabase.from('series').update({ hasta: fin.data.hasta, conteo: fin.data.conteo, generado_hasta: generado }).eq('id', s.id)
+  if (error) return { ok: false, mensaje: 'Couldn’t update the series, try again.' }
   return listo()
 }

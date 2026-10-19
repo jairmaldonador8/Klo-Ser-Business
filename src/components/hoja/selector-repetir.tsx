@@ -144,6 +144,12 @@ export function SelectorRepetir({ fecha, valor, cambiar }: { fecha: string; valo
             </div>
           )}
 
+        </div>
+      )}
+
+      {/* Cómo termina: siempre a la vista si se repite (alargar o acortar la calendarización). */}
+      {valor && (
+        <div className="v-repetir-fin">
           <span className="etq">Ends</span>
           <div className="grupo">
             <button type="button" className="v-boton chico" aria-pressed={terminacion === 'nunca'} onClick={() => poner({}, { hasta: null, conteo: null })}>

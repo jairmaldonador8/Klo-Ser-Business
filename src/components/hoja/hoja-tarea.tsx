@@ -3,7 +3,7 @@
 import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { guardarActividades } from '@/app/(app)/ajustes/acciones'
 import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
-import { borrarDesdeAqui, borrarTodas, cambiarDesdeAqui, cambiarTodas, crearEnVariosDias, crearRepetida, leerSerie, soloEsta } from '@/app/(app)/tareas/repetir'
+import { borrarDesdeAqui, borrarTodas, cambiarDesdeAqui, cambiarFin, cambiarTodas, crearEnVariosDias, crearRepetida, leerSerie, soloEsta } from '@/app/(app)/tareas/repetir'
 import { mismaRegla } from '@/lib/repetir'
 import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
@@ -154,7 +154,17 @@ export function HojaTarea({
   function guardar() {
     if (dias) return correr(() => crearEnVariosDias(form, dias))
     if (!tarea) return correr(() => (repetir ? crearRepetida(form, repetir.regla, repetir.fin) : guardarTarea({ ...form, id: '' }, notaId)))
-    // Cambiar la repetición siempre aplica a esta y las siguientes (como Notion).
+    // Solo cambió cómo termina (Never / On date / After): aplica a toda la calendarización, y si además editaste
+    // algo de esta task, también se guarda.
+    if (repeticionCambio && tarea.serie_id && repetir && repetirAntes && mismaRegla(repetir.regla, repetirAntes.regla)) {
+      const soloFin = JSON.stringify(form) === original
+      return correr(async () => {
+        const r = await cambiarFin(tarea.id, repetir.fin)
+        if (!r.ok || soloFin) return r
+        return soloEsta(tarea.id, form)
+      })
+    }
+    // Cambiar la regla aplica a esta y las siguientes (como Notion).
     if (repeticionCambio) return correr(() => cambiarDesdeAqui(tarea.id, form, repetir?.regla ?? null, repetir?.fin ?? null))
     if (tarea.serie_id) return setAlcance('guardar')
     correr(() => guardarTarea({ ...form, id: tarea.id }, notaId))

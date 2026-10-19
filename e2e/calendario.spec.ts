@@ -152,3 +152,56 @@ test('repeat: una task semanal aparece la semana siguiente y se borra con «This
   await page.getByRole('button', { name: 'Next', exact: true }).click()
   await expect(evento).toHaveCount(0)
 })
+
+test('calendarizar con Shift queda como repetición y «Ends» la alarga a otra fecha', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'arrastrar con mouse y teclado: basta con escritorio')
+  test.slow()
+  const titulo = `Prueba calendariza ${Date.now()}`
+  await page.goto('/calendario?vista=semana', { waitUntil: 'networkidle' })
+  const columnas = page.locator('[data-zona="hora"]')
+  const [d1, d3] = await Promise.all([columnas.nth(1).getAttribute('data-dia'), columnas.nth(3).getAttribute('data-dia')])
+  const enHora = async (dia: string, min: number) => {
+    const r = (await page.locator(`[data-zona="hora"][data-dia="${dia}"]`).boundingBox())!
+    return { x: r.x + r.width / 2, y: r.y + (min / 1440) * r.height + 2 }
+  }
+  await columnas.first().evaluate((el) => el.closest('.cal-scroll')!.scrollTo(0, ((4 * 60) / 1440) * el.scrollHeight))
+  const a = await enHora(d1!, 5 * 60)
+  const z = await enHora(d3!, 6 * 60)
+  await page.keyboard.down('Shift')
+  await page.mouse.move(a.x, a.y)
+  await page.mouse.down()
+  await page.mouse.move(z.x, z.y, { steps: 10 })
+  await page.mouse.up()
+  await page.keyboard.up('Shift')
+  const nueva = page.getByRole('dialog', { name: 'New task' })
+  await nueva.getByLabel('Title').fill(titulo)
+  await nueva.getByRole('button', { name: 'Save 3 tasks' }).click()
+  await expect(nueva).toBeHidden()
+
+  const tareas = page.getByRole('button', { name: new RegExp(titulo) })
+  await expect(tareas).toHaveCount(3)
+  // Abrir una: dice cómo se repite y hasta cuándo; alargarla al viernes de la semana siguiente.
+  await tareas.nth(1).click()
+  const hoja = page.getByRole('dialog', { name: 'Edit task' })
+  await expect(hoja.getByRole('button', { name: 'Repeat', exact: true })).toContainText('Every day')
+  await hoja.getByRole('button', { name: 'On date' }).click()
+  const viernesSiguiente = await page.evaluate((d) => {
+    const f = new Date(`${d}T12:00:00Z`)
+    f.setUTCDate(f.getUTCDate() + 9)
+    return f.toISOString().slice(0, 10)
+  }, d3!)
+  await hoja.getByLabel('Ends on').fill(viernesSiguiente)
+  await page.keyboard.press('Escape') // salir guarda
+  await expect(hoja).toBeHidden()
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+  await expect(tareas.first()).toBeVisible()
+  await page.getByRole('button', { name: 'Previous', exact: true }).click()
+
+  // Limpieza: borrar todas.
+  await tareas.first().click()
+  const editar = page.getByRole('dialog', { name: 'Edit task' })
+  await editar.getByRole('button', { name: 'Delete' }).click()
+  await editar.getByRole('button', { name: 'All', exact: true }).click()
+  await expect(editar).toBeHidden()
+  await expect(tareas).toHaveCount(0)
+})

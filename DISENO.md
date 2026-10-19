@@ -354,3 +354,8 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Con la hoja abierta, un velo (dentro de `.v-escena`) apaga la app y la task abierta queda encima con un anillo de su color (en listas, sube su mosaico y se marca el renglón). El `::backdrop` del diálogo es transparente.
 - Vista previa en vivo: color, título y actividad se pintan en el calendario mientras editas (`useHojaViva`/`conVistaPrevia`), sin guardar.
 - Salir (clic fuera o Esc) guarda solo; si la task es de un grupo pregunta **Only this / This and following / All**. Cancel descarta. Las copias de ⇧/⌘ nacen ligadas (serie «cada día» del primero al último).
+
+## 33. Calendarizar = repetición con final (2026-10-19)
+
+- Lo que se pone con ⇧/⌘ es una calendarización (serie «Every day · until <último día>»), no copias. Al abrir cualquiera, **Repeat** lo dice y **Ends (Never / On date / After N)** está siempre a la vista. Cambiar solo el final aplica a toda la serie sin preguntar (`cambiarFin`): alarga generando las que faltan o acorta quitando pendientes; las palomeadas se respetan.
+- Cambiar la regla desde una task del medio ya no duplica las palomeadas posteriores: se respetan y pasan a la serie nueva.
