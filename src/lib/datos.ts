@@ -4,7 +4,7 @@ import type { Clase, Tarea } from '@/lib/tareas/esquema'
 
 // Solo servidor: usa el cliente de Supabase con las cookies de la sesión.
 
-const COLUMNAS = 'id, espacio_id, titulo, clase, fecha, hora, hora_fin, proyecto_id, completada_en'
+const COLUMNAS = 'id, espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, proyecto_id, completada_en'
 
 /** Mis tareas vivas: pendientes de cualquier fecha + las completadas desde ayer (para «hechas hoy»). */
 export async function leerMisTareas(espacioId?: string): Promise<Tarea[]> {
@@ -75,7 +75,7 @@ export async function leerProyectos({ espacioId, soloActivos = true }: { espacio
   })
 }
 
-/** Mis tareas con fecha entre `desde` y `hasta` (incluidas las hechas): lo que pinta el calendario. */
+/** Mis tareas que tocan algún día entre `desde` y `hasta` (incluidas las hechas): lo que pinta el calendario. */
 export async function leerTareasRango(desde: string, hasta: string, espacioId?: string): Promise<Tarea[]> {
   const supabase = await crearClienteServidor()
   const { data: sesion } = await supabase.auth.getClaims()
@@ -84,8 +84,9 @@ export async function leerTareasRango(desde: string, hasta: string, espacioId?: 
     .select(COLUMNAS)
     .is('borrado_en', null)
     .eq('responsable_id', sesion!.claims.sub)
-    .gte('fecha', desde)
+    // Las que se cruzan con el rango: empiezan antes de que acabe y terminan después de que empieza.
     .lte('fecha', hasta)
+    .or(`fecha.gte.${desde},fecha_fin.gte.${desde}`)
     .order('fecha')
     .order('hora', { nullsFirst: true })
     .limit(2000)

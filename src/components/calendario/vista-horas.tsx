@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { acomodar, finEfectivo } from '@/lib/calendario/disposicion'
+import { acomodar } from '@/lib/calendario/disposicion'
 import { aMinutos, diaCorto, horaCorta, deMinutos, numeroDia } from '@/lib/calendario/fechas'
+import { diasDe, extremos, tramos, type Tramo } from '@/lib/calendario/tramos'
 import type { Tarea } from '@/lib/tareas/esquema'
 import { BanderaMeta, colorVar, EventoHora, FichaDia, minutoEn } from './fichas'
 import type { ColorDe, Empezar, Meta, Previa } from './tipos'
@@ -39,10 +40,18 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
     el.scrollTop = (min / 1440) * el.scrollHeight
   }, [ahora, dias, hoy])
 
-  const porDia = new Map(dias.map((d) => [d, { conHora: [] as Tarea[], sinHora: [] as Tarea[], metas: [] as Meta[] }]))
+  // Con hora: cada evento se parte en sus tramos por día (uno que cruza la medianoche sale en ambos días).
+  // Sin hora: una ficha en cada día que toca.
+  type Pedazo = { t: Tarea; ini: number; fin: number; tipo: Tramo['tipo'] }
+  const porDia = new Map(dias.map((d) => [d, { conHora: [] as Pedazo[], sinHora: [] as Tarea[], metas: [] as Meta[] }]))
   for (const t of tareas) {
-    const d = t.fecha && porDia.get(t.fecha)
-    if (d) (t.hora ? d.conHora : d.sinHora).push(t)
+    if (!t.fecha) continue
+    if (!t.hora) {
+      for (const d of diasDe(t)) porDia.get(d)?.sinHora.push(t)
+      continue
+    }
+    const { ini, fin } = extremos(t)
+    for (const tr of tramos(ini, fin)) porDia.get(tr.dia)?.conHora.push({ t, ini: tr.ini, fin: Math.max(tr.fin, tr.ini + 15), tipo: tr.tipo })
   }
   for (const m of metas) porDia.get(m.fecha_meta)?.metas.push(m)
 
@@ -96,13 +105,12 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
           </div>
           {dias.map((d) => {
             const lista = porDia.get(d)!.conHora
-            const lugares = acomodar(
-              lista.map((t) => {
-                const ini = aMinutos(t.hora!)
-                return { id: t.id, ini, fin: finEfectivo(ini, t.hora_fin ? aMinutos(t.hora_fin) : null) }
-              }),
-            )
-            const verPrevia = previa && previa.zona === 'hora' && (previa.dias ?? [previa.dia]).includes(d) && previa.ini !== null
+            const lugares = acomodar(lista.map((p) => ({ id: p.t.id, ini: p.ini, fin: p.fin })))
+            // La vista previa en esta columna: su tramo de este día, si lo tiene.
+            const pre =
+              previa && previa.zona === 'hora'
+                ? (previa.tramos?.find((x) => x.dia === d) ?? (previa.dia === d && previa.ini !== null && previa.fin !== null ? { ini: previa.ini, fin: previa.fin } : null))
+                : null
             return (
               <div
                 key={d}
@@ -115,9 +123,7 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                   empezar(e, { tipo: 'crear', dia: d, desde }, () => nuevaEn(d, desde, Math.min(1440 - 1, desde + 60)))
                 }}
               >
-                {lista.map((t) => {
-                  const ini = aMinutos(t.hora!)
-                  const fin = finEfectivo(ini, t.hora_fin ? aMinutos(t.hora_fin) : null)
+                {lista.map(({ t, ini, fin, tipo }) => {
                   const { col, cols } = lugares.get(t.id)!
                   // En cascada: cada uno se asoma sobre el de al lado (como Notion); el último no se sale.
                   const ancho = cols === 1 ? 1 : Math.min((cols - col) / cols, 1.7 / cols)
@@ -125,6 +131,9 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                     <EventoHora
                       key={t.id}
                       tarea={t}
+                      tipo={tipo}
+                      ini={ini}
+                      fin={fin}
                       color={colorDe(t.espacio_id)}
                       empezar={empezar}
                       fantasma={arrastrando === t.id}
@@ -138,12 +147,13 @@ export function VistaHoras({ dias, tareas, metas, hoy, ahora, colorDe, empezar, 
                     />
                   )
                 })}
-                {verPrevia && (
-                  <div className={`cal-ev previa${previa.contorno ? ' contorno' : ''}${previa.borrador ? ' borrador' : ''}`} style={{ top: pct(previa.ini!), height: pct(Math.max(15, previa.fin! - previa.ini!)), ...colorVar(previa.color) }}>
+                {pre && previa && (
+                  <div
+                    className={`cal-ev previa${previa.contorno ? ' contorno' : ''}${previa.borrador ? ' borrador' : ''}`}
+                    style={{ top: pct(pre.ini), height: pct(Math.max(15, pre.fin - pre.ini)), ...colorVar(previa.color) }}
+                  >
                     <b>{previa.titulo}</b>
-                    <small>
-                      {horaCorta(deMinutos(previa.ini!))} – {horaCorta(deMinutos(previa.fin!))}
-                    </small>
+                    <small>{previa.etiqueta ?? `${horaCorta(deMinutos(pre.ini))} – ${horaCorta(deMinutos(pre.fin))}`}</small>
                   </div>
                 )}
                 {d === hoy && ahora && (

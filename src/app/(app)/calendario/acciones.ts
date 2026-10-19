@@ -7,11 +7,12 @@ import { crearClienteServidor } from '@/lib/supabase/servidor'
 
 const hora = z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).nullable()
 const esquemaMovida = z
-  .object({ id: z.uuid(), fecha: z.iso.date().nullable(), hora, hora_fin: hora })
+  .object({ id: z.uuid(), fecha: z.iso.date().nullable(), hora, hora_fin: hora, fecha_fin: z.iso.date().nullable().default(null) })
   .refine((m) => !m.hora || m.fecha, { message: 'To set a time, set a date.' })
-  .refine((m) => !m.hora_fin || (m.hora && m.hora_fin > m.hora), { message: 'The end time must be after the start.' })
+  .refine((m) => !m.fecha_fin || (m.fecha && m.fecha_fin > m.fecha), { message: 'The end date must be after the start date.' })
+  .refine((m) => !m.hora_fin || (m.hora && (m.fecha_fin || m.hora_fin > m.hora)), { message: 'The end time must be after the start.' })
 
-/** Mover o estirar una tarea en el calendario: solo cambia fecha y horas (sin fecha = deshacer un calendarizar). */
+/** Mover o estirar una tarea en el calendario: solo cambia fechas y horas (sin fecha = deshacer un calendarizar). */
 export async function reprogramarTarea(datos: unknown): Promise<Resultado> {
   const leida = esquemaMovida.safeParse(datos)
   if (!leida.success) return { ok: false, mensaje: leida.error.issues[0]?.message ?? 'Check the time.' }

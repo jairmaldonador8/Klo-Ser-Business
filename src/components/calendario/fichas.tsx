@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useHoja } from '@/components/hoja/hoja-provider'
-import { aMinutos, horaCorta } from '@/lib/calendario/fechas'
+import { horaCorta } from '@/lib/calendario/fechas'
+import { absoluto, etiquetaRango, extremos, type Tramo } from '@/lib/calendario/tramos'
 import { porcentaje } from '@/lib/proyectos/avance'
 import { esClaseBase, hhmm, nombreClase, type Tarea } from '@/lib/tareas/esquema'
 import type { ColorDe, Empezar, Meta } from './tipos'
@@ -22,35 +23,59 @@ const soloTeclado = (fn: () => void) => (e: React.MouseEvent) => {
   if (e.detail === 0) fn()
 }
 
-const rango = (t: Tarea) => [t.hora, t.hora_fin].filter(Boolean).map((h) => horaCorta(hhmm(h)!)).join(' – ')
+const rango = (t: Tarea) => {
+  if (!t.hora) return ''
+  if (t.fecha_fin && t.hora_fin) {
+    const { ini, fin } = extremos(t)
+    return etiquetaRango(ini, fin, horaCorta)
+  }
+  return [t.hora, t.hora_fin].filter(Boolean).map((h) => horaCorta(hhmm(h)!)).join(' – ')
+}
 
-/** Evento con hora en la rejilla: se mueve arrastrándolo y se estira desde la orilla de abajo. */
+/** Absoluto del minuto bajo el puntero en la columna que lo contiene (para agarrar un tramo de un evento largo). */
+function absolutoEn(e: React.PointerEvent): number | null {
+  const col = (e.currentTarget as HTMLElement).closest<HTMLElement>('[data-zona="hora"]')
+  return col ? absoluto(col.dataset.dia!, minutoEn(e)) : null
+}
+
+/** Evento con hora en la rejilla (o uno de sus tramos, si cruza días): se mueve arrastrándolo y se estira por sus orillas. */
 export function EventoHora({
   tarea,
+  tipo = 'unico',
+  ini,
+  fin,
   estilo,
   color,
   empezar,
   fantasma,
 }: {
   tarea: Tarea
+  /** Qué pedazo es: el evento entero, o el inicio, medio o fin de uno que cruza días. */
+  tipo?: Tramo['tipo']
+  ini: number
+  fin: number
   estilo: React.CSSProperties
   color: string
   empezar: Empezar
   fantasma: boolean
 }) {
   const abrir = useHoja()
-  const ini = aMinutos(tarea.hora!)
-  const fin = tarea.hora_fin ? aMinutos(tarea.hora_fin) : ini + 30
   const corto = fin - ini < 45
   const abrirla = () => abrir({ tarea })
+  // Orillas que se pueden estirar: el inicio vive en el primer tramo; el fin, en el último.
+  const bordes = (['inicio', 'fin'] as const).filter((b) => (b === 'inicio' ? tipo === 'unico' || tipo === 'inicio' : tipo === 'unico' || tipo === 'fin'))
 
   return (
     <button
       type="button"
-      className={`cal-ev clase-${esClaseBase(tarea.clase) ? tarea.clase : 'propia'}${tarea.completada_en ? ' hecha' : ''}${corto ? ' corto' : ''}${fantasma ? ' fantasma' : ''}`}
+      className={`cal-ev tramo-${tipo} clase-${esClaseBase(tarea.clase) ? tarea.clase : 'propia'}${tarea.completada_en ? ' hecha' : ''}${corto ? ' corto' : ''}${fantasma ? ' fantasma' : ''}`}
       style={{ ...estilo, ...colorVar(color) }}
       aria-label={`${tarea.titulo}, ${rango(tarea)}`}
-      onPointerDown={(e) => empezar(e, { tipo: 'mover', tarea, agarre: minutoEn(e) - ini }, abrirla)}
+      onPointerDown={(e) => {
+        // Cuánto hay entre el inicio del evento (aunque sea de otro día) y donde lo tomaste.
+        const aqui = absolutoEn(e)
+        empezar(e, { tipo: 'mover', tarea, agarre: aqui === null ? 0 : aqui - extremos(tarea).ini }, abrirla)
+      }}
       onClick={soloTeclado(abrirla)}
     >
       <b>{tarea.titulo}</b>
@@ -58,9 +83,8 @@ export function EventoHora({
         {rango(tarea)}
         {tarea.clase !== 'tarea' && !corto && <em> · {nombreClase(tarea.clase)}</em>}
       </small>
-      {/* Orillas para estirar: arriba cambia el inicio, abajo el fin (la contraria queda fija). */}
       {!tarea.completada_en &&
-        (['inicio', 'fin'] as const).map((borde) => (
+        bordes.map((borde) => (
           <i
             key={borde}
             className={`cal-estirar ${borde === 'inicio' ? 'arriba' : 'abajo'}`}

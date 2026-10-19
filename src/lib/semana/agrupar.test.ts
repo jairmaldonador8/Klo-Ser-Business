@@ -5,7 +5,7 @@ import { agruparPendientes, DIAS } from './agrupar'
 const hoy = '2026-10-18'
 let n = 0
 const t = (p: Partial<Tarea>): Tarea => ({
-  id: String(++n), espacio_id: 'a', titulo: `t${n}`, clase: 'tarea', fecha: hoy, hora: null, hora_fin: null,
+  id: String(++n), espacio_id: 'a', titulo: `t${n}`, clase: 'tarea', fecha: hoy, hora: null, hora_fin: null, fecha_fin: null,
   proyecto_id: null, completada_en: null, ...p,
 })
 

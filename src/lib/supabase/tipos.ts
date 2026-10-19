@@ -324,6 +324,7 @@ export type Database = {
           creado_por: string
           espacio_id: string
           fecha: string | null
+          fecha_fin: string | null
           hora: string | null
           hora_fin: string | null
           id: string
@@ -341,6 +342,7 @@ export type Database = {
           creado_por?: string
           espacio_id: string
           fecha?: string | null
+          fecha_fin?: string | null
           hora?: string | null
           hora_fin?: string | null
           id?: string
@@ -358,6 +360,7 @@ export type Database = {
           creado_por?: string
           espacio_id?: string
           fecha?: string | null
+          fecha_fin?: string | null
           hora?: string | null
           hora_fin?: string | null
           id?: string

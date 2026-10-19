@@ -35,8 +35,10 @@ export type Previa = {
   id: string | null
   contorno?: boolean
   borrador?: boolean
-  /** Seleccionando varios días: la zona se pinta en cada uno (misma hora). */
-  dias?: string[]
+  /** Si cruza días, sus pedazos por día (lunes 5 pm → medianoche, martes 0:00 → 4 pm). */
+  tramos?: { dia: string; ini: number; fin: number }[]
+  /** «5 pm – 6 pm» o «Mon 5 pm – Tue 4 pm». */
+  etiqueta?: string
 }
 
 /** Empieza un arrastre desde un `pointerdown`; `alTocar` corre si fue un toque sin mover. */

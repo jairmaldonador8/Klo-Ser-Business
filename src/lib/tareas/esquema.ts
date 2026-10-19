@@ -34,6 +34,8 @@ export type Tarea = {
   fecha: string | null
   hora: string | null // 'HH:MM' o 'HH:MM:SS' tal como llega de Postgres
   hora_fin: string | null
+  /** Si termina otro día (lunes 5 pm → martes 4 pm); null = el mismo día. */
+  fecha_fin: string | null
   proyecto_id: string | null
   completada_en: string | null
 }
@@ -50,10 +52,12 @@ export const esquemaTarea = z
     fecha: z.preprocess(vacioANulo, z.iso.date().nullable()),
     hora,
     hora_fin: hora,
+    fecha_fin: z.preprocess(vacioANulo, z.iso.date().nullable()).optional().transform((v) => v ?? null),
     proyecto_id: z.preprocess(vacioANulo, z.uuid().nullable()),
   })
   .refine((t) => !t.hora || t.fecha, { message: 'To set a time, set a date.', path: ['hora'] })
-  .refine((t) => !t.hora_fin || (t.hora && t.hora_fin > t.hora), { message: 'The end time must be after the start.', path: ['hora_fin'] })
+  .refine((t) => !t.fecha_fin || (t.fecha && t.fecha_fin > t.fecha), { message: 'The end date must be after the start date.', path: ['fecha_fin'] })
+  .refine((t) => !t.hora_fin || (t.hora && (t.fecha_fin || t.hora_fin > t.hora)), { message: 'The end time must be after the start.', path: ['hora_fin'] })
   .refine((t) => t.clase !== 'junta' || t.hora, { message: 'A meeting needs a time.', path: ['hora'] })
 
 export type DatosTarea = z.infer<typeof esquemaTarea>

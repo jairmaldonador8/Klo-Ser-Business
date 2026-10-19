@@ -325,6 +325,8 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Seleccionar arrastrando (hacia arriba o abajo) deja un **borrador** pintado que respira mientras llenas la hoja; se va al guardar o cancelar.
 - Estirar desde la orilla de arriba o de abajo; la contraria queda fija y, si la cruzas, se voltea; mínimo 15 min. Esc cancela.
 
-## 27. Seleccionar varios días (2026-10-19)
+## 27. Eventos que cruzan días (2026-10-19)
 
-- En la rejilla de horas, la selección sigue al puntero de columna en columna (por geometría, sin brincos) y se pinta en cada día del tramo con la misma hora. Al soltar, la hoja muestra los días («3 days · same time each day») y «Save 3 tasks» crea una task por día (`crearEnVariosDias`, todo o nada). Cancelar quita el borrador.
+- Una task puede terminar otro día (`tareas.fecha_fin`, migración 0009): lunes 5 pm → martes 4 pm es **un solo evento**. En la rejilla se pinta en tramos por día (sin esquinas en la medianoche) y su etiqueta dice «Mon 5 pm – Tue 4 pm»; en el mes y en «todo el día» sale en cada día que toca.
+- Seleccionar en diagonal hacia la derecha (o la izquierda) crea ese evento continuo: el bloque donde empezaste cuenta. Mover conserva la duración completa (se puede tomar de cualquier tramo y cruzar la medianoche); estirar puede cruzar días. La copia flotante de un evento largo mide a lo mucho 140 px.
+- La hoja muestra «＋ Ends another day» y, si aplica, «Ends» con su fecha. Se descartó crear una task por día (Jair: «no quiero que se dupliquen las cosas»).

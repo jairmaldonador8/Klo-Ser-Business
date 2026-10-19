@@ -7,7 +7,6 @@ import { moverMeta, reprogramarTarea } from '@/app/(app)/calendario/acciones'
 import { useHoja } from '@/components/hoja/hoja-provider'
 import { useToast } from '@/components/tareas/toast'
 import {
-  aMinutos,
   ajustar,
   deMinutos,
   horaCorta,
@@ -20,7 +19,8 @@ import {
   VISTAS,
   type Vista,
 } from '@/lib/calendario/fechas'
-import { fechaEn, horaMinEn } from '@/lib/fechas'
+import { absoluto, campos, deAbsoluto, etiquetaRango, extremos, tramos } from '@/lib/calendario/tramos'
+import { diasEntre, fechaEn, horaMinEn, sumarDias } from '@/lib/fechas'
 import type { FrenteVista } from '@/lib/frentes'
 import { hhmm, type Tarea } from '@/lib/tareas/esquema'
 import { Calendarios, Flecha, Metas, MiniMes, PorCalendarizar } from './lado'
@@ -61,9 +61,9 @@ function guardar(clave: string, valor: string) {
   } catch {}
 }
 
-type Campos = { fecha: string | null; hora: string | null; hora_fin: string | null }
-const camposDe = (t: Tarea): Campos => ({ fecha: t.fecha, hora: hhmm(t.hora), hora_fin: hhmm(t.hora_fin) })
-const iguales = (a: Campos, b: Campos) => a.fecha === b.fecha && a.hora === b.hora && a.hora_fin === b.hora_fin
+type Campos = { fecha: string | null; hora: string | null; hora_fin: string | null; fecha_fin: string | null }
+const camposDe = (t: Tarea): Campos => ({ fecha: t.fecha, hora: hhmm(t.hora), hora_fin: hhmm(t.hora_fin), fecha_fin: t.fecha_fin })
+const iguales = (a: Campos, b: Campos) => a.fecha === b.fecha && a.hora === b.hora && a.hora_fin === b.hora_fin && a.fecha_fin === b.fecha_fin
 
 export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fechaInicial, vistaInicial, hoy: hoyServidor, zona }: Props) {
   const router = useRouter()
@@ -142,23 +142,28 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
   const colorDe = useCallback((id: string) => colores.get(id) ?? 'azul', [colores])
 
   // La zona que seleccionaste se queda pintada (borrador) mientras llenas la hoja; al cerrarla se va.
-  const [borrador, setBorrador] = useState<{ dia: string; ini: number; fin: number; dias: string[] } | null>(null)
+  // Va en minutos absolutos: puede empezar el lunes 5 pm y acabar el martes 4 pm.
+  const [borrador, setBorrador] = useState<{ a: number; b: number } | null>(null)
 
-  const nuevaEn = useCallback(
-    (dia: string, ini?: number, fin?: number, varios?: string[]) => {
-      if (ini !== undefined && fin !== undefined) setBorrador({ dia, ini, fin, dias: varios ?? [dia] })
+  /** Nueva task para el rango [a, b) en minutos absolutos (un solo evento, aunque cruce días). */
+  const nuevaRango = useCallback(
+    (a: number, b: number) => {
+      setBorrador({ a, b })
+      const c = campos(a, b)
       abrir({
-        dias: varios,
-        valores: {
-          fecha: dia,
-          hora: ini === undefined ? null : deMinutos(ini),
-          hora_fin: fin === undefined ? null : deMinutos(fin),
-          ...(frente && { espacio_id: frente.id }),
-        },
+        valores: { ...c, ...(frente && { espacio_id: frente.id }) },
         alCerrar: () => setBorrador(null),
       })
     },
     [abrir, frente],
+  )
+
+  const nuevaEn = useCallback(
+    (dia: string, ini?: number, fin?: number) => {
+      if (ini !== undefined && fin !== undefined) return nuevaRango(absoluto(dia, ini), absoluto(dia, fin))
+      abrir({ valores: { fecha: dia, hora: null, hora_fin: null, ...(frente && { espacio_id: frente.id }) } })
+    },
+    [abrir, frente, nuevaRango],
   )
 
   // ── Mover, estirar y reprogramar ─────────────────────────────────────
@@ -180,37 +185,42 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     [ponerTarea, avisar],
   )
 
-  /** Los días entre dos columnas de la vista (en cualquier orden), en orden de calendario. */
-  const tramo = useCallback(
-    (a: string, b: string) => {
-      const i = dias.indexOf(a)
-      const j = dias.indexOf(b)
-      if (i < 0 || j < 0) return [a]
-      return dias.slice(Math.min(i, j), Math.max(i, j) + 1)
-    },
-    [dias],
-  )
+  /** Rango [a, b) de una selección: el bloque donde empezaste cuenta; hacia atrás o hacia adelante, aunque cruce días. */
+  const rangoSeleccion = useCallback((o: { dia: string; desde: number }, d: Destino): [number, number] | null => {
+    if (d.min === null) return null
+    const ancla = absoluto(o.dia, o.desde)
+    const cursor = absoluto(d.dia, d.min)
+    return cursor >= ancla ? [ancla, Math.max(cursor, ancla + 15)] : [cursor, ancla + 15]
+  }, [])
 
-  /** Rango que deja estirar: la orilla contraria a la que tomaste queda fija; si la cruzas, se voltea. Mínimo 15 min. */
-  const rangoEstirado = useCallback((t: Tarea, borde: 'inicio' | 'fin', cursor: number): [number, number] => {
-    const ini = aMinutos(t.hora!)
-    const fin = t.hora_fin ? aMinutos(t.hora_fin) : ini + 30
+  /** Rango al estirar: la orilla contraria a la que tomaste queda fija; si la cruzas, se voltea. Mínimo 15 min. Puede cruzar días. */
+  const rangoEstirado = useCallback((t: Tarea, borde: 'inicio' | 'fin', d: Destino): [number, number] => {
+    const { ini, fin } = extremos(t)
+    if (d.min === null) return [ini, fin]
     const ancla = borde === 'fin' ? ini : fin
+    const cursor = absoluto(d.dia, d.min)
     const a = Math.min(ancla, cursor)
     const b = Math.max(ancla, cursor)
     if (b - a >= 15) return [a, b]
-    return borde === 'fin' ? [ancla, Math.min(1439, ancla + 15)] : [Math.max(0, ancla - 15), ancla]
+    return borde === 'fin' ? [ancla, ancla + 15] : [ancla - 15, ancla]
+  }, [])
+
+  /** Dónde queda una task al moverla a una hora: conserva su duración completa (también si cruza días). */
+  const rangoMovido = useCallback((t: Tarea, d: Destino): [number, number] | null => {
+    if (d.min === null) return null
+    const inicio = absoluto(d.dia, d.min)
+    if (!t.hora) return [inicio, inicio + 60]
+    const { ini, fin } = extremos(t)
+    return [inicio, inicio + (fin - ini)]
   }, [])
 
   /** Lo que pasa al soltar. Devuelve false si no cambió nada (entonces cuenta como un toque). */
   const aplicar = useCallback(
     (o: Origen, d: Destino): boolean => {
       if (o.tipo === 'crear') {
-        if (d.min === null) return false
-        const a = Math.min(o.desde, d.min)
-        const b = Math.max(o.desde + 15, d.min)
-        const varios = tramo(o.dia, d.dia)
-        nuevaEn(varios[0], a, Math.min(b, 1439), varios.length > 1 ? varios : undefined)
+        const r = rangoSeleccion(o, d)
+        if (!r) return false
+        nuevaRango(r[0], r[1])
         return true
       }
       if (o.tipo === 'meta') {
@@ -227,22 +237,26 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       let nuevos: Campos
       if (o.tipo === 'estirar') {
         if (d.min === null || !t.hora) return false
-        const [a, b] = rangoEstirado(t, o.borde, d.min)
-        nuevos = { ...antes, hora: deMinutos(a), hora_fin: deMinutos(b) }
+        const [a, b] = rangoEstirado(t, o.borde, d)
+        nuevos = campos(a, b)
       } else if (d.zona === 'hora' && d.min !== null) {
-        const dur = t.hora ? (t.hora_fin ? aMinutos(t.hora_fin) - aMinutos(t.hora) : null) : 60
-        nuevos = { fecha: d.dia, hora: deMinutos(d.min), hora_fin: dur === null ? null : deMinutos(Math.min(d.min + dur, 1439)) }
-      } else if (d.zona === 'dia' && t.clase !== 'junta') {
-        // Al renglón «todo el día»: pierde la hora (una junta la conserva: la necesita).
-        nuevos = { fecha: d.dia, hora: null, hora_fin: null }
+        const sinFin = t.hora && !t.hora_fin
+        const [a, b] = rangoMovido(t, d)!
+        nuevos = sinFin ? { fecha: d.dia, hora: deMinutos(d.min), hora_fin: null, fecha_fin: null } : campos(a, b)
       } else {
-        nuevos = { ...antes, fecha: d.dia }
+        // A un día (renglón «todo el día» o el mes): se recorre completo, sin perder cuántos días dura.
+        const corrimiento = t.fecha ? diasEntre(d.dia, t.fecha) : 0
+        const fecha_fin = t.fecha_fin ? sumarDias(t.fecha_fin, corrimiento) : null
+        nuevos =
+          d.zona === 'dia' && t.clase !== 'junta'
+            ? { fecha: d.dia, hora: null, hora_fin: null, fecha_fin }
+            : { ...antes, fecha: d.dia, fecha_fin }
       }
       if (iguales(antes, nuevos)) return false
       cambiar(t, nuevos, o.tipo === 'estirar' ? 'Resized' : antes.fecha ? 'Moved' : 'Scheduled')
       return true
     },
-    [cambiar, nuevaEn, ponerMeta, avisar, rangoEstirado, tramo],
+    [cambiar, nuevaRango, ponerMeta, avisar, rangoEstirado, rangoMovido, rangoSeleccion],
   )
 
   const [arrastre, setArrastre] = useState<{ origen: Origen; destino: Destino | null } | null>(null)
@@ -257,33 +271,30 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     pasoRef.current = { vista, fecha }
   })
 
-  /** Qué hay bajo el puntero. Estirar se queda en su día; crear sigue al puntero de columna en columna. */
+  /** Qué hay bajo el puntero. Crear y estirar siguen al puntero de columna en columna; mover, también al renglón de días. */
   const destinoEn = useCallback((x: number, y: number, o: Origen): Destino | null => {
-    if (o.tipo === 'crear') {
+    if (o.tipo === 'crear' || o.tipo === 'estirar') {
       // Por geometría (no por el elemento bajo el puntero): entre columnas, sobre la regla o fuera de la
-      // rejilla, la selección se pega a la columna más cercana y nunca brinca.
+      // rejilla, se pega a la columna más cercana y nunca brinca.
       const cols = [...document.querySelectorAll<HTMLElement>('[data-zona="hora"]')]
       if (!cols.length) return null
       const cajas = cols.map((c) => c.getBoundingClientRect())
       let i = cajas.findIndex((r) => x >= r.left && x < r.right)
       if (i < 0) i = x < cajas[0].left ? 0 : cols.length - 1
       const r = cajas[i]
-      return { dia: cols[i].dataset.dia!, zona: 'hora', min: Math.max(0, Math.min(1439, ajustar(((y - r.top) / r.height) * 1440))) }
+      return { dia: cols[i].dataset.dia!, zona: 'hora', min: Math.max(0, Math.min(1440, ajustar(((y - r.top) / r.height) * 1440))) }
     }
-    const fijo = o.tipo === 'estirar' ? o.tarea.fecha : null
-    const el = fijo
-      ? document.querySelector<HTMLElement>(`[data-zona="hora"][data-dia="${fijo}"]`)
-      : document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-dia]')
+    const el = document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-dia]')
     if (!el) return null
     const zona = el.dataset.zona as Destino['zona']
     const dia = el.dataset.dia!
-    if (zona !== 'hora') return o.tipo === 'estirar' ? null : { dia, zona, min: null }
+    if (zona !== 'hora') return { dia, zona, min: null }
     const r = el.getBoundingClientRect()
     const crudo = ((y - r.top) / r.height) * 1440
     if (o.tipo === 'mover') {
-      const t = o.tarea
-      const dur = t.hora && t.hora_fin ? aMinutos(t.hora_fin) - aMinutos(t.hora) : 30
-      return { dia, zona, min: Math.max(0, Math.min(1440 - dur, ajustar(crudo - o.agarre))) }
+      // El inicio puede quedar en otro día (agarraste el martes un evento que empieza el lunes) o cruzar la medianoche.
+      const inicio = deAbsoluto(absoluto(dia, ajustar(crudo - o.agarre)))
+      return { dia: inicio.fecha, zona, min: inicio.min }
     }
     return { dia, zona, min: Math.max(0, Math.min(1439, ajustar(crudo))) }
   }, [])
@@ -299,7 +310,9 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       const principal = document.querySelector<HTMLElement>('.cal-principal')
       // Dónde se tomó el elemento, para que la copia flotante no brinque al puntero.
       const caja = elemento.getBoundingClientRect()
-      const agarre = { dx: e.clientX - caja.left, dy: e.clientY - caja.top }
+      // Un evento largo no flota completo: la copia mide a lo mucho 140 px y se queda pegada al puntero.
+      const altoCopia = Math.min(caja.height, 140)
+      const agarre = { dx: e.clientX - caja.left, dy: Math.min(e.clientY - caja.top, altoCopia - 12) }
       const conCopia = origen.tipo === 'mover' || origen.tipo === 'meta'
       let activo = false
       let espera: ReturnType<typeof setTimeout> | undefined
@@ -352,7 +365,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
         document.documentElement.classList.add('cal-arrastrando')
         if (origen.tipo === 'estirar') document.documentElement.classList.add('cal-estirando')
         navigator.vibrate?.(8)
-        if (conCopia) setTamFlotante({ w: caja.width, h: caja.height, chip: origen.tipo === 'meta' || !(origen.tipo === 'mover' && origen.tarea.hora && elemento.classList.contains('cal-ev')) })
+        if (conCopia) setTamFlotante({ w: caja.width, h: altoCopia, chip: origen.tipo === 'meta' || !(origen.tipo === 'mover' && origen.tarea.hora && elemento.classList.contains('cal-ev')) })
         actualizar()
         cuadro = requestAnimationFrame(tic)
       }
@@ -410,29 +423,31 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
   )
 
   const previa = useMemo((): Previa | null => {
-    if (!arrastre?.destino) {
-      if (!borrador) return null
-      return { dia: borrador.dia, dias: borrador.dias, zona: 'hora', ini: borrador.ini, fin: borrador.fin, titulo: borrador.dias.length > 1 ? `New task · ${borrador.dias.length} days` : 'New task', color: frente?.color ?? 'azul', id: null, borrador: true }
+    /** Vista previa de un rango absoluto: sus tramos por día y su etiqueta. */
+    const deRango = (a: number, b: number, resto: Omit<Previa, 'dia' | 'zona' | 'ini' | 'fin' | 'tramos' | 'etiqueta'>): Previa => {
+      const i = deAbsoluto(a)
+      return { ...resto, dia: i.fecha, zona: 'hora', ini: i.min, fin: i.min + (b - a), tramos: tramos(a, b), etiqueta: etiquetaRango(a, b, horaCorta) }
     }
+    const color = frente?.color ?? 'azul'
+    if (!arrastre?.destino) return borrador ? deRango(borrador.a, borrador.b, { titulo: 'New task', color, id: null, borrador: true }) : null
     const { origen: o, destino: d } = arrastre
     if (o.tipo === 'crear') {
-      if (d.min === null) return null
-      const varios = tramo(o.dia, d.dia)
-      return { dia: o.dia, dias: varios, zona: 'hora', ini: Math.min(o.desde, d.min), fin: Math.max(o.desde + 15, d.min), titulo: varios.length > 1 ? `New task · ${varios.length} days` : 'New task', color: frente?.color ?? 'azul', id: null }
+      const r = rangoSeleccion(o, d)
+      return r ? deRango(r[0], r[1], { titulo: 'New task', color, id: null }) : null
     }
     if (o.tipo === 'meta') return { dia: d.dia, zona: d.zona, ini: null, fin: null, titulo: o.meta.nombre, color: colorDe(o.meta.espacio_id), id: o.meta.id, contorno: true }
     const t = o.tarea
     const base = { titulo: t.titulo, color: colorDe(t.espacio_id), id: t.id }
     if (o.tipo === 'estirar') {
-      const [ini, fin] = d.min === null ? [aMinutos(t.hora!), aMinutos(t.hora!) + 15] : rangoEstirado(t, o.borde, d.min)
-      return { ...base, dia: t.fecha!, zona: 'hora', ini, fin }
+      const [a, b] = rangoEstirado(t, o.borde, d)
+      return deRango(a, b, base)
     }
     if (d.zona === 'hora' && d.min !== null) {
-      const dur = t.hora && t.hora_fin ? aMinutos(t.hora_fin) - aMinutos(t.hora) : t.hora ? 30 : 60
-      return { ...base, dia: d.dia, zona: 'hora', ini: d.min, fin: d.min + dur, contorno: true }
+      const [a, b] = rangoMovido(t, d)!
+      return deRango(a, t.hora && !t.hora_fin ? a + 30 : b, { ...base, contorno: true })
     }
     return { ...base, dia: d.dia, zona: d.zona, ini: null, fin: null, contorno: true }
-  }, [arrastre, borrador, colorDe, frente, rangoEstirado, tramo])
+  }, [arrastre, borrador, colorDe, frente, rangoEstirado, rangoMovido, rangoSeleccion])
 
   const arrastrando = arrastre?.destino ? (arrastre.origen.tipo === 'meta' ? arrastre.origen.meta.id : arrastre.origen.tipo === 'crear' ? null : arrastre.origen.tarea.id) : null
 
@@ -447,11 +462,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
             aria-hidden
           >
             <b>{previa.titulo}</b>
-            {previa.ini !== null && previa.fin !== null && (
-              <small>
-                {horaCorta(deMinutos(previa.ini))} – {horaCorta(deMinutos(previa.fin))}
-              </small>
-            )}
+            {previa.etiqueta && <small>{previa.etiqueta}</small>}
           </div>,
           document.body,
         )

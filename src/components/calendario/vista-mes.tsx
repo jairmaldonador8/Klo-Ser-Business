@@ -1,6 +1,7 @@
 'use client'
 
 import { aMinutos, diaCorto, mesCorto, numeroDia, serie } from '@/lib/calendario/fechas'
+import { diasDe } from '@/lib/calendario/tramos'
 import type { Tarea } from '@/lib/tareas/esquema'
 import { BanderaMeta, colorVar, FichaDia } from './fichas'
 import type { ColorDe, Empezar, Meta, Previa } from './tipos'
@@ -28,7 +29,8 @@ const orden = (a: Tarea, b: Tarea) => (a.hora ? aMinutos(a.hora) : -1) - (b.hora
 export function VistaMes({ dias, fecha, tareas, metas, hoy, colorDe, empezar, previa, arrastrando, irADia, nuevaEn }: Props) {
   const mes = fecha.slice(0, 7)
   const porDia = new Map(dias.map((d) => [d, { tareas: [] as Tarea[], metas: [] as Meta[] }]))
-  for (const t of tareas) if (t.fecha) porDia.get(t.fecha)?.tareas.push(t)
+  // Una task de varios días sale en cada día que toca.
+  for (const t of tareas) for (const d of diasDe(t)) porDia.get(d)?.tareas.push(t)
   for (const m of metas) porDia.get(m.fecha_meta)?.metas.push(m)
 
   return (

@@ -46,29 +46,41 @@ test('crear en la rejilla, mover a otro día y borrar', async ({ page }, info) =
   await expect(page.getByRole('button', { name: new RegExp(titulo) })).toHaveCount(0)
 })
 
-test('seleccionar hacia la derecha pinta varios días y la hoja crea una task por día', async ({ page }, info) => {
+test('seleccionar de un día a otro crea un solo evento que cruza la medianoche', async ({ page }, info) => {
   test.skip(info.project.name !== 'escritorio', 'arrastrar con mouse: basta con escritorio')
+  test.slow()
+  const titulo = `Prueba cruza ${Date.now()}`
   await page.goto('/calendario?vista=semana', { waitUntil: 'networkidle' })
   const columnas = page.locator('[data-zona="hora"]')
-  const [d1, d3] = await Promise.all([columnas.nth(1).getAttribute('data-dia'), columnas.nth(3).getAttribute('data-dia')])
+  const [d1, d2] = await Promise.all([columnas.nth(1).getAttribute('data-dia'), columnas.nth(2).getAttribute('data-dia')])
   const enHora = async (dia: string, min: number) => {
-    const col = page.locator(`[data-zona="hora"][data-dia="${dia}"]`)
-    const r = (await col.boundingBox())!
-    return { x: r.x + r.width / 2, y: r.y + (min / 1440) * r.height + 4 }
+    const r = (await page.locator(`[data-zona="hora"][data-dia="${dia}"]`).boundingBox())!
+    return { x: r.x + r.width / 2, y: r.y + (min / 1440) * r.height + 2 }
   }
-  await columnas.first().evaluate((el) => el.closest('.cal-scroll')!.scrollTo(0, (8 * 60 / 1440) * el.scrollHeight))
-  const a = await enHora(d1!, 9 * 60)
-  const z = await enHora(d3!, 11 * 60)
+  await columnas.first().evaluate((el) => el.closest('.cal-scroll')!.scrollTo(0, ((15 * 60) / 1440) * el.scrollHeight))
+  // Lunes 5 pm → martes 4 pm (arrastrando en diagonal hacia la derecha y hacia arriba).
+  const a = await enHora(d1!, 17 * 60)
+  const z = await enHora(d2!, 16 * 60)
   await page.mouse.move(a.x, a.y)
   await page.mouse.down()
-  await page.mouse.move(z.x, z.y, { steps: 12 })
-  await expect(page.locator('.cal-ev.previa')).toHaveCount(3)
+  await page.mouse.move(z.x, z.y, { steps: 14 })
+  await expect(page.locator('.cal-ev.previa')).toHaveCount(2) // dos tramos de un mismo evento
   await page.mouse.up()
 
   const hoja = page.getByRole('dialog', { name: 'New task' })
-  await expect(hoja.getByRole('button', { name: 'Save 3 tasks' })).toBeVisible()
-  await expect(page.locator('.cal-ev.previa.borrador')).toHaveCount(3)
-  // Cancelar quita el borrador sin crear nada.
-  await hoja.getByRole('button', { name: 'Cancel' }).click()
-  await expect(page.locator('.cal-ev.previa')).toHaveCount(0)
+  await expect(hoja.getByLabel('Start time')).toHaveValue('17:00')
+  await expect(hoja.getByLabel('End time')).toHaveValue('16:00')
+  await expect(hoja.getByLabel('Ends')).toHaveValue(d2!)
+  await hoja.getByLabel('Title').fill(titulo)
+  await hoja.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(hoja).toBeHidden()
+
+  // Un solo evento, pintado en sus dos días.
+  const tramos = page.getByRole('button', { name: new RegExp(titulo) })
+  await expect(tramos).toHaveCount(2)
+  await tramos.first().click()
+  const editar = page.getByRole('dialog', { name: 'Edit task' })
+  await expect(editar.getByLabel('Ends')).toHaveValue(d2!)
+  await editar.getByRole('button', { name: 'Delete' }).click()
+  await expect(tramos).toHaveCount(0)
 })
