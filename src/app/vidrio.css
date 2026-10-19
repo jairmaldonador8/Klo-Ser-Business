@@ -654,11 +654,10 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
   background:linear-gradient(in oklch 90deg,#ffb38a,#ff5a2a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .v-lockup-hoy span i{width:22px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,138,92,.6))}
 .v-lockup-hoy span i:last-child{background:linear-gradient(90deg,rgba(255,138,92,.6),transparent)}
-/* El lockup ya da aire arriba: la fila de Personalizar se pega a los mosaicos. */
-.v-lockup-hoy + .v-hoy .v-herramientas{margin-top:-24px}
+/* Personalizar va a la izquierda, en su línea, bajo el lockup. */
+.v-lockup-hoy + .v-hoy .v-herramientas{justify-content:flex-start;margin-top:4px}
 @media (max-width:700px){
   .v-lockup-hoy{margin:4px 0 0}
   .v-lockup-hoy img{height:24px}
-  .v-lockup-hoy + .v-hoy .v-herramientas{margin-top:0}
 }
 }
