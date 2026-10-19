@@ -285,3 +285,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 
 - Al arrastrar un mosaico en Personalizar, nada se escala: el orden cambia en vivo, la rejilla se reacomoda y cada mosaico se desliza a su lugar (340 ms, curva `--ease`). El que arrastras flota encima con su tamaño real, levemente inclinado, y deja un hueco punteado.
 - Editando se conserva el acomodo editorial de Today, para que lo que mueves sea lo que vas a ver.
+
+## 20. Today sin mosaicos de spaces (2026-10-19)
+
+- Jair pidió quitar los cuadros de cada space de Today: a cada space se entra por las píldoras de abajo. Se borró el mosaico (`frentes`) y su resumen. Arriba quedan Your day (7) y Klo (5) a dos renglones; luego la fila de tres y Agenda + Projects.

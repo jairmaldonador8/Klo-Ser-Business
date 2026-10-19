@@ -1,10 +1,10 @@
 import { RenglonTarea } from '@/components/tareas/renglon-tarea'
 import { EditorHoy, type ItemHoy } from '@/components/vidrio/editor-hoy'
-import { MosaicoFrente, MosaicoKlo, MosaicoLista, MosaicoMedidor, MosaicoProyectos, MosaicoSimple } from '@/components/vidrio/mosaicos'
+import { MosaicoKlo, MosaicoLista, MosaicoMedidor, MosaicoProyectos, MosaicoSimple } from '@/components/vidrio/mosaicos'
 import { contextoAhora, leerMisTareas, leerProyectos } from '@/lib/datos'
 import { etiquetaDia } from '@/lib/fechas'
 import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
-import { calcularHoy, enRiesgo, resumenPorFrente } from '@/lib/hoy/calcular'
+import { calcularHoy, enRiesgo } from '@/lib/hoy/calcular'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { hhmm, type Tarea } from '@/lib/tareas/esquema'
 import type { IdMosaico } from '@/lib/vista/registro'
@@ -16,7 +16,6 @@ type Props = { searchParams: Promise<{ frente?: string | string[] }> }
 const CLASE: Record<IdMosaico, string> = {
   medidor: 'c2 r2',
   klo: 'c2',
-  frentes: 'c2',
   en_riesgo: '',
   meta: '',
   de_un_toque: 'c2',
@@ -61,7 +60,6 @@ export default async function Hoy({ searchParams }: Props) {
   const delFrente = frente ? tareas.filter((t) => t.espacio_id === frente.id) : tareas
   const hoyCalc = calcularHoy(delFrente, ctx)
   const riesgo = enRiesgo(delFrente, ctx.hoy)
-  const resumen = resumenPorFrente(tareas, ctx)
   const frenteDe = new Map(frentes.map((f) => [f.id, f]))
   const vencida = (t: Tarea) => t.fecha !== null && t.fecha < ctx.hoy
   // «vencida · ayer 10:00» o «hoy».
@@ -81,14 +79,6 @@ export default async function Hoy({ searchParams }: Props) {
         return <MosaicoMedidor key={id} hechas={hoyCalc.hechas} pendientes={hoyCalc.pendientes} siguiente={hoyCalc.siguiente?.titulo ?? null} i={i} />
       case 'klo':
         return <MosaicoKlo key={id} frase={fraseKlo(hoyCalc.pendientes, hoyCalc.siguiente?.titulo ?? null)} i={i} />
-      case 'frentes':
-        return (
-          <div key={id} className="v-grupo c2" aria-label="Your spaces">
-            {frentes.map((f, n) => (
-              <MosaicoFrente key={f.id} frente={f} ruta="/hoy" resumen={resumen.get(f.id)} proyectos={proyectos.filter((p) => p.espacio_id === f.id).length} i={i + n} />
-            ))}
-          </div>
-        )
       case 'en_riesgo':
         return (
           <MosaicoLista key={id} titulo="At risk" vacio="Nothing at risk." mas={mas(riesgo)} i={i}>
@@ -118,8 +108,8 @@ export default async function Hoy({ searchParams }: Props) {
     }
   }
 
-  // Dentro de un frente, o con uno solo, el panorama de frentes sobra; dentro de un frente, La meta también.
-  const aplica = (id: IdMosaico) => !(id === 'frentes' && (frente || frentes.length < 2)) && !(id === 'meta' && frente)
+  // Dentro de un frente, La meta sobra. A cada frente se llega por las píldoras de abajo.
+  const aplica = (id: IdMosaico) => !(id === 'meta' && frente)
   const items: ItemHoy[] = mosaicos
     .filter((m) => aplica(m.id))
     .map((m, i) => ({ id: m.id, nombre: m.nombre, clase: CLASE[m.id], obligatorio: m.obligatorio, visible: m.visible, nodo: nodo(m.id, i) }))

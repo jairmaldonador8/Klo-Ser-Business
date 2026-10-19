@@ -106,8 +106,6 @@ a.v-t[class*=v-color-] .v-ilus{color:var(--c);opacity:.2}
 .v-ondas i{width:4px;height:6px;border-radius:4px;background:var(--amanecer-texto);animation:v-onda 1.2s ease-in-out infinite}
 
 /* Grupo de mosaicos de frente: ocupa dos columnas y adentro van de dos en dos */
-.v-grupo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;grid-column:span 2;min-width:0}
-.v-grupo > .v-t{min-height:120px}
 
 /* ── Modo Personalizar ──────────────────────────────────────────────── */
 .v-hoy{display:flex;flex-direction:column;gap:12px}
@@ -609,19 +607,11 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
 .v-editorial .v-t.r2 .v-medidor{max-width:440px}
 .v-editorial .v-t.r2 .v-medidor .centro b{font-weight:200;font-size:clamp(84px,9vw,132px);letter-spacing:-.05em}
 
-/* Frentes como barras: su color entra suave desde la izquierda. */
-.v-editorial > [aria-label="Your spaces"]{grid-template-columns:minmax(0,1fr)}
-@media (max-width:700px){.v-editorial .v-grupo > a.v-t[class*=v-color-] .v-pila{margin-right:40px}.v-editorial .v-grupo > a.v-t[class*=v-color-] .v-ilus{font-size:64px}}
-.v-editorial .v-grupo > a.v-t[class*=v-color-]{flex-direction:row;align-items:center;justify-content:space-between;gap:16px;min-height:0;
-  background:radial-gradient(55% 140% at 0% 50%,color-mix(in oklch,var(--c) 26%,transparent),transparent 70%),var(--v-gris)}
-.v-editorial .v-grupo > a.v-t[class*=v-color-] .v-pila{margin-top:0!important;margin-right:56px}
-.v-editorial .v-grupo > a.v-t[class*=v-color-] .v-ilus{bottom:auto;top:50%;transform:translateY(-50%);font-size:84px}
 
 @media (min-width:1100px){
   .v-editorial{grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:minmax(132px,auto);gap:16px}
-  .v-editorial > [aria-label="Your day"]{grid-column:span 7;grid-row:span 3}
-  .v-editorial > [aria-label="Klo"]{grid-column:span 5}
-  .v-editorial > [aria-label="Your spaces"]{grid-column:span 5;grid-row:span 2;grid-template-columns:minmax(0,1fr);gap:16px}
+  .v-editorial > [aria-label="Your day"]{grid-column:span 7;grid-row:span 2}
+  .v-editorial > [aria-label="Klo"]{grid-column:span 5;grid-row:span 2;justify-content:center}
   .v-editorial > :is([aria-label="At risk"],[aria-label="Goal"],[aria-label="Quick wins"]){grid-column:span 4}
   .v-editorial > [aria-label="Today’s agenda"]{grid-column:span 7}
   .v-editorial > [aria-label="Projects"]{grid-column:span 5}
@@ -637,12 +627,11 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
    editorial; el que arrastras deja un hueco fantasma y flota encima sin deformarse. */
 @layer components {
 .v-editorial.editando{counter-reset:none}
-.v-editorial.editando > .v-editable > .v-editable-contenido > [aria-label="Your spaces"]{grid-template-columns:minmax(0,1fr);gap:16px}
 @media (min-width:1100px){
   .v-editorial.editando > .v-editable{grid-column:span 6;grid-row:auto}
-  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Your day"]){grid-column:span 7;grid-row:span 3}
-  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > :is([aria-label="Klo"],[aria-label="Projects"])){grid-column:span 5}
-  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Your spaces"]){grid-column:span 5;grid-row:span 2}
+  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Your day"]){grid-column:span 7;grid-row:span 2}
+  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Klo"]){grid-column:span 5;grid-row:span 2}
+  .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Projects"]){grid-column:span 5}
   .v-editorial.editando > .v-editable:has(> .v-editable-contenido > :is([aria-label="At risk"],[aria-label="Goal"],[aria-label="Quick wins"])){grid-column:span 4}
   .v-editorial.editando > .v-editable:has(> .v-editable-contenido > [aria-label="Today’s agenda"]){grid-column:span 7}
 }
@@ -654,6 +643,5 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
 /* El que arrastras: flota, un poco levantado, sin temblar ni escalar su contenido. */
 .v-editable.flotando{height:100%;cursor:grabbing;transform:rotate(-.6deg);filter:drop-shadow(0 30px 50px rgba(0,0,0,.75))}
 .v-editable.flotando .v-editable-contenido{animation:none}
-.v-editable.flotando .v-editable-contenido > [aria-label="Your spaces"]{grid-template-columns:minmax(0,1fr);gap:16px}
 @media (prefers-reduced-motion:reduce){.v-editable.flotando{transform:none}}
 }

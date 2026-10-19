@@ -2,7 +2,7 @@
  *  (al final y visible) sin romper la vista guardada de nadie: ver resolver.ts. */
 
 export type IdSeccion = 'hoy' | 'calendario' | 'proyectos' | 'semana' | 'clientes' | 'notas'
-export type IdMosaico = 'medidor' | 'klo' | 'frentes' | 'en_riesgo' | 'meta' | 'de_un_toque' | 'tu_dia' | 'proyectos'
+export type IdMosaico = 'medidor' | 'klo' | 'en_riesgo' | 'meta' | 'de_un_toque' | 'tu_dia' | 'proyectos'
 
 export type Seccion = { id: IdSeccion; nombre: string; ruta: string; obligatorio?: boolean }
 export type Mosaico = { id: IdMosaico; nombre: string; descripcion: string; obligatorio?: boolean }
@@ -19,7 +19,6 @@ export const SECCIONES: readonly Seccion[] = [
 export const MOSAICOS: readonly Mosaico[] = [
   { id: 'medidor', nombre: 'Your day', descripcion: 'How much is on your plate today and what’s next', obligatorio: true },
   { id: 'klo', nombre: 'Klo', descripcion: 'What Klo tells you and where to talk to it' },
-  { id: 'frentes', nombre: 'Your spaces', descripcion: 'One color tile per space' },
   { id: 'en_riesgo', nombre: 'At risk', descripcion: 'Deliveries overdue or due in the next 2 days' },
   { id: 'meta', nombre: 'Goal', descripcion: 'Your spotlight project' },
   { id: 'de_un_toque', nombre: 'Quick wins', descripcion: 'Untimed to-dos to check off' },
