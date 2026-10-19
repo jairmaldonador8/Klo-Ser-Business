@@ -267,3 +267,11 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Semana muestra tus pendientes por fecha (`lib/semana/agrupar.ts`): Vencidas (si hay), los 7 días desde hoy (siempre, aunque estén libres; hoy y mañana marcados), Más adelante y Sin fecha. Respeta el frente abierto (`?frente=`).
 - En teléfono, un día por renglón.
 - Los frentes en Hoy dicen cómo van: «N hoy · N pendientes» y «vencidas / en riesgo / Al día · N proyectos activos».
+
+## 17. Calendario (2026-10-19, referencia: Notion Calendar)
+
+- Sección propia `/calendario` (`components/calendario/`, `calendario.css`, prefijo `cal-`). Vistas Día, 3 días, Semana y Mes; semana empieza en lunes. En teléfono abre en 3 días.
+- Los frentes son los calendarios: cada evento lleva el color de su frente mezclado en oklch sobre carbón, con filo de 3 px. Trabajo profundo va con franjas finas; entrega con filo arriba; lo hecho, tachado y apagado.
+- Brasa solo para hoy (círculo del día) y la línea de «ahora». Metas de proyectos = bandera brasa en su fecha meta, con su % de avance.
+- Se arrastra para crear (rejilla), mover (entre horas, días o al renglón «todo el día»), estirar (orilla de abajo) y calendarizar (desde «Por calendarizar»). En teléfono, mantener el dedo un momento para arrastrar. Cada movida trae «Deshacer».
+- Panel lateral: mini mes, por calendarizar, metas con avance y cuánto falta, y calendarios que se prenden y apagan. Atajos: T, D/X/W/M, ←/→, N.

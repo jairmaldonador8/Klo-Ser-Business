@@ -1,7 +1,7 @@
 /** Lo que la app sabe pintar. Agregar una sección o un mosaico aquí lo hace aparecer para todos
  *  (al final y visible) sin romper la vista guardada de nadie: ver resolver.ts. */
 
-export type IdSeccion = 'hoy' | 'proyectos' | 'semana' | 'clientes' | 'notas'
+export type IdSeccion = 'hoy' | 'calendario' | 'proyectos' | 'semana' | 'clientes' | 'notas'
 export type IdMosaico = 'medidor' | 'klo' | 'frentes' | 'en_riesgo' | 'meta' | 'de_un_toque' | 'tu_dia' | 'proyectos'
 
 export type Seccion = { id: IdSeccion; nombre: string; ruta: string; obligatorio?: boolean }
@@ -9,6 +9,7 @@ export type Mosaico = { id: IdMosaico; nombre: string; descripcion: string; obli
 
 export const SECCIONES: readonly Seccion[] = [
   { id: 'hoy', nombre: 'Hoy', ruta: '/hoy', obligatorio: true },
+  { id: 'calendario', nombre: 'Calendario', ruta: '/calendario' },
   { id: 'proyectos', nombre: 'Proyectos', ruta: '/proyectos' },
   { id: 'semana', nombre: 'Semana', ruta: '/semana' },
   { id: 'clientes', nombre: 'Clientes', ruta: '/clientes' },

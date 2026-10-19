@@ -74,3 +74,42 @@ export async function leerProyectos({ espacioId, soloActivos = true }: { espacio
     }
   })
 }
+
+/** Mis tareas con fecha entre `desde` y `hasta` (incluidas las hechas): lo que pinta el calendario. */
+export async function leerTareasRango(desde: string, hasta: string, espacioId?: string): Promise<Tarea[]> {
+  const supabase = await crearClienteServidor()
+  const { data: sesion } = await supabase.auth.getClaims()
+  let q = supabase
+    .from('tareas')
+    .select(COLUMNAS)
+    .is('borrado_en', null)
+    .eq('responsable_id', sesion!.claims.sub)
+    .gte('fecha', desde)
+    .lte('fecha', hasta)
+    .order('fecha')
+    .order('hora', { nullsFirst: true })
+    .limit(2000)
+  if (espacioId) q = q.eq('espacio_id', espacioId)
+  const { data, error } = await q
+  if (error) console.error('leerTareasRango', error)
+  return (data ?? []).map((x) => ({ ...x, clase: x.clase as Clase }))
+}
+
+/** Mis pendientes sin fecha: lo que falta por calendarizar. */
+export async function leerSinFecha(espacioId?: string): Promise<Tarea[]> {
+  const supabase = await crearClienteServidor()
+  const { data: sesion } = await supabase.auth.getClaims()
+  let q = supabase
+    .from('tareas')
+    .select(COLUMNAS)
+    .is('borrado_en', null)
+    .is('completada_en', null)
+    .is('fecha', null)
+    .eq('responsable_id', sesion!.claims.sub)
+    .order('creado_en', { ascending: false })
+    .limit(100)
+  if (espacioId) q = q.eq('espacio_id', espacioId)
+  const { data, error } = await q
+  if (error) console.error('leerSinFecha', error)
+  return (data ?? []).map((x) => ({ ...x, clase: x.clase as Clase }))
+}

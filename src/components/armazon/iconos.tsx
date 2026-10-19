@@ -7,6 +7,13 @@ const TRAZOS: Record<NombreIcono | 'mas', React.ReactNode> = {
       <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
     </>
   ),
+  calendario: (
+    <>
+      <rect x="3" y="4.5" width="18" height="16.5" rx="3" />
+      <path d="M3 9.5h18M8 2.5v4M16 2.5v4" />
+      <path d="M7.5 13.5h.01M12 13.5h.01M16.5 13.5h.01M7.5 17h.01M12 17h.01" strokeWidth={2.6} />
+    </>
+  ),
   proyectos: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
   semana: (
     <>

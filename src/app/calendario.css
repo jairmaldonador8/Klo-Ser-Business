@@ -1,0 +1,221 @@
+/* Calendario (DISENO §17). Prefijo cal-. Negro vanta, paneles grises, brasa para hoy y «ahora»;
+   el color de cada evento es el de su frente (--c), mezclado en oklch para que se vea fino. */
+
+@layer components {
+.cal{--linea:rgba(255,255,255,.055);--linea-2:rgba(255,255,255,.1);--gutter:58px;--hora:52px;
+  display:flex;flex-direction:column;gap:14px;min-width:0;height:calc(100dvh - 196px);min-height:560px}
+
+/* ── Cabecera ─────────────────────────────────────────────────────────── */
+.cal-cab{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.cal-titulo h2{font-weight:500;font-size:30px;letter-spacing:-.03em;line-height:1}
+.cal-titulo small{display:block;margin-top:8px;font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-3)}
+.cal-mandos{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cal-boton{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--tinta);
+  background:#1b1a19;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 0 1px rgba(255,255,255,.04);transition:background .15s}
+.cal-boton:hover{background:#252423}
+.cal-boton.primario{background:#fff;color:#000;box-shadow:0 10px 24px -14px rgba(255,255,255,.5)}
+.cal-boton.primario:hover{background:#ece9e6}
+.cal-boton svg,.cal-icono svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cal-icono{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;color:var(--tinta-2);transition:background .15s,color .15s}
+.cal-icono:hover{background:rgba(255,255,255,.07);color:var(--tinta)}
+.cal-flechas{display:flex;padding:2px;border-radius:11px;background:#1b1a19;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.cal-vistas{display:flex;padding:3px;border-radius:12px;background:#141312;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.cal-vistas button{height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:500;color:var(--tinta-2);transition:background .15s,color .15s}
+.cal-vistas button:hover{color:var(--tinta)}
+.cal-vistas button[aria-checked="true"]{background:#2a2928;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 10px -6px #000}
+:is(.cal-boton,.cal-icono,.cal-vistas button):focus-visible{outline:2px solid #fff;outline-offset:1px}
+/* Cargando otro mes: una línea de brasa que corre bajo la cabecera. */
+.cal-carga{position:absolute;left:0;right:0;bottom:-8px;height:1px;opacity:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#ff5a2a,transparent);background-size:40% 100%;background-repeat:no-repeat;transition:opacity .2s}
+.cal[aria-busy="true"] .cal-carga{opacity:1;animation:cal-corre 1s linear infinite}
+@keyframes cal-corre{from{background-position:-40% 0}to{background-position:140% 0}}
+
+/* ── Cuerpo: calendario + panel lateral ───────────────────────────────── */
+.cal-cuerpo{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 272px;gap:16px}
+.cal-principal{min-width:0;min-height:0;border-radius:22px;overflow:hidden;background:var(--v-gris);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 40px 70px -35px rgba(0,0,0,.95),0 12px 24px -12px rgba(0,0,0,.6)}
+.cal-lado{min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:22px;padding:4px 2px 24px;scrollbar-width:none}
+.cal-lado::-webkit-scrollbar{display:none}
+
+/* ── Vista de horas ───────────────────────────────────────────────────── */
+.cal-horas{display:flex;flex-direction:column;height:100%}
+.cal-cabdias,.cal-todo-dia,.cal-rejilla{display:grid;grid-template-columns:var(--gutter) repeat(var(--n),minmax(0,1fr))}
+.cal-cabdias{padding:12px 0 10px;box-shadow:inset 0 -1px 0 var(--linea)}
+.cal-cabdia{display:flex;align-items:center;justify-content:center;gap:8px;padding:4px 0;border-radius:10px;color:var(--tinta-2);transition:background .15s}
+.cal-cabdia:hover{background:rgba(255,255,255,.04)}
+.cal-cabdia small{font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+.cal-cabdia b{display:grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border-radius:99px;font-weight:400;font-size:18px;letter-spacing:-.02em;color:var(--tinta);font-variant-numeric:tabular-nums}
+.cal-cabdia.hoy small{color:#ff8a5c}
+.cal-cabdia.hoy b{background:linear-gradient(in oklch 160deg,#ff6a3a,#d63d1a);color:#fff;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 18px -8px rgba(255,90,42,.7)}
+
+.cal-todo-dia{box-shadow:inset 0 -1px 0 var(--linea);max-height:112px;overflow-y:auto;scrollbar-width:none}
+.cal-etq-todo{align-self:start;padding:9px 8px 0 0;text-align:right;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-3);line-height:1.2}
+.cal-celda-dia{display:flex;flex-direction:column;gap:3px;min-height:36px;padding:5px 4px;box-shadow:inset 1px 0 0 var(--linea);transition:background .12s}
+.cal-celda-dia.sobre{background:rgba(255,90,42,.08)}
+
+.cal-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;position:relative}
+.cal-scroll::-webkit-scrollbar{display:none}
+.cal-rejilla{position:relative;height:calc(var(--hora) * 24)}
+.cal-regla{position:relative}
+.cal-regla span{position:absolute;right:10px;transform:translateY(-50%);font-size:10.5px;font-weight:500;color:var(--tinta-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cal-col{position:relative;box-shadow:inset 1px 0 0 var(--linea);cursor:crosshair;
+  background-image:repeating-linear-gradient(180deg,var(--linea) 0 1px,transparent 1px calc(var(--hora) / 2),rgba(255,255,255,.022) calc(var(--hora) / 2) calc(var(--hora) / 2 + 1px),transparent calc(var(--hora) / 2 + 1px) var(--hora))}
+.cal-col.hoy{background-color:rgba(255,90,42,.025)}
+
+/* La línea de ahora: brasa, con su punto en la orilla. */
+.cal-ahora{position:absolute;left:0;right:0;height:0;border-top:1.5px solid #ff5a2a;z-index:4;pointer-events:none;box-shadow:0 0 12px rgba(255,90,42,.6)}
+.cal-ahora i{position:absolute;left:-5px;top:-5.5px;width:9px;height:9px;border-radius:50%;background:#ff5a2a;box-shadow:0 0 0 3px rgba(255,90,42,.22)}
+
+/* ── Eventos ──────────────────────────────────────────────────────────── */
+.cal-ev{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:1px;overflow:hidden;text-align:left;
+  padding:5px 8px 5px 10px;border-radius:8px;cursor:grab;touch-action:manipulation;-webkit-touch-callout:none;user-select:none;
+  background:linear-gradient(180deg,color-mix(in oklch,var(--c) 30%,#141312),color-mix(in oklch,var(--c) 22%,#121110));
+  color:color-mix(in oklch,var(--c) 22%,#fff);
+  box-shadow:inset 3px 0 0 var(--c),inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(0,0,0,.55),0 8px 18px -10px rgba(0,0,0,.8);
+  transition:filter .15s,opacity .15s,transform .15s}
+.cal-ev:hover{filter:brightness(1.12)}
+.cal-ev:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.cal-ev b{font-weight:600;font-size:12.5px;line-height:1.25;letter-spacing:-.005em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cal-ev small{font-size:11px;color:color-mix(in oklch,var(--c) 45%,#fff);opacity:.8;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cal-ev small em{font-style:normal}
+.cal-ev.corto{flex-direction:row;align-items:center;gap:6px;padding-top:2px;padding-bottom:2px}
+.cal-ev.corto b{-webkit-line-clamp:1;flex:0 1 auto;min-width:0;white-space:nowrap;text-overflow:ellipsis;display:block}
+.cal-ev.corto small{flex:none}
+/* Trabajo profundo: franjas finas, como bloque protegido. Entrega: filo arriba. */
+.cal-ev.clase-profundo{background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 6px,transparent 6px 12px),linear-gradient(180deg,color-mix(in oklch,var(--c) 30%,#141312),color-mix(in oklch,var(--c) 22%,#121110))}
+.cal-ev.clase-entrega{box-shadow:inset 3px 0 0 var(--c),inset 0 1.5px 0 color-mix(in oklch,var(--c) 70%,#fff),0 0 0 1px rgba(0,0,0,.55),0 8px 18px -10px rgba(0,0,0,.8)}
+.cal-ev.hecha{opacity:.42}
+.cal-ev.hecha b{text-decoration:line-through;text-decoration-color:color-mix(in oklch,var(--c) 50%,transparent)}
+.cal-ev.fantasma,.cal-ficha.fantasma,.cal-meta.fantasma,.cal-suelta.fantasma{opacity:.3}
+.cal-ev.previa{left:2px;right:4px;z-index:5;pointer-events:none;cursor:grabbing;
+  background:color-mix(in oklch,var(--c) 38%,#141312);box-shadow:inset 3px 0 0 var(--c),0 0 0 1.5px color-mix(in oklch,var(--c) 80%,#fff),0 18px 40px -14px rgba(0,0,0,.9)}
+.cal-estirar{position:absolute;left:0;right:0;bottom:0;height:8px;cursor:ns-resize;touch-action:none}
+.cal-estirar::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:2px;margin-left:-9px;border-radius:2px;background:currentColor;opacity:0;transition:opacity .15s}
+.cal-ev:hover .cal-estirar::after{opacity:.5}
+
+/* Fichas de día (todo el día y mes). */
+.cal-ficha{display:flex;align-items:center;gap:6px;min-width:0;height:22px;padding:0 8px;border-radius:6px;font-size:12px;font-weight:500;text-align:left;cursor:grab;
+  touch-action:manipulation;-webkit-touch-callout:none;user-select:none;
+  background:color-mix(in oklch,var(--c) 26%,#141312);color:color-mix(in oklch,var(--c) 22%,#fff);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:filter .15s}
+.cal-ficha:hover{filter:brightness(1.15)}
+.cal-ficha span{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cal-ficha.con-hora{background:transparent;box-shadow:none;color:var(--tinta);padding-left:4px}
+.cal-ficha.con-hora::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--c)}
+.cal-ficha.con-hora:hover{background:rgba(255,255,255,.05)}
+.cal-ficha time{flex:none;font-size:11px;color:var(--tinta-3);font-variant-numeric:tabular-nums}
+.cal-ficha.hecha{opacity:.42}
+.cal-ficha.hecha span{text-decoration:line-through}
+.cal-ficha.previa{pointer-events:none;box-shadow:0 0 0 1.5px color-mix(in oklch,var(--c) 80%,#fff)}
+
+/* Meta: bandera con avance, en brasa sobre la mezcla del frente. */
+.cal-meta{display:flex;align-items:center;gap:6px;min-width:0;height:22px;padding:0 6px 0 7px;border-radius:6px;font-size:12px;font-weight:600;cursor:grab;
+  touch-action:manipulation;-webkit-touch-callout:none;user-select:none;color:#ffd2bd;
+  background:linear-gradient(90deg,rgba(255,90,42,.22),rgba(255,90,42,.08));box-shadow:inset 0 0 0 1px rgba(255,106,58,.38);transition:filter .15s}
+.cal-meta:hover{filter:brightness(1.2)}
+.cal-meta svg{flex:none;width:12px;height:12px;fill:none;stroke:#ff7a4a;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cal-meta span{min-width:0;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:left}
+.cal-meta i{flex:none;font-style:normal;font-size:10.5px;font-weight:600;color:#ff9a6b;font-variant-numeric:tabular-nums}
+
+/* ── Vista de mes ─────────────────────────────────────────────────────── */
+.cal-mes{display:flex;flex-direction:column;height:100%}
+.cal-mes-cab{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:12px 0 10px;box-shadow:inset 0 -1px 0 var(--linea)}
+.cal-mes-cab span{padding-left:12px;font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-3)}
+.cal-mes-rejilla{flex:1;min-height:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:repeat(var(--semanas),minmax(0,1fr))}
+.cal-mes-celda{display:flex;flex-direction:column;gap:2px;min-width:0;min-height:0;overflow:hidden;padding:6px 6px 4px;
+  box-shadow:inset 1px 0 0 var(--linea),inset 0 -1px 0 var(--linea);transition:background .12s;cursor:default}
+.cal-mes-celda:nth-child(7n+1){box-shadow:inset 0 -1px 0 var(--linea)}
+.cal-mes-celda:nth-child(7n+6),.cal-mes-celda:nth-child(7n){background:rgba(0,0,0,.12)}
+.cal-mes-celda.fuera > :not(.cal-mes-num){opacity:.55}
+.cal-mes-celda.fuera .cal-mes-num{color:var(--tinta-3)}
+.cal-mes-celda.sobre{background:rgba(255,90,42,.08)}
+.cal-mes-num{align-self:flex-start;min-width:26px;height:26px;padding:0 7px;margin-bottom:2px;border-radius:99px;font-size:13px;font-weight:500;color:var(--tinta-2);font-variant-numeric:tabular-nums;transition:background .15s}
+.cal-mes-num:hover{background:rgba(255,255,255,.07);color:var(--tinta)}
+.cal-mes-celda.hoy .cal-mes-num{background:linear-gradient(in oklch 160deg,#ff6a3a,#d63d1a);color:#fff;font-weight:600}
+.cal-mas{align-self:flex-start;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:600;color:var(--tinta-3)}
+.cal-mas:hover{color:var(--tinta);background:rgba(255,255,255,.05)}
+
+/* ── Panel lateral ────────────────────────────────────────────────────── */
+.cal-mini header{display:flex;align-items:center;gap:2px;margin-bottom:8px}
+.cal-mini header b{flex:1;padding-left:4px;font-weight:600;font-size:13.5px;text-transform:capitalize}
+.cal-mini-rejilla{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0}
+.cal-mini-rejilla .dow{height:24px;display:grid;place-items:center;font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--tinta-3);text-transform:uppercase}
+.cal-mini-rejilla button{position:relative;height:30px;font-size:12px;color:var(--tinta-2);font-variant-numeric:tabular-nums;border-radius:8px;transition:background .12s,color .12s}
+.cal-mini-rejilla button:hover{background:rgba(255,255,255,.07);color:var(--tinta)}
+.cal-mini-rejilla button.fuera{color:#4a4643}
+.cal-mini-rejilla button.visible{background:rgba(255,255,255,.075);color:var(--tinta);border-radius:0}
+.cal-mini-rejilla button.visible:is(:nth-child(7n+1)){border-radius:8px 0 0 8px}
+.cal-mini-rejilla button.visible:nth-child(7n){border-radius:0 8px 8px 0}
+.cal-mini-rejilla button.hoy{color:#ff8a5c;font-weight:700}
+.cal-mini-rejilla button.algo::after{content:"";position:absolute;left:50%;bottom:3px;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:currentColor;opacity:.6}
+
+.cal-bloque{display:flex;flex-direction:column;gap:6px}
+.cal-bloque h4{display:flex;align-items:center;gap:8px;margin-bottom:2px;font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-3)}
+.cal-bloque h4 span{color:#ff8a5c}
+.cal-vacio{font-size:12.5px;color:var(--tinta-3);line-height:1.45}
+.cal-suelta-lista{display:flex;flex-direction:column;gap:4px}
+.cal-suelta{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:10px;text-align:left;font-size:13px;cursor:grab;
+  touch-action:manipulation;-webkit-touch-callout:none;user-select:none;
+  background:#1b1a19;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);transition:background .15s}
+.cal-suelta:hover{background:#242322}
+.cal-suelta i{flex:none;width:8px;height:8px;border-radius:3px;background:var(--c);box-shadow:0 0 0 3px color-mix(in oklch,var(--c) 20%,transparent)}
+.cal-suelta span{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cal-suelta small{flex:none;font-size:10.5px;color:var(--tinta-3)}
+
+.cal-meta-fila{display:grid;gap:6px;width:100%;padding:10px 12px;border-radius:12px;text-align:left;
+  background:radial-gradient(90% 140% at 0% 0%,color-mix(in oklch,var(--c) 14%,transparent),transparent 70%),#1b1a19;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);transition:background .15s}
+.cal-meta-fila:hover{background:radial-gradient(90% 140% at 0% 0%,color-mix(in oklch,var(--c) 22%,transparent),transparent 70%),#222120}
+.cal-meta-fila .nombre{font-size:13.5px;font-weight:500;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cal-meta-fila .pista{height:3px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.cal-meta-fila .pista i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#c8643a,#ff7a4a)}
+.cal-meta-fila small{font-size:11px;color:var(--tinta-3)}
+
+.cal-cal{display:flex;align-items:center;gap:10px;padding:5px 4px;border-radius:8px;font-size:13px;color:var(--tinta-2);cursor:pointer}
+.cal-cal:hover{color:var(--tinta);background:rgba(255,255,255,.04)}
+.cal-cal input{position:absolute;opacity:0;pointer-events:none}
+.cal-cal i{display:grid;place-items:center;width:15px;height:15px;border-radius:5px;box-shadow:inset 0 0 0 1.5px var(--c);transition:background .15s}
+.cal-cal input:checked + i{background:var(--c)}
+.cal-cal input:checked + i::after{content:"";width:7px;height:4px;margin-top:-2px;border:solid #000;border-width:0 0 1.6px 1.6px;transform:rotate(-45deg)}
+.cal-cal input:focus-visible + i{outline:2px solid #fff;outline-offset:2px}
+.cal-atajos{font-size:11px;color:var(--tinta-3);line-height:2}
+.cal-atajos kbd{font-family:var(--mono);font-size:10px;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+
+/* Arrastrando: el puntero agarra y nada se selecciona. */
+.cal-arrastrando,.cal-arrastrando *{cursor:grabbing!important;user-select:none!important}
+
+/* ── Tamaños ─────────────────────────────────────────────────────────── */
+@media (max-width:1180px){.cal-cuerpo{grid-template-columns:minmax(0,1fr) 236px}}
+@media (max-width:980px){
+  .cal{height:auto;min-height:0}
+  .cal-cuerpo{grid-template-columns:minmax(0,1fr)}
+  .cal-principal{height:calc(100dvh - 250px);min-height:480px}
+  .cal-lado{overflow:visible;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 18px}
+  .cal-atajos{display:none}
+}
+@media (max-width:700px){
+  .cal{--gutter:44px;--hora:56px;gap:12px}
+  .cal-cab{align-items:stretch;flex-direction:column;gap:12px}
+  .cal-titulo h2{font-size:26px}
+  .cal-mandos{justify-content:space-between;gap:6px}
+  .cal-vistas{flex:1}
+  .cal-vistas button{flex:1;padding:0 4px;font-size:12px}
+  .cal-boton.primario span{display:none}
+  .cal-boton.primario{padding:0 10px}
+  .cal-principal{border-radius:18px;height:calc(100dvh - 300px);min-height:440px}
+  .cal-lado{grid-template-columns:minmax(0,1fr)}
+  .cal-regla span{right:6px;font-size:9.5px}
+  .cal-cabdia{flex-direction:column;gap:2px}
+  .cal-cabdia b{font-size:16px;height:28px;min-width:28px}
+  .cal-etq-todo{font-size:8.5px;padding-right:4px}
+  .cal-ev{padding:4px 5px 4px 7px}
+  .cal-ev b{font-size:11.5px}
+  .cal-mes-cab span{padding-left:0;text-align:center;letter-spacing:.06em}
+  .cal-mes-celda{padding:4px 2px 2px;align-items:stretch}
+  .cal-mes-num{align-self:center;font-size:12px;height:22px;min-width:22px;padding:0 5px}
+  .cal-ficha,.cal-meta{height:18px;padding:0 4px;font-size:10px;border-radius:4px}
+  .cal-ficha time,.cal-meta i,.cal-meta svg{display:none}
+  .cal-ficha.con-hora{padding-left:2px;gap:3px}
+  .cal-ficha.con-hora::before{width:4px;height:4px}
+  .cal-mas{font-size:10px;padding:0 2px}
+}
+@media (prefers-reduced-motion:reduce){.cal[aria-busy="true"] .cal-carga{animation:none}}
+}
