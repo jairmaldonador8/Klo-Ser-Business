@@ -300,3 +300,9 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - Arriba, **Micro wins**: hábitos diarios personales (migración 0006, `micro_wins` + `micro_wins_hechos` por fecha) en píldoras; palomeado = brasa y tachado; amanecen vacíos cada día. «Edit» agrega y quita (borrado suave; la historia queda para rachas).
 - Escritorio: Tasks 7×2; At risk y Goal 6; Agenda y Projects 5.
 - Ojo: en `vidrio.css` las líneas ~194–267 quedaron fuera de `@layer` y le ganan a todo lo que está en capa; para pisarlas hay que escribir fuera de capa.
+
+## 23. Spaces en el riel, color por space y apertura (2026-10-19)
+
+- Los spaces salen de la barra de abajo y viven en el riel izquierdo, bajo las secciones (cuadro con su inicial en su color; «All» con cuatro puntos). En teléfono, segundo renglón del riel con píldoras con nombre que se deslizan. El «+» queda flotante abajo a la derecha, en el color del space abierto.
+- Cada space trae su paleta (`--ac-claro/--ac/--ac-hondo/--ac-negro/--ac-texto` por `data-color`): Your day, Klo, índices, micro wins, palomitas, lockup y Calendar (hoy, «ahora»). En «All» sigue la brasa.
+- Al abrir un space: velo oscuro difuminado con el logo del space al centro (su inicial en un cuadro con su degradado; Klo en «All») y un anillo fino que gira en su color; dura lo que tarda en llegar y al menos 0.75 s. El cuadro tocado en el riel late mientras carga (`useLinkStatus`). Las secciones muestran el mismo logo con anillo en `loading.tsx`.

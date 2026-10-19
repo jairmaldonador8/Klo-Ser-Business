@@ -35,7 +35,7 @@ test('un frente se abre con su píldora y sigue abierto al cambiar de sección',
   await page.goto('/hoy')
   const frentes = page.getByRole('navigation', { name: 'Spaces' })
   const primero = frentes.getByRole('link').nth(1) // el 0 es «Todos»
-  const nombre = (await primero.textContent())!.trim()
+  const nombre = (await primero.getAttribute('aria-label'))!
 
   await primero.click()
   await expect(page).toHaveURL(/\/hoy\?frente=/)

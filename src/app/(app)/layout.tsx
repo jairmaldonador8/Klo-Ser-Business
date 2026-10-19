@@ -43,12 +43,12 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
       <HojaProvider frentes={frentes} proyectos={proyectos ?? []} actividades={perfil?.actividades ?? []} hoy={fechaEn(ahora, zona)}>
         <div className="v-escena">
           <Suspense>
-            <Riel secciones={secciones} />
+            <Riel secciones={secciones} frentes={frentes} />
             <Ventana frentes={frentes}>
               <BarraArriba nombre={perfil?.nombre ?? null} zona={zona} frentes={frentes} ahora={ahora.toISOString()} />
               {children}
             </Ventana>
-            {/* Fuera de la ventana: su backdrop-filter atraparía el position:fixed. */}
+            {/* El + flotante va fuera de la ventana: su backdrop-filter atraparía el position:fixed. */}
             <Pildoras frentes={frentes} />
           </Suspense>
         </div>
