@@ -44,9 +44,9 @@ export function prepararFrentes(
 export const COLORES = ['azul', 'sol', 'rosa', 'violeta'] as const
 export type Color = (typeof COLORES)[number]
 
-/** Lo que el armazón necesita de cada frente. */
-/** `logo`: la marca blanca y cuadrada del frente (ruta de la app o https); sin logo, se usa la inicial. */
-export type FrenteVista = { id: string; nombre: string; inicial: string; atajo: string; color: Color; logo?: string | null }
+/** Lo que el armazón necesita de cada frente. `logo`: la marca blanca y cuadrada del frente (ruta de la app o https); sin logo, se usa la inicial.
+ *  `logo_ancho`: su wordmark completo, que acompaña al lockup en Today. */
+export type FrenteVista = { id: string; nombre: string; inicial: string; atajo: string; color: Color; logo?: string | null; logo_ancho?: string | null }
 
 export function esColor(valor: unknown): valor is Color {
   return typeof valor === 'string' && (COLORES as readonly string[]).includes(valor)

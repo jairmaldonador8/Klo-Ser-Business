@@ -49,7 +49,7 @@ export default async function Hoy({ searchParams }: Props) {
   const { data } = await supabase.auth.getClaims()
   const [{ data: perfil }, { data: espacios }, tareas, proyectos, ctx] = await Promise.all([
     supabase.from('perfiles').select('vista').eq('user_id', data!.claims.sub).single(),
-    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo').order('orden'),
+    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo, logo_ancho').order('orden'),
     // Todas: el panorama de frentes necesita las de cada uno; el frente abierto se filtra aquí.
     leerMisTareas(),
     leerProyectos(),
@@ -152,14 +152,22 @@ export default async function Hoy({ searchParams }: Props) {
   // Se personaliza desde «Todos». La key reinicia el editor al abrir un frente: ahí cambian los mosaicos.
   return (
     <>
-      {/* El lockup oficial (wordmark sin redibujar) encabeza Today, entre la barra y los mosaicos. */}
-      <div className="v-lockup-hoy">
-        <Image src="/marca/blanco/03-wordmark.svg" alt="Klo-Ser" width={220} height={55} unoptimized priority />
-        <span>
-          <i aria-hidden />
-          Business
-          <i aria-hidden />
-        </span>
+      {/* El lockup oficial (wordmark sin redibujar) encabeza Today; dentro de un space, a su lado va el wordmark del space. */}
+      <div className="v-encabezado-hoy">
+        <div className="v-lockup-hoy">
+          <Image src="/marca/blanco/03-wordmark.svg" alt="Klo-Ser" width={220} height={55} unoptimized priority />
+          <span>
+            <i aria-hidden />
+            Business
+            <i aria-hidden />
+          </span>
+        </div>
+        {frente?.logo_ancho && (
+          <>
+            <i className="v-separador" aria-hidden />
+            <Image key={frente.id} className="v-wordmark-espacio" src={frente.logo_ancho} alt={frente.nombre} width={240} height={60} unoptimized priority />
+          </>
+        )}
       </div>
       <EditorHoy key={frente?.id ?? 'todos'} items={items} editable={!frente} />
     </>

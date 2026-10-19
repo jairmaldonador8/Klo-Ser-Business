@@ -17,7 +17,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
 
   const [{ data: perfil }, { data: espacios }, { data: proyectos }] = await Promise.all([
     supabase.from('perfiles').select('nombre, zona_horaria, vista, actividades').eq('user_id', data.claims.sub).single(),
-    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo').order('orden'),
+    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo, logo_ancho').order('orden'),
     supabase.from('proyectos').select('id, espacio_id, nombre').eq('estado', 'activo').order('nombre'),
   ])
   if (!espacios?.length) redirect('/bienvenida')

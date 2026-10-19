@@ -10,7 +10,7 @@ export default async function Notas({ searchParams }: Props) {
   const { frente: atajo } = await searchParams
   const supabase = await crearClienteServidor()
   const [{ data: espacios }, { data: filas }, ctx] = await Promise.all([
-    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo').order('orden'),
+    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo, logo_ancho').order('orden'),
     supabase
       .from('notas')
       .select('id, espacio_id, texto, creado_en')

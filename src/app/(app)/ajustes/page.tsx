@@ -11,7 +11,7 @@ export default async function Ajustes() {
   const { data } = await supabase.auth.getClaims()
   const [{ data: perfil }, { data: espacios }] = await Promise.all([
     supabase.from('perfiles').select('vista, actividades').eq('user_id', data!.claims.sub).single(),
-    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo').order('orden'),
+    supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo, logo_ancho').order('orden'),
   ])
   const frentes: FrenteVista[] = (espacios ?? []).map((e) => ({ ...e, color: esColor(e.color) ? e.color : 'azul' }))
   const { secciones, mosaicos } = resolverVista(perfil?.vista)

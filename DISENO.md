@@ -312,3 +312,8 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 - `espacios.logo` (migración 0007): ruta de la app o URL https de una marca **blanca y cuadrada**; se pinta sobre el degradado del color del space en el riel, la barra de arriba y la apertura. Sin logo, la inicial.
 - Los de Jair: Klo-Ser = monograma K oficial (`/marca/blanco/05-monograma-k.svg`); Personal brand = «VITA» recortado del wordmark de VITA Studio (`/espacios/vita-studio.png`, repo Vitastudios); Top Digital = isotipo de TOP-DIGITAL-SYSTEM sin su fondo degradado (`/espacios/top-digital.svg`).
 - Siguiente paso natural para multi-tenant: subir el logo desde Ajustes a Storage.
+
+## 25. Wordmark del space junto al lockup (2026-10-19)
+
+- Dentro de un space, Today muestra a la derecha del lockup Klo-Ser Business (con una línea fina en medio) el wordmark completo del space (`espacios.logo_ancho`, migración 0008), 34 px de alto (24 en teléfono), entrando desde la izquierda.
+- Los de Jair: Klo-Ser = wordmark oficial Klo-Ser Real Estate en azul (`marca/logos/azul/wordmark-real-estate.png`); Personal brand = VITASTUDIO completo en blanco; Top Digital = wordmark «Top Digital» de TOP-DIGITAL-SYSTEM. Falta el archivo «Somos Top Digital» (no existe en los repos).

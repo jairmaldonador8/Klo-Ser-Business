@@ -49,6 +49,7 @@ export type Database = {
           id: string
           inicial: string
           logo: string | null
+          logo_ancho: string | null
           nombre: string
           orden: number
         }
@@ -61,6 +62,7 @@ export type Database = {
           id?: string
           inicial: string
           logo?: string | null
+          logo_ancho?: string | null
           nombre: string
           orden?: number
         }
@@ -73,6 +75,7 @@ export type Database = {
           id?: string
           inicial?: string
           logo?: string | null
+          logo_ancho?: string | null
           nombre?: string
           orden?: number
         }

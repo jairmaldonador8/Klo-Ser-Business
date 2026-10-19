@@ -659,10 +659,10 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
 .v-lockup-hoy span i{width:22px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,138,92,.6))}
 .v-lockup-hoy span i:last-child{background:linear-gradient(90deg,rgba(255,138,92,.6),transparent)}
 /* El bloque va a la izquierda (con «BUSINESS» centrado bajo el wordmark) y Personalizar a la derecha, en la misma línea. */
-.v-lockup-hoy + .v-hoy .v-herramientas{margin-top:-46px}
+.v-encabezado-hoy + .v-hoy .v-herramientas{margin-top:-46px}
 /* Editando, todo va a la derecha para no encimarse con el logo; en el teléfono, en su propia línea. */
-.v-lockup-hoy + .v-hoy .v-herramientas .v-sub{margin-right:0}
-@media (max-width:700px){.v-lockup-hoy + .v-hoy[data-editando] .v-herramientas{margin-top:0}}
+.v-encabezado-hoy + .v-hoy .v-herramientas .v-sub{margin-right:0}
+@media (max-width:700px){.v-encabezado-hoy + .v-hoy[data-editando] .v-herramientas{margin-top:0}}
 @media (max-width:700px){
   .v-lockup-hoy{margin:4px 0 0}
   .v-lockup-hoy img{height:24px}
@@ -818,4 +818,20 @@ a.v-t[class*=v-color-]:hover{box-shadow:0 60px 100px -40px rgba(40,4,0,.85),0 24
 .v-riel-espacios a b.con-logo{padding:5px}
 .v-marca-carga > b.con-logo{padding:12px}
 .v-foto.con-logo{padding:9px;background:linear-gradient(in oklch 150deg,var(--ac),var(--ac-hondo) 70%,var(--ac-negro));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px -14px var(--ac)}
+}
+
+/* ── Wordmark del space junto al lockup (DISENO §25) ────────────────── */
+@layer components {
+.v-encabezado-hoy{display:flex;align-items:center;gap:18px;align-self:flex-start;max-width:calc(100% - 150px)}
+.v-encabezado-hoy .v-lockup-hoy{flex:none}
+.v-separador{flex:none;width:1px;height:34px;margin-top:10px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.22),transparent)}
+.v-wordmark-espacio{display:block;width:auto;height:34px;max-width:220px;object-fit:contain;object-position:left center;margin-top:10px;animation:v-entra-wordmark .6s var(--ease) both}
+@keyframes v-entra-wordmark{from{opacity:0;transform:translateX(-8px)}}
+@media (max-width:700px){
+  .v-encabezado-hoy{max-width:100%;gap:12px}
+  .v-separador{height:26px;margin-top:4px}
+  .v-wordmark-espacio{height:24px;max-width:150px;margin-top:4px}
+  .v-encabezado-hoy + .v-hoy .v-herramientas{margin-top:0}
+}
+@media (prefers-reduced-motion:reduce){.v-wordmark-espacio{animation:none}}
 }
