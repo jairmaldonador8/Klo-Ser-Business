@@ -283,3 +283,8 @@
 .cal-ev.tramo-medio{border-radius:2px}
 .cal-ev:is(.tramo-fin,.tramo-medio) > b{opacity:.8}
 }
+
+/* Calendarizar en varios días (⇧/⌘): los días elegidos en la hoja. */
+@layer components {
+.v-hoja .v-dia-chip{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:500;color:var(--tinta);background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+}

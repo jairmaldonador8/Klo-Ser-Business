@@ -2,7 +2,7 @@
 
 import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { guardarActividades } from '@/app/(app)/ajustes/acciones'
-import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
+import { borrarTarea, completarTarea, crearEnVariosDias, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
 import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
@@ -55,6 +55,8 @@ export function HojaTarea({
   cerrar: () => void
 }) {
   const { tarea, notaId } = apertura
+  // Calendarizar en varios días (⇧/⌘ al arrastrar): la misma task, una independiente por día.
+  const dias = !tarea && apertura.dias && apertura.dias.length > 1 ? apertura.dias : null
   const dialogo = useRef<HTMLDialogElement>(null)
   const [form, setForm] = useState(() => inicial(apertura, frentes, hoy))
   const [aviso, setAviso] = useState('')
@@ -99,7 +101,8 @@ export function HojaTarea({
     })
   }
 
-  const guardar = () => correr(() => guardarTarea({ ...form, id: tarea?.id ?? '' }, notaId))
+  const guardar = () =>
+    correr(() => (dias ? crearEnVariosDias(form, dias) : guardarTarea({ ...form, id: tarea?.id ?? '' }, notaId)))
 
   return (
     <dialog
@@ -191,27 +194,43 @@ export function HojaTarea({
           </>
         )}
 
-        <label className="etq" htmlFor="hoja-fecha">
-          {form.fecha_fin ? 'Starts' : 'Date'}
-        </label>
-        <div className="grupo">
-          <input id="hoja-fecha" type="date" className="v-campo" value={form.fecha} onChange={(e) => poner('fecha', e.target.value)} />
-          <button type="button" className="v-boton chico" aria-pressed={form.fecha === hoy} onClick={() => poner('fecha', hoy)}>
-            Today
-          </button>
-          <button type="button" className="v-boton chico" aria-pressed={form.fecha === manana} onClick={() => poner('fecha', manana)}>
-            Tomorrow
-          </button>
-          <button
-            type="button"
-            className="v-boton chico"
-            aria-pressed={form.fecha === ''}
-            // Sin fecha no puede haber hora ni fin en otro día.
-            onClick={() => setForm((x) => ({ ...x, fecha: '', hora: '', hora_fin: '', fecha_fin: '' }))}
-          >
-            No date
-          </button>
-        </div>
+        {dias && (
+          <>
+            <span className="etq">{dias.length} days · one task each day</span>
+            <div className="grupo" aria-label="Days">
+              {dias.map((d) => (
+                <span key={d} className="v-chip v-dia-chip">
+                  {new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(`${d}T12:00:00Z`))}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+        {!dias && (
+          <>
+            <label className="etq" htmlFor="hoja-fecha">
+              {form.fecha_fin ? 'Starts' : 'Date'}
+            </label>
+            <div className="grupo">
+              <input id="hoja-fecha" type="date" className="v-campo" value={form.fecha} onChange={(e) => poner('fecha', e.target.value)} />
+              <button type="button" className="v-boton chico" aria-pressed={form.fecha === hoy} onClick={() => poner('fecha', hoy)}>
+                Today
+              </button>
+              <button type="button" className="v-boton chico" aria-pressed={form.fecha === manana} onClick={() => poner('fecha', manana)}>
+                Tomorrow
+              </button>
+              <button
+                type="button"
+                className="v-boton chico"
+                aria-pressed={form.fecha === ''}
+                // Sin fecha no puede haber hora ni fin en otro día.
+                onClick={() => setForm((x) => ({ ...x, fecha: '', hora: '', hora_fin: '', fecha_fin: '' }))}
+              >
+                No date
+              </button>
+            </div>
+          </>
+        )}
 
         <span className="etq">Time</span>
         <div className="grupo">
@@ -220,7 +239,7 @@ export function HojaTarea({
         </div>
 
         {/* Termina otro día (lunes 5 pm → martes 4 pm): un solo evento. */}
-        {form.fecha_fin ? (
+        {dias ? null : form.fecha_fin ? (
           <>
             <label className="etq" htmlFor="hoja-fecha-fin">
               Ends
@@ -271,7 +290,7 @@ export function HojaTarea({
 
         <div className="pie">
           <button type="submit" className="v-boton primario" disabled={ocupada}>
-            {ocupada ? 'Saving…' : 'Save'}
+            {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : 'Save'}
           </button>
           {tarea && (
             <>

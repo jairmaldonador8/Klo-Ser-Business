@@ -143,7 +143,8 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
 
   // La zona que seleccionaste se queda pintada (borrador) mientras llenas la hoja; al cerrarla se va.
   // Va en minutos absolutos: puede empezar el lunes 5 pm y acabar el martes 4 pm.
-  const [borrador, setBorrador] = useState<{ a: number; b: number } | null>(null)
+  // Con ⇧/⌘ el borrador es «la misma hora en varios días» (una task independiente por día).
+  const [borrador, setBorrador] = useState<{ a: number; b: number } | { dias: string[]; ini: number; fin: number } | null>(null)
 
   /** Nueva task para el rango [a, b) en minutos absolutos (un solo evento, aunque cruce días). */
   const nuevaRango = useCallback(
@@ -152,6 +153,19 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       const c = campos(a, b)
       abrir({
         valores: { ...c, ...(frente && { espacio_id: frente.id }) },
+        alCerrar: () => setBorrador(null),
+      })
+    },
+    [abrir, frente],
+  )
+
+  /** Calendarizar con ⇧/⌘: la misma task, independiente, en cada uno de `varios` días de `ini` a `fin`. */
+  const nuevaRepetida = useCallback(
+    (varios: string[], ini: number, fin: number) => {
+      setBorrador({ dias: varios, ini, fin })
+      abrir({
+        dias: varios,
+        valores: { fecha: varios[0], hora: deMinutos(ini), hora_fin: deMinutos(fin), fecha_fin: null, ...(frente && { espacio_id: frente.id }) },
         alCerrar: () => setBorrador(null),
       })
     },
@@ -193,6 +207,18 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
     return cursor >= ancla ? [ancla, Math.max(cursor, ancla + 15)] : [cursor, ancla + 15]
   }, [])
 
+  /** Con ⇧/⌘: los días entre la columna donde empezaste y la del puntero, con la misma franja de hora en cada uno. */
+  const rangoRepetido = useCallback(
+    (o: { dia: string; desde: number }, d: Destino): { dias: string[]; ini: number; fin: number } | null => {
+      if (d.min === null) return null
+      const i = dias.indexOf(o.dia)
+      const j = dias.indexOf(d.dia)
+      const varios = i < 0 || j < 0 ? [o.dia] : dias.slice(Math.min(i, j), Math.max(i, j) + 1)
+      return { dias: varios, ini: Math.min(o.desde, d.min), fin: Math.min(1440, Math.max(o.desde + 15, d.min)) }
+    },
+    [dias],
+  )
+
   /** Rango al estirar: la orilla contraria a la que tomaste queda fija; si la cruzas, se voltea. Mínimo 15 min. Puede cruzar días. */
   const rangoEstirado = useCallback((t: Tarea, borde: 'inicio' | 'fin', d: Destino): [number, number] => {
     const { ini, fin } = extremos(t)
@@ -216,7 +242,14 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
 
   /** Lo que pasa al soltar. Devuelve false si no cambió nada (entonces cuenta como un toque). */
   const aplicar = useCallback(
-    (o: Origen, d: Destino): boolean => {
+    (o: Origen, d: Destino, repetir = false): boolean => {
+      if (o.tipo === 'crear' && repetir) {
+        const r = rangoRepetido(o, d)
+        if (!r) return false
+        if (r.dias.length > 1) nuevaRepetida(r.dias, r.ini, r.fin)
+        else nuevaRango(absoluto(r.dias[0], r.ini), absoluto(r.dias[0], r.fin))
+        return true
+      }
       if (o.tipo === 'crear') {
         const r = rangoSeleccion(o, d)
         if (!r) return false
@@ -256,10 +289,11 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       cambiar(t, nuevos, o.tipo === 'estirar' ? 'Resized' : antes.fecha ? 'Moved' : 'Scheduled')
       return true
     },
-    [cambiar, nuevaRango, ponerMeta, avisar, rangoEstirado, rangoMovido, rangoSeleccion],
+    [cambiar, nuevaRango, nuevaRepetida, ponerMeta, avisar, rangoEstirado, rangoMovido, rangoSeleccion, rangoRepetido],
   )
 
-  const [arrastre, setArrastre] = useState<{ origen: Origen; destino: Destino | null } | null>(null)
+  // `repetir`: ⇧ Shift o ⌘ Cmd presionado al crear → una task independiente por día.
+  const [arrastre, setArrastre] = useState<{ origen: Origen; destino: Destino | null; repetir: boolean } | null>(null)
   // La copia flotante sigue al puntero sin pasar por React (se mueve con transform en cada cuadro).
   const flotante = useRef<HTMLDivElement | null>(null)
   const [tamFlotante, setTamFlotante] = useState<{ w: number; h: number; chip: boolean } | null>(null)
@@ -318,15 +352,16 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       let espera: ReturnType<typeof setTimeout> | undefined
       let cuadro = 0
       let clave = ''
+      let repetir = e.shiftKey || e.metaKey
       let orilla: { lado: -1 | 1; desde: number; ultimo: number } | null = null
 
       const actualizar = () => {
         const d = destinoEn(puntero.x, puntero.y, origen)
-        const nueva = d ? `${d.dia}|${d.zona}|${d.min}` : '-'
+        const nueva = d ? `${d.dia}|${d.zona}|${d.min}|${repetir}` : '-'
         // Solo se re-pinta React cuando cambia el bloque de 15 min o el día, no en cada pixel.
         if (nueva !== clave) {
           clave = nueva
-          setArrastre({ origen, destino: d })
+          setArrastre({ origen, destino: d, repetir })
         }
       }
 
@@ -375,6 +410,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       const mover = (ev: PointerEvent) => {
         puntero.x = ev.clientX
         puntero.y = ev.clientY
+        repetir = ev.shiftKey || ev.metaKey
         if (!activo) {
           const d = Math.hypot(ev.clientX - inicio.x, ev.clientY - inicio.y)
           if (tactil) {
@@ -392,10 +428,15 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
         const d = eraActivo ? destinoEn(ev.clientX, ev.clientY, origen) : null
         limpiar()
         if (!eraActivo) return alTocar?.()
-        if (!d || !aplicar(origen, d)) alTocar?.()
+        if (!d || !aplicar(origen, d, repetir)) alTocar?.()
       }
+      // Presionar o soltar ⇧/⌘ a medio arrastre cambia el modo al instante, sin mover el puntero.
       const tecla = (ev: KeyboardEvent) => {
-        if (ev.key === 'Escape') limpiar()
+        if (ev.key === 'Escape') return limpiar()
+        if (ev.key === 'Shift' || ev.key === 'Meta') {
+          repetir = ev.type === 'keydown'
+          if (activo) actualizar()
+        }
       }
       const bloquearScroll = (ev: TouchEvent) => {
         if (activo) ev.preventDefault()
@@ -411,12 +452,14 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
         window.removeEventListener('pointerup', soltar)
         window.removeEventListener('pointercancel', limpiar)
         window.removeEventListener('keydown', tecla)
+        window.removeEventListener('keyup', tecla)
         document.removeEventListener('touchmove', bloquearScroll)
       }
       window.addEventListener('pointermove', mover)
       window.addEventListener('pointerup', soltar)
       window.addEventListener('pointercancel', limpiar)
       window.addEventListener('keydown', tecla)
+      window.addEventListener('keyup', tecla)
       document.addEventListener('touchmove', bloquearScroll, { passive: false })
     },
     [destinoEn, aplicar],
@@ -428,9 +471,27 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       const i = deAbsoluto(a)
       return { ...resto, dia: i.fecha, zona: 'hora', ini: i.min, fin: i.min + (b - a), tramos: tramos(a, b), etiqueta: etiquetaRango(a, b, horaCorta) }
     }
+    /** Vista previa de «la misma hora en varios días»: un bloque igual en cada día. */
+    const deRepetido = (r: { dias: string[]; ini: number; fin: number }, resto: Omit<Previa, 'dia' | 'zona' | 'ini' | 'fin' | 'tramos' | 'etiqueta' | 'titulo'>): Previa => ({
+      ...resto,
+      titulo: r.dias.length > 1 ? `New task · ${r.dias.length} days` : 'New task',
+      dia: r.dias[0],
+      zona: 'hora',
+      ini: r.ini,
+      fin: r.fin,
+      tramos: r.dias.map((dia) => ({ dia, ini: r.ini, fin: r.fin })),
+      etiqueta: `${horaCorta(deMinutos(r.ini))} – ${horaCorta(deMinutos(r.fin))}`,
+    })
     const color = frente?.color ?? 'azul'
-    if (!arrastre?.destino) return borrador ? deRango(borrador.a, borrador.b, { titulo: 'New task', color, id: null, borrador: true }) : null
+    if (!arrastre?.destino) {
+      if (!borrador) return null
+      return 'dias' in borrador ? deRepetido(borrador, { color, id: null, borrador: true }) : deRango(borrador.a, borrador.b, { titulo: 'New task', color, id: null, borrador: true })
+    }
     const { origen: o, destino: d } = arrastre
+    if (o.tipo === 'crear' && arrastre.repetir) {
+      const r = rangoRepetido(o, d)
+      return r ? deRepetido(r, { color, id: null }) : null
+    }
     if (o.tipo === 'crear') {
       const r = rangoSeleccion(o, d)
       return r ? deRango(r[0], r[1], { titulo: 'New task', color, id: null }) : null
@@ -447,7 +508,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
       return deRango(a, t.hora && !t.hora_fin ? a + 30 : b, { ...base, contorno: true })
     }
     return { ...base, dia: d.dia, zona: d.zona, ini: null, fin: null, contorno: true }
-  }, [arrastre, borrador, colorDe, frente, rangoEstirado, rangoMovido, rangoSeleccion])
+  }, [arrastre, borrador, colorDe, frente, rangoEstirado, rangoMovido, rangoSeleccion, rangoRepetido])
 
   const arrastrando = arrastre?.destino ? (arrastre.origen.tipo === 'meta' ? arrastre.origen.meta.id : arrastre.origen.tipo === 'crear' ? null : arrastre.origen.tarea.id) : null
 
@@ -585,6 +646,8 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
           {!frente && frentes.length > 1 && <Calendarios frentes={frentes} ocultos={ocultos} alternar={alternar} />}
           <p className="cal-atajos">
             <kbd>T</kbd> today · <kbd>D</kbd> <kbd>X</kbd> <kbd>W</kbd> <kbd>M</kbd> view · <kbd>←</kbd> <kbd>→</kbd> · <kbd>N</kbd> new
+            <br />
+            <kbd>⇧</kbd> / <kbd>⌘</kbd> + drag across days: one task per day
           </p>
         </aside>
       </div>

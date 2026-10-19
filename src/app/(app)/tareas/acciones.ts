@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { esquemaTarea } from '@/lib/tareas/esquema'
 
@@ -60,6 +61,25 @@ export async function borrarTarea(id: string, borrar = true): Promise<Resultado>
   if (borrar) {
     const { error: errorNota } = await supabase.from('notas').update({ convertida_en_tarea_id: null }).eq('convertida_en_tarea_id', id)
     if (errorNota) console.error('borrarTarea: soltar nota', errorNota)
+  }
+  return listo()
+}
+
+/** Calendarizar con ⇧/⌘: la misma task en varios días, a la misma hora; una fila independiente por día, todo o nada. */
+export async function crearEnVariosDias(datos: unknown, fechas: unknown): Promise<Resultado> {
+  const dias = z.array(z.iso.date()).min(1).max(31).safeParse(fechas)
+  if (!dias.success) return { ok: false, mensaje: 'Check the days.' }
+  const unicos = [...new Set(dias.data)].sort()
+  // Cada copia vive en su día: sin fecha de fin.
+  const leida = esquemaTarea.safeParse({ ...(datos as object), id: '', fecha: unicos[0], fecha_fin: null })
+  if (!leida.success) return { ok: false, mensaje: leida.error.issues[0]?.message ?? 'Check the details.' }
+  const { id, ...campos } = leida.data
+  void id
+  const supabase = await crearClienteServidor()
+  const { error } = await supabase.from('tareas').insert(unicos.map((fecha) => ({ ...campos, fecha })))
+  if (error) {
+    console.error('crearEnVariosDias', error)
+    return { ok: false, mensaje: 'Couldn’t create the tasks, try again.' }
   }
   return listo()
 }

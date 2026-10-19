@@ -84,3 +84,31 @@ test('seleccionar de un día a otro crea un solo evento que cruza la medianoche'
   await editar.getByRole('button', { name: 'Delete' }).click()
   await expect(tramos).toHaveCount(0)
 })
+
+test('con Shift, arrastrar entre días calendariza una task independiente por día', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'arrastrar con mouse y teclado: basta con escritorio')
+  await page.goto('/calendario?vista=semana', { waitUntil: 'networkidle' })
+  const columnas = page.locator('[data-zona="hora"]')
+  const [d1, d3] = await Promise.all([columnas.nth(1).getAttribute('data-dia'), columnas.nth(3).getAttribute('data-dia')])
+  const enHora = async (dia: string, min: number) => {
+    const r = (await page.locator(`[data-zona="hora"][data-dia="${dia}"]`).boundingBox())!
+    return { x: r.x + r.width / 2, y: r.y + (min / 1440) * r.height + 2 }
+  }
+  await columnas.first().evaluate((el) => el.closest('.cal-scroll')!.scrollTo(0, ((8 * 60) / 1440) * el.scrollHeight))
+  const a = await enHora(d1!, 9 * 60)
+  const z = await enHora(d3!, 10 * 60)
+  await page.keyboard.down('Shift')
+  await page.mouse.move(a.x, a.y)
+  await page.mouse.down()
+  await page.mouse.move(z.x, z.y, { steps: 12 })
+  await expect(page.locator('.cal-ev.previa')).toHaveCount(3) // un bloque por día, a la misma hora
+  await page.mouse.up()
+  await page.keyboard.up('Shift')
+
+  const hoja = page.getByRole('dialog', { name: 'New task' })
+  await expect(hoja.getByRole('button', { name: 'Save 3 tasks' })).toBeVisible()
+  await expect(hoja.getByLabel('Start time')).toHaveValue('09:00')
+  await expect(hoja.getByLabel('End time')).toHaveValue('10:00')
+  await hoja.getByRole('button', { name: 'Cancel' }).click()
+  await expect(page.locator('.cal-ev.previa')).toHaveCount(0)
+})

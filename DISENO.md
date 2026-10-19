@@ -334,3 +334,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 ## 28. Radios premium (2026-10-19)
 
 - Menos redondo, más sobrio, con una sola escala (`--r-*`, al final de `vidrio.css`, fuera de capa para ganarle a lo viejo): tarjetas 14 px (12 en teléfono), cajas internas 10, botones y campos 8, chips 6, eventos 5. Lo circular se queda circular (palomitas, avatares, el círculo de hoy, interruptores).
+
+## 29. Calendarizar con ⇧/⌘ (2026-10-19)
+
+- Dos modos al seleccionar entre días: **normal** = un solo evento continuo (§27); con **⇧ Shift** (o **⌘ Cmd**) = una task **independiente por día** a la misma franja de hora (`crearEnVariosDias`, sin fecha de fin). La tecla se lee en vivo: presionarla o soltarla a medio arrastre cambia la vista previa al instante. La hoja muestra los días y «Save N tasks». Pista en el panel: «⇧ / ⌘ + drag across days: one task per day».

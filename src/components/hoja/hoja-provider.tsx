@@ -8,7 +8,8 @@ import { HojaTarea } from './hoja-tarea'
 
 export type ProyectoOpcion = { id: string; espacio_id: string; nombre: string }
 /** Lo que abre la hoja: una tarea existente, o valores para una nueva (frente abierto, texto de una nota…). */
-export type Apertura = { tarea?: Tarea; valores?: Partial<Tarea>; notaId?: string; alCerrar?: () => void }
+/** `dias`: calendarizar la misma task en varios días (arrastrar con ⇧/⌘ en el calendario), una por día. */
+export type Apertura = { tarea?: Tarea; valores?: Partial<Tarea>; notaId?: string; dias?: string[]; alCerrar?: () => void }
 
 const Contexto = createContext<(a?: Apertura) => void>(() => {})
 export const useHoja = () => useContext(Contexto)
