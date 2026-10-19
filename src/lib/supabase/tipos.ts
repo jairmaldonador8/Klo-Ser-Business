@@ -314,6 +314,53 @@ export type Database = {
           },
         ]
       }
+      series: {
+        Row: {
+          borrado_en: string | null
+          conteo: number | null
+          creado_en: string
+          creado_por: string
+          espacio_id: string
+          generado_hasta: string
+          hasta: string | null
+          id: string
+          inicio: string
+          regla: Json
+        }
+        Insert: {
+          borrado_en?: string | null
+          conteo?: number | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id: string
+          generado_hasta: string
+          hasta?: string | null
+          id?: string
+          inicio: string
+          regla: Json
+        }
+        Update: {
+          borrado_en?: string | null
+          conteo?: number | null
+          creado_en?: string
+          creado_por?: string
+          espacio_id?: string
+          generado_hasta?: string
+          hasta?: string | null
+          id?: string
+          inicio?: string
+          regla?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "series_espacio_id_fkey"
+            columns: ["espacio_id"]
+            isOneToOne: false
+            referencedRelation: "espacios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tareas: {
         Row: {
           actualizado_en: string
@@ -331,6 +378,7 @@ export type Database = {
           origen: string
           proyecto_id: string | null
           responsable_id: string
+          serie_id: string | null
           titulo: string
         }
         Insert: {
@@ -349,6 +397,7 @@ export type Database = {
           origen?: string
           proyecto_id?: string | null
           responsable_id?: string
+          serie_id?: string | null
           titulo: string
         }
         Update: {
@@ -367,6 +416,7 @@ export type Database = {
           origen?: string
           proyecto_id?: string | null
           responsable_id?: string
+          serie_id?: string | null
           titulo?: string
         }
         Relationships: [
@@ -382,6 +432,13 @@ export type Database = {
             columns: ["proyecto_id"]
             isOneToOne: false
             referencedRelation: "proyectos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tareas_serie_id_fkey"
+            columns: ["serie_id"]
+            isOneToOne: false
+            referencedRelation: "series"
             referencedColumns: ["id"]
           },
         ]

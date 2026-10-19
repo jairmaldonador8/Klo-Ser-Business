@@ -338,3 +338,9 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 ## 29. Calendarizar con ⇧/⌘ (2026-10-19)
 
 - Dos modos al seleccionar entre días: **normal** = un solo evento continuo (§27); con **⇧ Shift** (o **⌘ Cmd**) = una task **independiente por día** a la misma franja de hora (`crearEnVariosDias`, sin fecha de fin). La tecla se lee en vivo: presionarla o soltarla a medio arrastre cambia la vista previa al instante. La hoja muestra los días y «Save N tasks». Pista en el panel: «⇧ / ⌘ + drag across days: one task per day».
+
+## 30. Repeat (2026-10-19, como Notion Calendar)
+
+- La hoja tiene **Repeat**: menú armado para el día elegido (Every day · Every weekday/weekend day · Every week on Sat · Every 2 weeks on Sat · Every month on the 24th · Every month on the 4th Sat · Every year on Oct 24) y **Custom…** (cada N días/semanas/meses/años, días de la semana, mes por número o posición, termina nunca / en fecha / tras N veces). Reglas y etiquetas en `lib/repetir.ts`.
+- Modelo (migración 0010): `series` (regla, inicio, hasta/conteo, `generado_hasta`) + `tareas.serie_id`. Cada repetición es una **task real** (se palomea, se mueve y se borra sola); la app genera 180 días adelante y `extenderSeries()` (al abrir Today y Calendar) extiende cuando quedan menos de 90. La plantilla de las nuevas es la última task de la serie.
+- Editar o borrar una que se repite pregunta **Only this / This and following**; cambiar la regla aplica a esta y las siguientes. En el calendario llevan ↻. Week muestra solo la próxima repetición de cada serie en «Later»; el avance de proyectos no cuenta repeticiones futuras.

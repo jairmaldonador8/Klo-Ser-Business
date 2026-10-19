@@ -4,12 +4,15 @@ import { esFecha, esVista, rangoCarga } from '@/lib/calendario/fechas'
 import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { avance } from '@/lib/proyectos/avance'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
+import { extenderSeries } from '@/app/(app)/tareas/repetir'
 
 type Props = { searchParams: Promise<{ frente?: string | string[]; fecha?: string | string[]; vista?: string | string[] }> }
 
 /** El calendario: tus tareas con fecha, las metas de tus proyectos y lo que falta por calendarizar. */
 export default async function PaginaCalendario({ searchParams }: Props) {
   const { frente: atajo, fecha: f, vista: v } = await searchParams
+  // Las tasks que se repiten se generan por adelantado; si a alguna serie le falta, se extiende antes de leer.
+  await extenderSeries()
   const supabase = await crearClienteServidor()
   const [{ data: espacios }, ctx] = await Promise.all([
     supabase.from('espacios').select('id, nombre, inicial, atajo, color, logo, logo_ancho').order('orden'),

@@ -36,6 +36,8 @@ export type Tarea = {
   hora_fin: string | null
   /** Si termina otro día (lunes 5 pm → martes 4 pm); null = el mismo día. */
   fecha_fin: string | null
+  /** Si se repite: su serie (cada repetición es una task propia). */
+  serie_id: string | null
   proyecto_id: string | null
   completada_en: string | null
 }

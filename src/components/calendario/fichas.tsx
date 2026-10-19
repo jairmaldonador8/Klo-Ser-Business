@@ -32,6 +32,13 @@ const rango = (t: Tarea) => {
   return [t.hora, t.hora_fin].filter(Boolean).map((h) => horaCorta(hhmm(h)!)).join(' – ')
 }
 
+/** ↻: se repite. */
+const Repite = () => (
+  <svg className="cal-rep" viewBox="0 0 16 16" aria-label="Repeats" role="img">
+    <path d="M2.5 7.5a5 5 0 0 1 8.6-3.4L13 6M13 2.5V6H9.5M13.5 8.5a5 5 0 0 1-8.6 3.4L3 10M3 13.5V10h3.5" />
+  </svg>
+)
+
 /** Absoluto del minuto bajo el puntero en la columna que lo contiene (para agarrar un tramo de un evento largo). */
 function absolutoEn(e: React.PointerEvent): number | null {
   const col = (e.currentTarget as HTMLElement).closest<HTMLElement>('[data-zona="hora"]')
@@ -82,6 +89,7 @@ export function EventoHora({
       <small>
         {rango(tarea)}
         {tarea.clase !== 'tarea' && !corto && <em> · {nombreClase(tarea.clase)}</em>}
+        {tarea.serie_id && <Repite />}
       </small>
       {!tarea.completada_en &&
         bordes.map((borde) => (
@@ -117,6 +125,7 @@ export function FichaDia({ tarea, color, empezar, fantasma, conHora }: { tarea: 
     >
       {conReloj && <time>{horaCorta(hhmm(tarea.hora)!)}</time>}
       <span>{tarea.titulo}</span>
+      {tarea.serie_id && <Repite />}
     </button>
   )
 }

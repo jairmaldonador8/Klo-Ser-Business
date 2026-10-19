@@ -37,7 +37,12 @@ export function agruparPendientes(tareas: readonly Tarea[], hoy: string): Grupo[
     })
   }
 
-  const despues = pendientes.filter((t) => t.fecha !== null && t.fecha > fin).sort(porFechaYHora)
+  // Más adelante: de cada serie solo la próxima repetición (las demás ya se generaron por adelantado).
+  const vistas = new Set<string>()
+  const despues = pendientes
+    .filter((t) => t.fecha !== null && t.fecha > fin)
+    .sort(porFechaYHora)
+    .filter((t) => !t.serie_id || (!vistas.has(t.serie_id) && vistas.add(t.serie_id)))
   if (despues.length) grupos.push({ clave: 'despues', titulo: 'Later', tareas: despues })
 
   const sinFecha = pendientes.filter((t) => t.fecha === null)

@@ -5,7 +5,7 @@ import { agruparPendientes, DIAS } from './agrupar'
 const hoy = '2026-10-18'
 let n = 0
 const t = (p: Partial<Tarea>): Tarea => ({
-  id: String(++n), espacio_id: 'a', titulo: `t${n}`, clase: 'tarea', fecha: hoy, hora: null, hora_fin: null, fecha_fin: null,
+  id: String(++n), espacio_id: 'a', titulo: `t${n}`, clase: 'tarea', fecha: hoy, hora: null, hora_fin: null, fecha_fin: null, serie_id: null,
   proyecto_id: null, completada_en: null, ...p,
 })
 
@@ -44,5 +44,13 @@ describe('agruparPendientes', () => {
     const g = agruparPendientes([t({ fecha: '2026-10-24' }), t({ fecha: '2026-10-25' })], hoy)
     expect(g.find((x) => x.clave === '2026-10-24')!.tareas).toHaveLength(1)
     expect(g.find((x) => x.clave === 'despues')!.tareas).toHaveLength(1)
+  })
+
+  it('más adelante: de una serie solo sale la próxima repetición', () => {
+    const r1 = t({ fecha: '2026-11-01', serie_id: 's' })
+    const r2 = t({ fecha: '2026-11-08', serie_id: 's' })
+    const suelta = t({ fecha: '2026-11-05' })
+    const g = agruparPendientes([r2, suelta, r1], hoy)
+    expect(g.find((x) => x.clave === 'despues')!.tareas).toEqual([r1, suelta])
   })
 })

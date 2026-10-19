@@ -112,3 +112,43 @@ test('con Shift, arrastrar entre días calendariza una task independiente por d�
   await hoja.getByRole('button', { name: 'Cancel' }).click()
   await expect(page.locator('.cal-ev.previa')).toHaveCount(0)
 })
+
+test('repeat: una task semanal aparece la semana siguiente y se borra con «This and following»', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'cambia datos de la cuenta: basta con escritorio')
+  test.slow()
+  const titulo = `Prueba repite ${Date.now()}`
+  await page.goto('/calendario?vista=semana', { waitUntil: 'networkidle' })
+  const columnas = page.locator('[data-zona="hora"]')
+  const dia = (await columnas.nth(2).getAttribute('data-dia'))!
+  const col = page.locator(`[data-zona="hora"][data-dia="${dia}"]`)
+  await col.evaluate((el) => el.closest('.cal-scroll')!.scrollTo(0, ((5 * 60) / 1440) * el.scrollHeight))
+  const r = (await col.boundingBox())!
+  await page.mouse.click(r.x + r.width / 2, r.y + ((6 * 60) / 1440) * r.height + 4)
+
+  const hoja = page.getByRole('dialog', { name: 'New task' })
+  await hoja.getByLabel('Title').fill(titulo)
+  await hoja.getByRole('button', { name: 'Repeat', exact: true }).click()
+  await hoja.getByRole('option', { name: /^Every week on/ }).click()
+  await expect(hoja.getByRole('button', { name: 'Repeat', exact: true })).toContainText('Every week on')
+  await hoja.getByRole('button', { name: 'Save repeating' }).click()
+  await expect(hoja).toBeHidden()
+
+  // Esta semana y la siguiente: una repetición en el mismo día, con su ↻.
+  const evento = page.getByRole('button', { name: new RegExp(titulo) })
+  await expect(evento).toHaveCount(1)
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+  await expect(evento).toHaveCount(1)
+  await expect(evento.getByRole('img', { name: 'Repeats' })).toBeVisible()
+  await page.getByRole('button', { name: 'Previous', exact: true }).click()
+
+  // Borrar desde la primera: «This and following» se lleva toda la serie.
+  await evento.click()
+  const editar = page.getByRole('dialog', { name: 'Edit task' })
+  await expect(editar.getByRole('button', { name: 'Repeat', exact: true })).toContainText('Every week on')
+  await editar.getByRole('button', { name: 'Delete' }).click()
+  await editar.getByRole('button', { name: 'This and following' }).click()
+  await expect(editar).toBeHidden()
+  await expect(evento).toHaveCount(0)
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+  await expect(evento).toHaveCount(0)
+})

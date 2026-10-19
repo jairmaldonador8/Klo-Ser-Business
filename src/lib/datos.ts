@@ -4,9 +4,13 @@ import type { Clase, Tarea } from '@/lib/tareas/esquema'
 
 // Solo servidor: usa el cliente de Supabase con las cookies de la sesión.
 
-const COLUMNAS = 'id, espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, proyecto_id, completada_en'
+const COLUMNAS = 'id, espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, serie_id, proyecto_id, completada_en'
 
-/** Mis tareas vivas: pendientes de cualquier fecha + las completadas desde ayer (para «hechas hoy»). */
+/** Días hacia adelante que leen Today y Week: más allá solo hay repeticiones generadas por adelantado. */
+const VENTANA_LISTAS = 120
+const enDias = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10)
+
+/** Mis tareas vivas: pendientes (sin fecha o hasta ~4 meses) + las completadas desde ayer (para «hechas hoy»). */
 export async function leerMisTareas(espacioId?: string): Promise<Tarea[]> {
   const supabase = await crearClienteServidor()
   const { data: sesion } = await supabase.auth.getClaims()
@@ -17,6 +21,7 @@ export async function leerMisTareas(espacioId?: string): Promise<Tarea[]> {
     .is('borrado_en', null)
     .eq('responsable_id', sesion!.claims.sub)
     .or(`completada_en.is.null,completada_en.gte.${desde}`)
+    .or(`fecha.is.null,fecha.lte.${enDias(VENTANA_LISTAS)}`)
     .order('fecha', { nullsFirst: false })
     .order('hora', { nullsFirst: true })
     .limit(500)
@@ -55,7 +60,7 @@ export async function leerProyectos({ espacioId, soloActivos = true }: { espacio
   const supabase = await crearClienteServidor()
   let q = supabase
     .from('proyectos')
-    .select('id, espacio_id, nombre, meta, fecha_inicio, fecha_meta, modo_avance, cifra_actual, cifra_meta, estado, tareas(completada_en, borrado_en)')
+    .select('id, espacio_id, nombre, meta, fecha_inicio, fecha_meta, modo_avance, cifra_actual, cifra_meta, estado, tareas(completada_en, borrado_en, serie_id, fecha)')
     .order('fecha_meta', { nullsFirst: false })
     .order('orden')
   if (soloActivos) q = q.eq('estado', 'activo')
@@ -63,7 +68,9 @@ export async function leerProyectos({ espacioId, soloActivos = true }: { espacio
   const { data, error } = await q
   if (error) console.error('leerProyectos', error)
   return (data ?? []).map(({ tareas, ...p }) => {
-    const vivas = (tareas ?? []).filter((t) => !t.borrado_en)
+    // Las repeticiones futuras de una serie no cuentan para el avance (si no, una diaria pesaría 180 tareas).
+    const manana = enDias(1)
+    const vivas = (tareas ?? []).filter((t) => !t.borrado_en && !(t.serie_id && t.fecha && t.fecha >= manana))
     return {
       ...p,
       modo_avance: p.modo_avance as ProyectoLista['modo_avance'],

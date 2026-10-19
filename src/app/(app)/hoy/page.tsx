@@ -8,6 +8,7 @@ import { etiquetaDia } from '@/lib/fechas'
 import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { calcularHoy, enRiesgo } from '@/lib/hoy/calcular'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
+import { extenderSeries } from '@/app/(app)/tareas/repetir'
 import { hhmm, nombreClase, type Tarea } from '@/lib/tareas/esquema'
 import type { IdMosaico } from '@/lib/vista/registro'
 import { resolverVista } from '@/lib/vista/resolver'
@@ -45,6 +46,8 @@ function fraseKlo(pendientes: number, siguiente: string | null): string {
 
 export default async function Hoy({ searchParams }: Props) {
   const { frente: atajo } = await searchParams
+  // Las tasks que se repiten se generan por adelantado; si a alguna serie le falta, se extiende antes de leer.
+  await extenderSeries()
   const supabase = await crearClienteServidor()
   const { data } = await supabase.auth.getClaims()
   const [{ data: perfil }, { data: espacios }, tareas, proyectos, ctx] = await Promise.all([

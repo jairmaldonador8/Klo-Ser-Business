@@ -3,11 +3,14 @@
 import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { guardarActividades } from '@/app/(app)/ajustes/acciones'
 import { borrarTarea, completarTarea, crearEnVariosDias, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
+import { borrarDesdeAqui, cambiarDesdeAqui, crearRepetida, leerSerie, soloEsta } from '@/app/(app)/tareas/repetir'
+import { mismaRegla } from '@/lib/repetir'
 import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
 import { CLASES, hhmm, MAX_ACTIVIDAD, nombreClase, type Clase } from '@/lib/tareas/esquema'
 import type { Apertura, ProyectoOpcion } from './hoja-provider'
+import { SelectorRepetir, type Repetir } from './selector-repetir'
 
 type Formulario = {
   titulo: string
@@ -60,6 +63,12 @@ export function HojaTarea({
   const dialogo = useRef<HTMLDialogElement>(null)
   const [form, setForm] = useState(() => inicial(apertura, frentes, hoy))
   const [aviso, setAviso] = useState('')
+  // Repetición: la elegida y, si ya era de una serie, la que tenía (para saber si cambió).
+  const [repetir, setRepetir] = useState<Repetir>(null)
+  const [repetirAntes, setRepetirAntes] = useState<Repetir>(null)
+  const [cargandoSerie, setCargandoSerie] = useState(!!tarea?.serie_id)
+  // Una task que se repite pregunta a cuáles aplicar: solo esta o esta y las siguientes.
+  const [alcance, setAlcance] = useState<'guardar' | 'borrar' | null>(null)
   const [ocupada, empezar] = useTransition()
   const avisar = useToast()
   const manana = sumarDias(hoy, 1)
@@ -91,6 +100,24 @@ export function HojaTarea({
 
   const poner = <K extends keyof Formulario>(campo: K, valor: Formulario[K]) => setForm((f) => ({ ...f, [campo]: valor }))
 
+  useEffect(() => {
+    if (!tarea?.serie_id) return
+    leerSerie(tarea.serie_id).then((s) => {
+      const v = s ? { regla: s.regla, fin: s.fin } : null
+      setRepetir(v)
+      setRepetirAntes(v)
+      setCargandoSerie(false)
+    })
+  }, [tarea?.serie_id])
+
+  const repeticionCambio = !(repetir === null && repetirAntes === null) && !(
+    repetir &&
+    repetirAntes &&
+    mismaRegla(repetir.regla, repetirAntes.regla) &&
+    repetir.fin.hasta === repetirAntes.fin.hasta &&
+    repetir.fin.conteo === repetirAntes.fin.conteo
+  )
+
   function correr(accion: () => Promise<Resultado>, despues?: () => void) {
     setAviso('')
     empezar(async () => {
@@ -101,8 +128,28 @@ export function HojaTarea({
     })
   }
 
-  const guardar = () =>
-    correr(() => (dias ? crearEnVariosDias(form, dias) : guardarTarea({ ...form, id: tarea?.id ?? '' }, notaId)))
+  function guardar() {
+    if (dias) return correr(() => crearEnVariosDias(form, dias))
+    if (!tarea) return correr(() => (repetir ? crearRepetida(form, repetir.regla, repetir.fin) : guardarTarea({ ...form, id: '' }, notaId)))
+    // Cambiar la repetición siempre aplica a esta y las siguientes (como Notion).
+    if (repeticionCambio) return correr(() => cambiarDesdeAqui(tarea.id, form, repetir?.regla ?? null, repetir?.fin ?? null))
+    if (tarea.serie_id) return setAlcance('guardar')
+    correr(() => guardarTarea({ ...form, id: tarea.id }, notaId))
+  }
+
+  /** Borrar esta (con Deshacer). */
+  const borrarSoloEsta = (t: NonNullable<typeof tarea>) =>
+    correr(
+      () => borrarTarea(t.id),
+      // La hoja ya se cerró: el Deshacer corre fuera de ella y avisa si falla.
+      () =>
+        avisar('Deleted', () =>
+          startTransition(async () => {
+            const d = await borrarTarea(t.id, false)
+            if (!d.ok) avisar(d.mensaje)
+          }),
+        ),
+    )
 
   return (
     <dialog
@@ -284,45 +331,67 @@ export function HojaTarea({
           </>
         )}
 
+        {!dias && (
+          <>
+            <span className="etq">Repeat</span>
+            {cargandoSerie ? <p className="v-sub">Loading…</p> : <SelectorRepetir fecha={form.fecha} valor={repetir} cambiar={setRepetir} />}
+          </>
+        )}
+
         <p className="v-aviso" role="status">
           {aviso}
         </p>
 
-        <div className="pie">
-          <button type="submit" className="v-boton primario" disabled={ocupada}>
-            {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : 'Save'}
-          </button>
-          {tarea && (
-            <>
-              <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => completarTarea(tarea.id, !tarea.completada_en))}>
-                {tarea.completada_en ? 'Reopen' : 'Complete'}
-              </button>
-              <button
-                type="button"
-                className="v-boton"
-                disabled={ocupada}
-                onClick={() =>
-                  correr(
-                    () => borrarTarea(tarea.id),
-                    // La hoja ya se cerró: el Deshacer corre fuera de ella y avisa si falla.
-                    () =>
-                      avisar('Deleted', () =>
-                        startTransition(async () => {
-                          const d = await borrarTarea(tarea.id, false)
-                          if (!d.ok) avisar(d.mensaje)
-                        }),
-                      ),
-                  )
-                }
-              >
-                Delete
-              </button>
-            </>
-          )}
-          <button type="button" className="v-boton" onClick={() => dialogo.current?.close()}>
-            Cancel
-          </button>
-        </div>
+        {tarea && alcance ? (
+          <div className="pie v-alcance" role="group" aria-label="Apply to">
+            <span className="v-sub">This task repeats. {alcance === 'borrar' ? 'Delete' : 'Apply changes to'}:</span>
+            <button
+              type="button"
+              className="v-boton"
+              disabled={ocupada}
+              onClick={() => (alcance === 'borrar' ? borrarSoloEsta(tarea) : correr(() => soloEsta(tarea.id, form)))}
+            >
+              Only this
+            </button>
+            <button
+              type="button"
+              className="v-boton primario"
+              disabled={ocupada}
+              onClick={() =>
+                correr(() => (alcance === 'borrar' ? borrarDesdeAqui(tarea.id) : cambiarDesdeAqui(tarea.id, form, repetirAntes?.regla ?? null, repetirAntes?.fin ?? null)))
+              }
+            >
+              This and following
+            </button>
+            <button type="button" className="v-boton" onClick={() => setAlcance(null)}>
+              Back
+            </button>
+          </div>
+        ) : (
+          <div className="pie">
+            <button type="submit" className="v-boton primario" disabled={ocupada}>
+              {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : !tarea && repetir ? 'Save repeating' : 'Save'}
+            </button>
+            {tarea && (
+              <>
+                <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => completarTarea(tarea.id, !tarea.completada_en))}>
+                  {tarea.completada_en ? 'Reopen' : 'Complete'}
+                </button>
+                <button
+                  type="button"
+                  className="v-boton"
+                  disabled={ocupada}
+                  onClick={() => (tarea.serie_id ? setAlcance('borrar') : borrarSoloEsta(tarea))}
+                >
+                  Delete
+                </button>
+              </>
+            )}
+            <button type="button" className="v-boton" onClick={() => dialogo.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        )}
       </form>
     </dialog>
   )
