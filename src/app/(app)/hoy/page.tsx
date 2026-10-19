@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { RenglonTarea } from '@/components/tareas/renglon-tarea'
 import { EditorHoy, type ItemHoy } from '@/components/vidrio/editor-hoy'
 import { MosaicoKlo, MosaicoLista, MosaicoMedidor, MosaicoProyectos, MosaicoSimple } from '@/components/vidrio/mosaicos'
@@ -125,5 +126,18 @@ export default async function Hoy({ searchParams }: Props) {
   }
 
   // Se personaliza desde «Todos». La key reinicia el editor al abrir un frente: ahí cambian los mosaicos.
-  return <EditorHoy key={frente?.id ?? 'todos'} items={items} editable={!frente} />
+  return (
+    <>
+      {/* El lockup oficial (wordmark sin redibujar) encabeza Today, entre la barra y los mosaicos. */}
+      <div className="v-lockup-hoy">
+        <Image src="/marca/blanco/03-wordmark.svg" alt="Klo-Ser" width={220} height={55} unoptimized priority />
+        <span>
+          <i aria-hidden />
+          Business
+          <i aria-hidden />
+        </span>
+      </div>
+      <EditorHoy key={frente?.id ?? 'todos'} items={items} editable={!frente} />
+    </>
+  )
 }

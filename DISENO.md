@@ -289,3 +289,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 ## 20. Today sin mosaicos de spaces (2026-10-19)
 
 - Jair pidió quitar los cuadros de cada space de Today: a cada space se entra por las píldoras de abajo. Se borró el mosaico (`frentes`) y su resumen. Arriba quedan Your day (7) y Klo (5) a dos renglones; luego la fila de tres y Agenda + Projects.
+
+## 21. Lockup en Today (2026-10-19)
+
+- Entre la barra (campo de Klo) y los mosaicos, centrado: el wordmark oficial blanco (`/marca/blanco/03-wordmark.svg`, sin redibujar) y abajo «BUSINESS» espaciado (.62em) en degradado durazno→brasa, entre dos líneas finas que se desvanecen. Solo en Today.
