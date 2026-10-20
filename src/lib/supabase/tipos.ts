@@ -154,6 +154,10 @@ export type Database = {
           rol: string
           sesion: string
           texto: string
+          tokens_cache_escritos: number
+          tokens_cache_leidos: number
+          tokens_entrada: number
+          tokens_salida: number
         }
         Insert: {
           acciones?: Json
@@ -165,6 +169,10 @@ export type Database = {
           rol: string
           sesion: string
           texto: string
+          tokens_cache_escritos?: number
+          tokens_cache_leidos?: number
+          tokens_entrada?: number
+          tokens_salida?: number
         }
         Update: {
           acciones?: Json
@@ -176,6 +184,10 @@ export type Database = {
           rol?: string
           sesion?: string
           texto?: string
+          tokens_cache_escritos?: number
+          tokens_cache_leidos?: number
+          tokens_entrada?: number
+          tokens_salida?: number
         }
         Relationships: []
       }

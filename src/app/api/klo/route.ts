@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
   let r: Conversacion
   if (!process.env.ANTHROPIC_API_KEY) {
-    r = { respuesta: '', acciones: [], pendientes: [], error: 'sin_llave' }
+    r = { respuesta: '', acciones: [], pendientes: [], uso: { entrada: 0, salida: 0, cacheLeidos: 0, cacheEscritos: 0 }, error: 'sin_llave' }
   } else {
     r = await conversar({
       cliente: new Anthropic(),
@@ -95,6 +95,10 @@ export async function POST(req: Request) {
       texto: respuesta,
       acciones: r.acciones as never,
       pendiente: r.pendientes.length ? (r.pendientes as never) : null,
+      tokens_entrada: r.uso.entrada,
+      tokens_salida: r.uso.salida,
+      tokens_cache_leidos: r.uso.cacheLeidos,
+      tokens_cache_escritos: r.uso.cacheEscritos,
     })
     .select('id')
     .single()

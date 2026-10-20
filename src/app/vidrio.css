@@ -918,6 +918,11 @@ button.v-klo-campo:focus-visible{outline:2px solid var(--brasa);outline-offset:2
 .klo-memoria{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .klo-memoria li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--tinta-2);padding:6px 8px;border-radius:var(--r-chip);background:#1d1a19}
 .klo-memoria span{flex:1}
+.klo-uso{margin:0;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.klo-uso div{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:var(--r-chip);background:#1d1a19}
+.klo-uso dt{color:var(--tinta-3)}
+.klo-uso dd{margin:0;color:var(--tinta-2);text-align:right}
+.klo-uso strong{color:var(--tinta)}
 .klo-memoria button{background:none;border:0;color:var(--tinta-3);cursor:pointer;font-size:15px;line-height:1}
 /* Cerrado: fuera del foco del teclado y de los lectores (visibility espera a que termine el desvanecido). */
 .klo-capa:not([data-abierto]) .klo-panel{visibility:hidden;transition:opacity .18s,transform .22s var(--ease),visibility 0s .22s}

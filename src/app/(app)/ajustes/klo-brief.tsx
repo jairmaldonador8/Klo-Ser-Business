@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { costoUsd, formatoTokens, formatoUsd, tokensTotales, type Gasto } from '@/lib/klo/costo'
 import { MAX_BRIEF } from '@/lib/klo/sistema'
 import { borrarMemoria, guardarBrief } from './acciones'
 
@@ -12,7 +13,7 @@ How you like to work: focus hours, meetings only in the afternoon, gym at 7 am�
 type Memoria = { id: string; texto: string }
 
 /** Lo que Klo sabe de ti: el brief que escribes y lo que fue recordando (lo puedes borrar). */
-export function KloBrief({ brief: inicial, memoria: memoriaInicial }: { brief: string; memoria: Memoria[] }) {
+export function KloBrief({ brief: inicial, memoria: memoriaInicial, uso }: { brief: string; memoria: Memoria[]; uso: { hoy: Gasto; mes: Gasto } }) {
   const [brief, setBrief] = useState(inicial)
   const [memoria, setMemoria] = useState(memoriaInicial)
   const [aviso, setAviso] = useState('')
@@ -78,6 +79,19 @@ export function KloBrief({ brief: inicial, memoria: memoriaInicial }: { brief: s
       ) : (
         <p className="v-sub">Nothing yet. Klo saves facts it learns as you talk.</p>
       )}
+      <h4 className="v-sub" style={{ marginTop: 6 }}>
+        Klo usage
+      </h4>
+      <dl className="klo-uso">
+        {([['Today', uso.hoy], ['This month', uso.mes]] as const).map(([etiqueta, g]) => (
+          <div key={etiqueta}>
+            <dt>{etiqueta}</dt>
+            <dd>
+              <strong>{formatoUsd(costoUsd(g))}</strong> · {g.mensajes} {g.mensajes === 1 ? 'reply' : 'replies'} · {formatoTokens(tokensTotales(g))} tokens
+            </dd>
+          </div>
+        ))}
+      </dl>
       <p className="v-aviso" role="status">
         {aviso}
       </p>

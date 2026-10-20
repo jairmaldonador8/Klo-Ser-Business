@@ -10,7 +10,8 @@ const TOPE_MS = 20_000
 
 export type Accion = { nombre: NombreHerramienta; resumen?: string; deshacer?: Deshacer }
 export type Pendiente = { nombre: NombreHerramienta; input: unknown }
-export type Conversacion = { respuesta: string; acciones: Accion[]; pendientes: Pendiente[]; error?: string }
+export type Uso = { entrada: number; salida: number; cacheLeidos: number; cacheEscritos: number }
+export type Conversacion = { respuesta: string; acciones: Accion[]; pendientes: Pendiente[]; uso: Uso; error?: string }
 
 type Opciones = {
   cliente: Pick<Anthropic, 'messages'>
@@ -25,6 +26,7 @@ export async function conversar({ cliente, sistema, panorama, historia, texto, e
   const mensajes: Anthropic.MessageParam[] = [...historia, { role: 'user', content: texto }]
   const acciones: Accion[] = []
   const pendientes: Pendiente[] = []
+  const uso: Uso = { entrada: 0, salida: 0, cacheLeidos: 0, cacheEscritos: 0 }
   let cambios = 0
   const senal = AbortSignal.timeout(TOPE_MS)
 
@@ -44,8 +46,13 @@ export async function conversar({ cliente, sistema, panorama, historia, texto, e
         },
         { signal: senal },
       )
+      // Se suma cada vuelta: es lo que se cobra por esta respuesta.
+      uso.entrada += r.usage?.input_tokens ?? 0
+      uso.salida += r.usage?.output_tokens ?? 0
+      uso.cacheLeidos += r.usage?.cache_read_input_tokens ?? 0
+      uso.cacheEscritos += r.usage?.cache_creation_input_tokens ?? 0
 
-      if (r.stop_reason === 'refusal') return { respuesta: '', acciones, pendientes, error: 'refusal' }
+      if (r.stop_reason === 'refusal') return { respuesta: '', acciones, pendientes, uso, error: 'refusal' }
       const usos = r.content.filter((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use')
       if (r.stop_reason !== 'tool_use' || !usos.length) {
         const respuesta = r.content
@@ -53,7 +60,7 @@ export async function conversar({ cliente, sistema, panorama, historia, texto, e
           .map((b) => b.text)
           .join('\n')
           .trim()
-        return { respuesta: respuesta || 'Done.', acciones, pendientes }
+        return { respuesta: respuesta || 'Done.', acciones, pendientes, uso }
       }
 
       mensajes.push({ role: 'assistant', content: r.content })
@@ -83,9 +90,9 @@ export async function conversar({ cliente, sistema, panorama, historia, texto, e
       // Todos los resultados en un solo mensaje: así Claude sigue haciendo llamadas en paralelo.
       mensajes.push({ role: 'user', content: resultados })
     }
-    return { respuesta: 'I did what I could — check the rest.', acciones, pendientes }
+    return { respuesta: 'I did what I could — check the rest.', acciones, pendientes, uso }
   } catch (e) {
     console.error('klo: claude', e)
-    return { respuesta: '', acciones, pendientes, error: e instanceof Error ? e.name : 'error' }
+    return { respuesta: '', acciones, pendientes, uso, error: e instanceof Error ? e.name : 'error' }
   }
 }
