@@ -1069,3 +1069,89 @@ button.klo-campo{gap:10px;padding:6px 8px 6px 6px;transition:box-shadow .25s cub
   .klo-tarjeta{gap:14px}
   .klo-tarjeta .klo-orbe[data-grande]{width:52px;height:52px}
 }
+
+/* ── Hoja de la task con personalidad (fuera de capa: manda sobre las reglas viejas de .v-hoja) ──
+   Nueva: un composer al centro. Editar: lateral (en el calendario se sigue viendo el evento). */
+.v-hoja{background:radial-gradient(90% 220px at 15% 0%,rgba(255,90,42,.13),transparent 70%),radial-gradient(70% 200px at 95% 0%,rgba(28,54,238,.12),transparent 70%),linear-gradient(180deg,#1a1715 0%,#0e0c0b 40%,#0a0909 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),-30px 0 90px -30px rgba(0,0,0,.85);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent}
+.v-hoja .cuerpo{gap:16px;padding:20px 22px 0}
+.hoja-cabeza{display:flex;align-items:center;gap:10px}
+.hoja-cabeza h3{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-2)}
+.hoja-punto{width:8px;height:8px;border-radius:50%;background:var(--brasa);animation:hoja-latido 2.2s ease-out infinite;flex:none}
+@keyframes hoja-latido{0%{box-shadow:0 0 0 0 rgba(255,90,42,.55),0 0 12px rgba(255,90,42,.7)}70%,100%{box-shadow:0 0 0 8px rgba(255,90,42,0),0 0 12px rgba(255,90,42,.7)}}
+.hoja-esc{margin-left:auto;padding:0;border:0;background:none;cursor:pointer}
+.hoja-esc kbd{font-family:var(--mono);font-size:10.5px;color:var(--tinta-3);padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:color .15s,background .15s}
+.hoja-esc:hover kbd{color:var(--tinta);background:rgba(255,255,255,.08)}
+
+/* El título manda: grande, sin caja. */
+.v-hoja .cuerpo>.v-campo.hoja-titulo{background:none;box-shadow:none;border:0;border-radius:0;padding:4px 2px 10px;font-size:clamp(22px,2.6vw,27px);font-weight:600;letter-spacing:-.02em;line-height:1.2;color:var(--tinta);caret-color:var(--brasa);
+  border-bottom:1px solid rgba(255,255,255,.07);transition:border-color .25s}
+.v-hoja .cuerpo>.v-campo.hoja-titulo:focus{outline:0;box-shadow:none;border-bottom-color:rgba(255,122,74,.6)}
+.v-hoja .hoja-titulo::placeholder{color:var(--tinta-3);font-weight:500}
+
+/* Propiedades: ícono y nombre a la izquierda, el control a la derecha. */
+.v-hoja .props{display:flex;flex-direction:column;gap:2px;margin:0 -10px}
+.v-hoja .prop{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px;align-items:start;padding:7px 10px;border-radius:12px;transition:background .2s}
+.v-hoja .prop:hover,.v-hoja .prop:focus-within{background:rgba(255,255,255,.025)}
+.v-hoja .prop .etq{display:flex;align-items:center;gap:8px;min-height:34px;font-family:var(--poppins);font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--tinta-3)}
+.v-hoja .prop:focus-within .etq{color:var(--tinta-2)}
+.v-hoja .prop .etq svg{color:var(--tinta-3);flex:none;transition:color .2s}
+.v-hoja .prop:focus-within .etq svg{color:var(--brasa)}
+.v-hoja .valor{min-width:0;display:flex;flex-direction:column;gap:8px;justify-content:center;min-height:34px}
+.v-hoja .valor>select.v-campo{max-width:280px}
+.v-hoja select.v-campo{appearance:none;-webkit-appearance:none;height:34px;padding:0 34px 0 12px;color:var(--tinta);font-size:14px;cursor:pointer;
+  background:rgba(0,0,0,.35) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a8a29e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center}
+
+/* Controles: chips y campos con el mismo lenguaje del chat de Klo. */
+.v-hoja .grupo button{height:32px;padding:0 12px;border-radius:9px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);color:var(--tinta-2);font-size:13px;transition:background .15s,color .15s,box-shadow .15s,transform .15s}
+.v-hoja .grupo button:hover{background:rgba(255,255,255,.08);color:var(--tinta)}
+.v-hoja .grupo button:active{transform:scale(.97)}
+.v-hoja .grupo button[aria-pressed=true],.v-hoja .grupo button[aria-checked=true]{background:linear-gradient(140deg,rgba(255,122,74,.28),rgba(226,70,28,.22));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,122,74,.65),0 6px 16px -8px rgba(255,90,42,.7)}
+.v-hoja .v-campo{background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);border-radius:10px;transition:box-shadow .2s}
+.v-hoja .v-campo:focus{outline:0;box-shadow:inset 0 0 0 1px rgba(255,122,74,.6),0 0 0 3px rgba(255,90,42,.12)}
+.v-hoja .grupo .v-campo{flex:1 1 130px;height:34px;padding:0 12px}
+
+/* Pie: atajos a la izquierda; Save en brasa a la derecha. Se queda abajo al hacer scroll. */
+.v-hoja .pie{position:sticky;bottom:0;z-index:2;margin:auto -22px 0;padding:14px 22px calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  background:#0a0909;border-top:1px solid rgba(255,255,255,.06);box-shadow:0 -16px 24px -8px #0a0909}
+.v-hoja .hoja-pista{margin-right:auto;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;text-transform:none;color:var(--tinta-3)}
+.v-hoja .pie .v-boton{height:36px;padding:0 14px;border-radius:10px;font-size:13.5px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);color:var(--tinta-2)}
+.v-hoja .pie .v-boton:hover{background:rgba(255,255,255,.09);color:var(--tinta)}
+.v-hoja .pie .v-boton.primario{padding:0 20px;font-weight:600;color:#fff;background:linear-gradient(140deg,#ff7a4a,#e2461c);box-shadow:0 10px 26px -10px rgba(255,90,42,.9),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .2s cubic-bezier(.34,1.56,.64,1),filter .15s}
+.v-hoja .pie .v-boton.primario:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.v-hoja .pie .v-boton.primario:active{transform:scale(.97)}
+.v-hoja .pie .v-boton:disabled{opacity:.6}
+.v-hoja:not(.nueva) .hoja-pista{display:none}
+.v-hoja:not(.nueva) .pie .v-boton.primario{margin-left:auto}
+
+/* Nueva: el composer al centro, con entrada y propiedades en cascada. */
+.v-hoja.nueva{inset:0 0 auto 0;margin:9vh auto auto;width:min(680px,calc(100vw - 32px));height:auto;max-height:min(84dvh,860px);border-radius:22px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 1px 0 rgba(255,255,255,.08),0 50px 140px -30px rgba(0,0,0,.9),0 0 100px -30px rgba(255,90,42,.45)}
+.v-hoja.nueva[open]{animation:hoja-entrar .5s cubic-bezier(.16,1,.3,1) both}
+.v-hoja.nueva::backdrop{background:rgba(0,0,0,.25);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.v-hoja.nueva .cuerpo{padding:22px 26px 0}
+.v-hoja.nueva .pie{margin:auto -26px 0;padding-left:26px;padding-right:26px}
+.v-hoja.nueva[open] :is(.hoja-cabeza,.hoja-titulo,.prop){animation:hoja-subir .5s cubic-bezier(.16,1,.3,1) both}
+.v-hoja.nueva[open] .hoja-titulo{animation-delay:40ms}
+.v-hoja.nueva[open] .prop:nth-child(1){animation-delay:80ms}
+.v-hoja.nueva[open] .prop:nth-child(2){animation-delay:110ms}
+.v-hoja.nueva[open] .prop:nth-child(3){animation-delay:140ms}
+.v-hoja.nueva[open] .prop:nth-child(4){animation-delay:170ms}
+.v-hoja.nueva[open] .prop:nth-child(5){animation-delay:200ms}
+.v-hoja.nueva[open] .prop:nth-child(6){animation-delay:230ms}
+.v-hoja.nueva[open] .prop:nth-child(n+7){animation-delay:260ms}
+@keyframes hoja-entrar{from{opacity:0;transform:translateY(14px) scale(.965);filter:blur(6px)}}
+@keyframes hoja-subir{from{opacity:0;transform:translateY(8px)}}
+
+@media (max-width:700px){
+  .v-hoja.nueva{inset:auto 0 0 0;margin:0;width:100vw;max-width:100vw;max-height:92dvh;border-radius:24px 24px 0 0}
+  .v-hoja.nueva[open]{animation-name:hoja-desde-abajo}
+  .v-hoja .cuerpo,.v-hoja.nueva .cuerpo{padding:18px 18px 0}
+  .v-hoja .pie,.v-hoja.nueva .pie{margin:auto -18px 0;padding-left:18px;padding-right:18px}
+  .v-hoja .prop{grid-template-columns:1fr;gap:4px}
+  .v-hoja .prop .etq{min-height:0}
+  .v-hoja .hoja-pista{display:none}
+  .v-hoja .pie .v-boton.primario{margin-left:auto}
+}
+@keyframes hoja-desde-abajo{from{opacity:0;transform:translateY(40px)}}
+@media (prefers-reduced-motion:reduce){.v-hoja,.v-hoja *{animation:none!important}}

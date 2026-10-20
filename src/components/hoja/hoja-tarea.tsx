@@ -1,5 +1,6 @@
 'use client'
 
+import { Bell, CalendarDays, CalendarRange, Clock, Folder, Layers, Palette, Repeat, Shapes, type LucideIcon } from 'lucide-react'
 import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { guardarActividades } from '@/app/(app)/ajustes/acciones'
 import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
@@ -39,6 +40,28 @@ const AVISOS = [
   ['30', '30 min before'],
   ['60', '1 hour before'],
 ] as const
+
+/** Una propiedad de la task: ícono y nombre a la izquierda, el control a la derecha. */
+function Prop({ icono: Icono, etq, htmlFor, children }: { icono: LucideIcon; etq: string; htmlFor?: string; children: React.ReactNode }) {
+  const nombre = (
+    <>
+      <Icono size={14} strokeWidth={2} aria-hidden />
+      {etq}
+    </>
+  )
+  return (
+    <div className="prop">
+      {htmlFor ? (
+        <label className="etq" htmlFor={htmlFor}>
+          {nombre}
+        </label>
+      ) : (
+        <span className="etq">{nombre}</span>
+      )}
+      <div className="valor">{children}</div>
+    </div>
+  )
+}
 
 function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[], hoy: string): Formulario {
   const base = tarea ?? valores
@@ -202,7 +225,7 @@ export function HojaTarea({
   return (
     <dialog
       ref={dialogo}
-      className="v-hoja"
+      className={`v-hoja${tarea ? '' : ' nueva'}`}
       aria-label={tarea ? 'Edit task' : 'New task'}
       onClose={cerrar}
       // Esc o tocar el fondo: salir guardando (ver `salir`).
@@ -219,11 +242,17 @@ export function HojaTarea({
           guardar()
         }}
       >
-        <h3>{tarea ? 'Task' : 'New task'}</h3>
+        <header className="hoja-cabeza">
+          <span className="hoja-punto" aria-hidden />
+          <h3>{tarea ? 'Task' : dias ? `New task · ${dias.length} days` : 'New task'}</h3>
+          <button type="button" className="hoja-esc" onClick={salir} aria-label="Close">
+            <kbd>esc</kbd>
+          </button>
+        </header>
 
         {/* Enter en el título envía el formulario. */}
         <input
-          className="v-campo"
+          className="v-campo hoja-titulo"
           autoFocus
           maxLength={200}
           placeholder="What needs to be done?"
@@ -232,7 +261,8 @@ export function HojaTarea({
           onChange={(e) => poner('titulo', e.target.value)}
         />
 
-        <span className="etq">Activity</span>
+        <div className="props">
+        <Prop icono={Shapes} etq="Activity">
         <div className="grupo" aria-label="Activity">
           {opciones.map((c) => (
             <button key={c} type="button" className="v-boton chico" aria-pressed={form.clase === c} onClick={() => poner('clase', c)}>
@@ -267,11 +297,11 @@ export function HojaTarea({
             />
           )}
         </div>
+        </Prop>
 
         {/* Desde una nota, el frente es el de la nota: la tarea y la nota van juntas. */}
         {frentes.length > 1 && !notaId && (
-          <>
-            <span className="etq">Space</span>
+          <Prop icono={Layers} etq="Space">
             <div className="grupo" role="radiogroup" aria-label="Space">
               {frentes.map((f) => (
                 <button
@@ -290,12 +320,11 @@ export function HojaTarea({
                 </button>
               ))}
             </div>
-          </>
+          </Prop>
         )}
 
         {dias && (
-          <>
-            <span className="etq">{dias.length} days · one task each day</span>
+          <Prop icono={CalendarDays} etq="Days">
             <div className="grupo" aria-label="Days">
               {dias.map((d) => (
                 <span key={d} className="v-chip v-dia-chip">
@@ -303,13 +332,10 @@ export function HojaTarea({
                 </span>
               ))}
             </div>
-          </>
+          </Prop>
         )}
         {!dias && (
-          <>
-            <label className="etq" htmlFor="hoja-fecha">
-              {form.fecha_fin ? 'Starts' : 'Date'}
-            </label>
+          <Prop icono={CalendarDays} etq={form.fecha_fin ? 'Starts' : 'Date'} htmlFor="hoja-fecha">
             <div className="grupo">
               <input id="hoja-fecha" type="date" className="v-campo" value={form.fecha} onChange={(e) => poner('fecha', e.target.value)} />
               <button type="button" className="v-boton chico" aria-pressed={form.fecha === hoy} onClick={() => poner('fecha', hoy)}>
@@ -328,20 +354,18 @@ export function HojaTarea({
                 No date
               </button>
             </div>
-          </>
+          </Prop>
         )}
 
-        <span className="etq">Time</span>
+        <Prop icono={Clock} etq="Time">
         <div className="grupo">
           <input type="time" className="v-campo" aria-label="Start time" value={form.hora} onChange={(e) => poner('hora', e.target.value)} />
           <input type="time" className="v-campo" aria-label="End time" value={form.hora_fin} onChange={(e) => poner('hora_fin', e.target.value)} />
         </div>
+        </Prop>
 
         {form.hora && (
-          <>
-            <label className="etq" htmlFor="hoja-aviso">
-              Alert
-            </label>
+          <Prop icono={Bell} etq="Alert" htmlFor="hoja-aviso">
             <select id="hoja-aviso" className="v-campo" value={form.aviso_min} onChange={(e) => poner('aviso_min', e.target.value)}>
               {/* Un aviso que puso Klo fuera de la lista (p. ej. 20 min) también se ve. */}
               {(AVISOS.some(([v]) => v === form.aviso_min) ? AVISOS : [...AVISOS, [form.aviso_min, `${form.aviso_min} min before`] as const]).map(([valor, texto]) => (
@@ -350,15 +374,12 @@ export function HojaTarea({
                 </option>
               ))}
             </select>
-          </>
+          </Prop>
         )}
 
         {/* Termina otro día (lunes 5 pm → martes 4 pm): un solo evento. */}
         {dias ? null : form.fecha_fin ? (
-          <>
-            <label className="etq" htmlFor="hoja-fecha-fin">
-              Ends
-            </label>
+          <Prop icono={CalendarRange} etq="Ends" htmlFor="hoja-fecha-fin">
             <div className="grupo">
               <input
                 id="hoja-fecha-fin"
@@ -372,29 +393,29 @@ export function HojaTarea({
                 Same day
               </button>
             </div>
-          </>
+          </Prop>
         ) : (
           form.fecha && (
-            <div className="grupo">
-              <button type="button" className="v-boton chico" onClick={() => poner('fecha_fin', sumarDias(form.fecha, 1))}>
-                ＋ Ends another day
-              </button>
-            </div>
+            <Prop icono={CalendarRange} etq="Ends">
+              <div className="grupo">
+                <button type="button" className="v-boton chico" onClick={() => poner('fecha_fin', sumarDias(form.fecha, 1))}>
+                  ＋ Another day
+                </button>
+              </div>
+            </Prop>
           )
         )}
 
-        <span className="etq">Color</span>
-        <SelectorColor
-          valor={form.color}
-          colorEspacio={frentes.find((f) => f.id === form.espacio_id)?.color ?? 'azul'}
-          cambiar={(c) => poner('color', c)}
-        />
+        <Prop icono={Palette} etq="Color">
+          <SelectorColor
+            valor={form.color}
+            colorEspacio={frentes.find((f) => f.id === form.espacio_id)?.color ?? 'azul'}
+            cambiar={(c) => poner('color', c)}
+          />
+        </Prop>
 
         {delFrente.length > 0 && (
-          <>
-            <label className="etq" htmlFor="hoja-proyecto">
-              Project
-            </label>
+          <Prop icono={Folder} etq="Project" htmlFor="hoja-proyecto">
             <select id="hoja-proyecto" className="v-campo" value={form.proyecto_id} onChange={(e) => poner('proyecto_id', e.target.value)}>
               <option value="">No project</option>
               {delFrente.map((p) => (
@@ -403,27 +424,31 @@ export function HojaTarea({
                 </option>
               ))}
             </select>
-          </>
+          </Prop>
         )}
 
         {!dias && (
-          <>
-            <span className="etq">Repeat</span>
+          <Prop icono={Repeat} etq="Repeat">
             {cargandoSerie ? <p className="v-sub">Loading…</p> : <SelectorRepetir fecha={form.fecha} valor={repetir} cambiar={setRepetir} />}
-          </>
+          </Prop>
         )}
+        </div>
 
         <p className="v-aviso" role="status">
           {aviso}
         </p>
 
         <div className="pie">
-          <button type="submit" className="v-boton primario" disabled={ocupada}>
-            {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : !tarea && repetir ? 'Save repeating' : 'Save'}
-          </button>
+          <small className="hoja-pista" aria-hidden>
+            Enter to save · Esc to close
+          </small>
           {tarea && (
             <>
-              <button type="button" className="v-boton" disabled={ocupada} onClick={() => {
+              <button
+                type="button"
+                className="v-boton"
+                disabled={ocupada}
+                onClick={() => {
                   // Al momento en todos los renglones de esta task; si el servidor falla, regresa.
                   const nueva = !tarea.completada_en
                   marcar(tarea.id, nueva)
@@ -448,6 +473,9 @@ export function HojaTarea({
           )}
           <button type="button" className="v-boton" onClick={() => dialogo.current?.close()}>
             Cancel
+          </button>
+          <button type="submit" className="v-boton primario" disabled={ocupada}>
+            {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : !tarea && repetir ? 'Save repeating' : 'Save'}
           </button>
         </div>
 
