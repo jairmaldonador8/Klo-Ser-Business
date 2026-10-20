@@ -35,6 +35,9 @@ export async function GET(req: Request) {
     // responsable_id apunta a auth.users, no a perfiles: la zona sale de una segunda consulta.
     sb.from('perfiles').select('user_id, zona_horaria, resumen_hora, resumen_enviado'),
   ])
+  // Solo cuenta quien tiene un dispositivo: si no, el resumen de hoy se gastaría sin llegar a nadie.
+  const { data: subs } = await sb.from('push_suscripciones').select('owner_id')
+  const conDispositivo = new Set((subs ?? []).map((s) => s.owner_id))
   if (error) console.error('avisos: tareas', error)
   const zonaDe = new Map((perfiles ?? []).map((p) => [p.user_id, p.zona_horaria ?? ZONA]))
 
@@ -43,7 +46,7 @@ export async function GET(req: Request) {
       const aviso: TareaAviso = { id: t.id, titulo: t.titulo, fecha: t.fecha!, hora: t.hora!, aviso_min: t.aviso_min!, zona: zonaDe.get(t.responsable_id) ?? ZONA }
       return { t, aviso }
     })
-    .filter(({ aviso }) => tocaAviso(aviso, ahora))
+    .filter(({ t, aviso }) => conDispositivo.has(t.responsable_id) && tocaAviso(aviso, ahora))
   if (tocan.length) {
     const { data: reclamadas } = await sb
       .from('tareas')
@@ -71,7 +74,7 @@ export async function GET(req: Request) {
   }
 
   // 3. Resumen de la mañana.
-  for (const p of perfiles ?? []) {
+  for (const p of (perfiles ?? []).filter((p) => conDispositivo.has(p.user_id))) {
     const zona = p.zona_horaria ?? ZONA
     const hoy = tocaResumen({ resumen_hora: p.resumen_hora, resumen_enviado: p.resumen_enviado, zona }, ahora)
     if (!hoy) continue
