@@ -1,4 +1,5 @@
-const PUBLICAS = ['/entrar', '/auth/', '/~offline']
+// /api/avisos/enviar la llama el cron de Supabase sin sesión: se protege con CRON_SECRET.
+const PUBLICAS = ['/entrar', '/auth/', '/~offline', '/api/avisos/enviar', '/sw.js']
 
 export function esRutaPublica(pathname: string): boolean {
   return PUBLICAS.some((ruta) => (ruta.endsWith('/') ? pathname.startsWith(ruta) : pathname === ruta))

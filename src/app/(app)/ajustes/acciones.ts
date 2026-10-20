@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { esColor } from '@/lib/frentes'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
+import { enviarA } from '@/lib/avisos/enviar'
 import { MAX_BRIEF } from '@/lib/klo/sistema'
 import { limpiarActividades } from '@/lib/tareas/esquema'
 import { MOSAICOS, SECCIONES } from '@/lib/vista/registro'
@@ -113,6 +114,29 @@ export async function borrarMemoria(id: string): Promise<Resultado> {
   if (error) {
     console.error('borrarMemoria', error)
     return { ok: false, mensaje: 'Couldn’t forget it, try again.' }
+  }
+  return { ok: true }
+}
+
+/** «Send a test»: un push a todos tus dispositivos ahora mismo. */
+export async function enviarPrueba(): Promise<Resultado> {
+  const supabase = await crearClienteServidor()
+  const { data } = await supabase.auth.getClaims()
+  if (!data?.claims) return { ok: false, mensaje: 'Your session ended; sign in again.' }
+  const llegaron = await enviarA(supabase, data.claims.sub, { titulo: 'Klo', cuerpo: 'Notifications are on. I’ll tap you before what matters.', url: '/hoy', tag: 'prueba' })
+  return llegaron ? { ok: true } : { ok: false, mensaje: 'No device got it. Turn notifications on again on this phone.' }
+}
+
+/** Hora del resumen de la mañana («HH:MM») o null para apagarlo. */
+export async function guardarResumen(hora: string | null): Promise<Resultado> {
+  if (hora !== null && !/^\d{2}:\d{2}$/.test(hora)) return { ok: false, mensaje: 'Pick a time.' }
+  const supabase = await crearClienteServidor()
+  const { data } = await supabase.auth.getClaims()
+  if (!data?.claims) return { ok: false, mensaje: 'Your session ended; sign in again.' }
+  const { error } = await supabase.from('perfiles').update({ resumen_hora: hora }).eq('user_id', data.claims.sub)
+  if (error) {
+    console.error('guardarResumen', error)
+    return { ok: false, mensaje: 'Couldn’t save, try again.' }
   }
   return { ok: true }
 }

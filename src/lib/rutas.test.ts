@@ -7,6 +7,12 @@ describe('esRutaPublica', () => {
     expect(esRutaPublica('/auth/callback')).toBe(true)
     expect(esRutaPublica('/~offline')).toBe(true)
   })
+  it('el cron de avisos y el service worker no piden sesión', () => {
+    expect(esRutaPublica('/api/avisos/enviar')).toBe(true)
+    expect(esRutaPublica('/sw.js')).toBe(true)
+    expect(esRutaPublica('/api/avisos/suscribir')).toBe(false)
+    expect(esRutaPublica('/api/klo')).toBe(false)
+  })
   it('lo demás exige sesión', () => {
     expect(esRutaPublica('/hoy')).toBe(false)
     expect(esRutaPublica('/bienvenida')).toBe(false)

@@ -25,7 +25,19 @@ type Formulario = {
   proyecto_id: string
   /** '' = el color de su space. */
   color: string
+  /** Minutos antes para el aviso push; '' = sin aviso. */
+  aviso_min: string
 }
+
+const AVISOS = [
+  ['', 'None'],
+  ['0', 'At start'],
+  ['5', '5 min before'],
+  ['10', '10 min before'],
+  ['15', '15 min before'],
+  ['30', '30 min before'],
+  ['60', '1 hour before'],
+] as const
 
 function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[], hoy: string): Formulario {
   const base = tarea ?? valores
@@ -41,6 +53,8 @@ function inicial({ tarea, valores = {} }: Apertura, frentes: FrenteVista[], hoy:
     fecha_fin: base.fecha_fin ?? '',
     proyecto_id: base.proyecto_id ?? '',
     color: base.color ?? '',
+    // Sin dato (task nueva o leída sin la columna) = 10 min, como la base.
+    aviso_min: base.aviso_min === null ? '' : String(base.aviso_min ?? 10),
   }
 }
 
@@ -321,6 +335,22 @@ export function HojaTarea({
           <input type="time" className="v-campo" aria-label="Start time" value={form.hora} onChange={(e) => poner('hora', e.target.value)} />
           <input type="time" className="v-campo" aria-label="End time" value={form.hora_fin} onChange={(e) => poner('hora_fin', e.target.value)} />
         </div>
+
+        {form.hora && (
+          <>
+            <label className="etq" htmlFor="hoja-aviso">
+              Alert
+            </label>
+            <select id="hoja-aviso" className="v-campo" value={form.aviso_min} onChange={(e) => poner('aviso_min', e.target.value)}>
+              {/* Un aviso que puso Klo fuera de la lista (p. ej. 20 min) también se ve. */}
+              {(AVISOS.some(([v]) => v === form.aviso_min) ? AVISOS : [...AVISOS, [form.aviso_min, `${form.aviso_min} min before`] as const]).map(([valor, texto]) => (
+                <option key={valor} value={valor}>
+                  {texto}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
 
         {/* Termina otro día (lunes 5 pm → martes 4 pm): un solo evento. */}
         {dias ? null : form.fecha_fin ? (

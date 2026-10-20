@@ -3,6 +3,7 @@ import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { resolverVista } from '@/lib/vista/resolver'
 import { salir } from '../acciones'
 import { KloBrief } from './klo-brief'
+import { Notificaciones } from './notificaciones'
 import { TuApp } from './tu-app'
 import { TusActividades } from './tus-actividades'
 import { TusFrentes } from './tus-frentes'
@@ -20,6 +21,7 @@ export default async function Ajustes() {
 
   return (
     <div className="v-bento">
+      <Notificaciones resumenHora={perfil?.resumen_hora ?? null} />
       <KloBrief brief={perfil?.klo_brief ?? ''} memoria={memoria ?? []} />
       <TusFrentes frentes={frentes} />
       <TusActividades actividades={perfil?.actividades ?? []} />

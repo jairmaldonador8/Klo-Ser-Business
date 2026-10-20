@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { RegistrarSW } from '@/components/avisos/registrar-sw'
 import { HojaProvider } from '@/components/hoja/hoja-provider'
 import { KloProvider } from '@/components/klo/klo-provider'
 import { BarraArriba } from '@/components/vidrio/barra-arriba'
@@ -32,6 +33,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
   // useSearchParams (frente abierto) vive en componentes cliente: van dentro de Suspense.
   return (
     <>
+      <RegistrarSW />
       <div className="v-auras" aria-hidden>
         <i />
         <i />
