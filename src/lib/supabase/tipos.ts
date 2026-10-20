@@ -39,6 +39,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      avisos: {
+        Row: {
+          creado_en: string
+          enviado_en: string | null
+          enviar_en: string
+          id: string
+          owner_id: string
+          tarea_id: string | null
+          texto: string
+          url: string | null
+        }
+        Insert: {
+          creado_en?: string
+          enviado_en?: string | null
+          enviar_en: string
+          id?: string
+          owner_id?: string
+          tarea_id?: string | null
+          texto: string
+          url?: string | null
+        }
+        Update: {
+          creado_en?: string
+          enviado_en?: string | null
+          enviar_en?: string
+          id?: string
+          owner_id?: string
+          tarea_id?: string | null
+          texto?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_tarea_id_fkey"
+            columns: ["tarea_id"]
+            isOneToOne: false
+            referencedRelation: "tareas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       espacios: {
         Row: {
           actualizado_en: string
@@ -78,6 +119,63 @@ export type Database = {
           logo_ancho?: string | null
           nombre?: string
           orden?: number
+        }
+        Relationships: []
+      }
+      klo_memoria: {
+        Row: {
+          creado_en: string
+          id: string
+          owner_id: string
+          texto: string
+        }
+        Insert: {
+          creado_en?: string
+          id?: string
+          owner_id?: string
+          texto: string
+        }
+        Update: {
+          creado_en?: string
+          id?: string
+          owner_id?: string
+          texto?: string
+        }
+        Relationships: []
+      }
+      klo_mensajes: {
+        Row: {
+          acciones: Json
+          creado_en: string
+          deshecho_en: string | null
+          id: string
+          owner_id: string
+          pendiente: Json | null
+          rol: string
+          sesion: string
+          texto: string
+        }
+        Insert: {
+          acciones?: Json
+          creado_en?: string
+          deshecho_en?: string | null
+          id?: string
+          owner_id?: string
+          pendiente?: Json | null
+          rol: string
+          sesion: string
+          texto: string
+        }
+        Update: {
+          acciones?: Json
+          creado_en?: string
+          deshecho_en?: string | null
+          id?: string
+          owner_id?: string
+          pendiente?: Json | null
+          rol?: string
+          sesion?: string
+          texto?: string
         }
         Relationships: []
       }
@@ -220,7 +318,10 @@ export type Database = {
           actualizado_en: string
           creado_en: string
           espacio_predeterminado_id: string | null
+          klo_brief: string | null
           nombre: string
+          resumen_enviado: string | null
+          resumen_hora: string | null
           user_id: string
           vista: Json
           zona_horaria: string
@@ -230,7 +331,10 @@ export type Database = {
           actualizado_en?: string
           creado_en?: string
           espacio_predeterminado_id?: string | null
+          klo_brief?: string | null
           nombre?: string
+          resumen_enviado?: string | null
+          resumen_hora?: string | null
           user_id: string
           vista?: Json
           zona_horaria?: string
@@ -240,7 +344,10 @@ export type Database = {
           actualizado_en?: string
           creado_en?: string
           espacio_predeterminado_id?: string | null
+          klo_brief?: string | null
           nombre?: string
+          resumen_enviado?: string | null
+          resumen_hora?: string | null
           user_id?: string
           vista?: Json
           zona_horaria?: string
@@ -314,6 +421,36 @@ export type Database = {
           },
         ]
       }
+      push_suscripciones: {
+        Row: {
+          agente: string | null
+          auth: string
+          creado_en: string
+          endpoint: string
+          id: string
+          owner_id: string
+          p256dh: string
+        }
+        Insert: {
+          agente?: string | null
+          auth: string
+          creado_en?: string
+          endpoint: string
+          id?: string
+          owner_id?: string
+          p256dh: string
+        }
+        Update: {
+          agente?: string | null
+          auth?: string
+          creado_en?: string
+          endpoint?: string
+          id?: string
+          owner_id?: string
+          p256dh?: string
+        }
+        Relationships: []
+      }
       series: {
         Row: {
           borrado_en: string | null
@@ -364,6 +501,8 @@ export type Database = {
       tareas: {
         Row: {
           actualizado_en: string
+          avisado_en: string | null
+          aviso_min: number | null
           borrado_en: string | null
           clase: string
           color: string | null
@@ -384,6 +523,8 @@ export type Database = {
         }
         Insert: {
           actualizado_en?: string
+          avisado_en?: string | null
+          aviso_min?: number | null
           borrado_en?: string | null
           clase?: string
           color?: string | null
@@ -404,6 +545,8 @@ export type Database = {
         }
         Update: {
           actualizado_en?: string
+          avisado_en?: string | null
+          aviso_min?: number | null
           borrado_en?: string | null
           clase?: string
           color?: string | null
