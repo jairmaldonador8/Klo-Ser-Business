@@ -12,6 +12,7 @@ export async function leerCtx(sb: Cliente, userId: string) {
   ])
   const lista = espacios ?? []
   const ctx: Ctx = {
+    usuario: userId,
     espacios: new Set(lista.map((e) => e.id)),
     predeterminado: perfil?.espacio_predeterminado_id ?? lista[0]?.id ?? null,
     zona: perfil?.zona_horaria ?? 'America/Monterrey',
@@ -29,15 +30,19 @@ export async function describirPendientes(sb: Cliente, pendientes: Pendiente[]):
     const de = (i.id && titulo.get(i.id)) || 'a task'
     switch (nombre) {
       case 'borrar_task':
-        return `Delete · ${de}`
+        return (input as { toda_la_serie?: boolean }).toda_la_serie ? `Stop repeating · ${de}` : `Delete · ${de}`
       case 'crear_task':
-        return `Add · ${i.titulo ?? 'task'} · ${cuando(i.fecha ?? null, i.hora ?? null)}`
+        return `Add · ${i.titulo ?? 'task'} · ${cuando(i.fecha ?? null, i.hora ?? null)}${(input as { repetir?: object }).repetir ? ' · repeats' : ''}`
       case 'cambiar_task':
         return i.fecha || i.hora ? `Move · ${de} → ${cuando(i.fecha ?? null, i.hora ?? null)}` : `Edit · ${de}`
       case 'completar_task':
         return `Done · ${de}`
       case 'crear_nota':
         return `Note · ${(i.texto ?? '').slice(0, 50)}`
+      case 'crear_proyecto':
+        return `New project · ${i.nombre ?? ''}`
+      case 'cambiar_proyecto':
+        return `Project · ${i.nombre ?? i.estado ?? 'edit'}`
       case 'programar_aviso':
         return `Reminder · ${i.texto ?? ''} · ${cuando(i.fecha ?? null, i.hora ?? null)}`
       default:

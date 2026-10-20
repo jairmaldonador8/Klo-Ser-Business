@@ -7,7 +7,10 @@ function clienteFalso() {
   const llamadas: string[] = []
   const sb = {
     from: (tabla: string) => ({
-      update: (datos: object) => ({ eq: async (_c: string, id: string) => (llamadas.push(`${tabla}.update ${JSON.stringify(datos).replace(/"20\d\d-\d\d-\d\dT[^"]+"/, '"T"')} ${id}`), { error: null }) }),
+      update: (datos: object) => {
+        const anota = (id: string) => (llamadas.push(`${tabla}.update ${JSON.stringify(datos).replace(/"20\d\d-\d\d-\d\dT[^"]+"/, '"T"')} ${id}`), { error: null })
+        return { eq: async (_c: string, id: string) => anota(id), in: async (_c: string, ids: string[]) => anota(ids.join(',')) }
+      },
       delete: () => ({ eq: async (_c: string, id: string) => (llamadas.push(`${tabla}.delete ${id}`), { error: null }) }),
     }),
   }
@@ -15,6 +18,26 @@ function clienteFalso() {
 }
 
 describe('aplicarDeshacer', () => {
+  it('revierte series y proyectos', async () => {
+    const { sb, llamadas } = clienteFalso()
+    const fallas = await aplicarDeshacer(sb, [
+      { tipo: 'borrar_serie', id: 's1' },
+      { tipo: 'restaurar_serie', id: 's2', campos: { hasta: null, generado_hasta: '2027-04-01', borrado_en: null }, tareas: ['t1', 't2'] },
+      { tipo: 'borrar_proyecto', id: 'p1' },
+      { tipo: 'restaurar_proyecto', id: 'p2', campos: { estado: 'activo' } },
+    ])
+    expect(fallas).toBe(0)
+    expect(llamadas).toEqual([
+      'proyectos.update {"estado":"activo"} p2',
+      'proyectos.delete p1',
+      'tareas.update {"borrado_en":null} t1,t2',
+      'series.update {"hasta":null,"generado_hasta":"2027-04-01","borrado_en":null} s2',
+      'tareas.update {"borrado_en":"T"} s1',
+      'series.update {"borrado_en":"T"} s1',
+    ])
+  })
+
+
   it('revierte en orden inverso cada tipo de cambio', async () => {
     const { sb, llamadas } = clienteFalso()
     const fallas = await aplicarDeshacer(sb, [

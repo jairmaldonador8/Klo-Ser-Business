@@ -17,6 +17,13 @@ describe('esquemas', () => {
     expect(ESQUEMAS.crear_task.safeParse({ titulo: 'Junta', fecha: 'jueves' }).success).toBe(false)
     expect(ESQUEMAS.cambiar_task.safeParse({ id: 'x', hora: null }).success).toBe(true)
   })
+  it('valida la repetición y los proyectos', () => {
+    const gym = { titulo: 'Gym', fecha: '2026-10-21', hora: '07:00', repetir: { freq: 'semana', cada: 1, dias: [0, 2, 4] } }
+    expect(ESQUEMAS.crear_task.safeParse(gym).success).toBe(true)
+    expect(ESQUEMAS.crear_task.safeParse({ ...gym, repetir: { freq: 'diario', cada: 1 } }).success).toBe(false)
+    expect(ESQUEMAS.crear_proyecto.safeParse({ nombre: 'Lanzar Klo-Ser' }).success).toBe(true)
+    expect(ESQUEMAS.cambiar_proyecto.safeParse({ id: 'p', estado: 'borrado' }).success).toBe(false)
+  })
   it('manda JSON schema limpio a Claude', () => {
     const crear = HERRAMIENTAS.find((h) => h.name === 'crear_task')!
     expect(crear.input_schema.type).toBe('object')
