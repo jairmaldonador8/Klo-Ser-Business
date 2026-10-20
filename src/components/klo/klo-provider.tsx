@@ -8,7 +8,7 @@ const Contexto = createContext<Klo>({ abierto: false, abrir: () => {}, cerrar: (
 /** `abrir()` desde la barra, el mosaico de Today o ⌘K. */
 export const useKlo = () => useContext(Contexto)
 
-export function KloProvider({ children }: { children: React.ReactNode }) {
+export function KloProvider({ children, nombre }: { children: React.ReactNode; nombre?: string | null }) {
   const [abierto, setAbierto] = useState(false)
   const abrir = useCallback(() => setAbierto(true), [])
   const cerrar = useCallback(() => setAbierto(false), [])
@@ -29,7 +29,7 @@ export function KloProvider({ children }: { children: React.ReactNode }) {
     <Contexto.Provider value={{ abierto, abrir, cerrar }}>
       {children}
       {/* Montado siempre: la conversación sigue aunque cierres y abras el panel. */}
-      <PanelKlo abierto={abierto} cerrar={cerrar} />
+      <PanelKlo abierto={abierto} cerrar={cerrar} nombre={nombre} />
     </Contexto.Provider>
   )
 }

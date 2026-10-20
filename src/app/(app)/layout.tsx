@@ -44,7 +44,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
       </div>
       {/* La hoja de edición se abre desde cualquier parte (el +, un renglón, una nota). */}
       <HojaProvider frentes={frentes} proyectos={proyectos ?? []} actividades={perfil?.actividades ?? []} hoy={fechaEn(ahora, zona)}>
-        <KloProvider>
+        <KloProvider nombre={perfil?.nombre ?? null}>
         <div className="v-escena">
           <Suspense>
             <Riel secciones={secciones} frentes={frentes} />

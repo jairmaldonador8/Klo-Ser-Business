@@ -1,8 +1,29 @@
 'use client'
 
+import {
+  Archive,
+  ArrowRight,
+  ArrowUp,
+  Bell,
+  Brain,
+  Check,
+  FolderPlus,
+  Pause,
+  PenLine,
+  Play,
+  Plus,
+  Repeat,
+  RotateCcw,
+  Sparkles,
+  StickyNote,
+  Trash2,
+  Undo2,
+  X,
+  type LucideIcon,
+} from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { RespuestaKlo } from '@/app/api/klo/route'
 
 type Mensaje =
@@ -33,7 +54,82 @@ async function enviarJson<T>(url: string, cuerpo: object): Promise<T> {
   return datos as T
 }
 
-export function PanelKlo({ abierto, cerrar }: { abierto: boolean; cerrar: () => void }) {
+// Cada chip llega como «Verbo · detalle»; el verbo decide el ícono.
+const ICONOS: Record<string, LucideIcon> = {
+  Added: Plus,
+  Moved: ArrowRight,
+  Edited: PenLine,
+  'Edited project': PenLine,
+  Done: Check,
+  Reopened: RotateCcw,
+  Deleted: Trash2,
+  Delete: Trash2,
+  Note: StickyNote,
+  Reminder: Bell,
+  Remembered: Brain,
+  'New project': FolderPlus,
+  Project: FolderPlus,
+  Paused: Pause,
+  Archived: Archive,
+  Reactivated: Play,
+  'Stopped repeating': Repeat,
+  'Stop repeating': Repeat,
+  Add: Plus,
+  Move: ArrowRight,
+  Edit: PenLine,
+}
+
+function partir(chip: string) {
+  const [verbo, ...resto] = chip.split(' · ')
+  return { verbo, detalle: resto.join(' · '), Icono: ICONOS[verbo] ?? Sparkles }
+}
+
+/** Ms por palabra al «escribir» la respuesta; las acciones entran cuando termina. */
+const PASO = 22
+const TOPE = 1600
+const retraso = (palabras: number) => Math.min(palabras * PASO, TOPE)
+
+function Acciones({ chips, desde, tachadas }: { chips: string[]; desde: number; tachadas?: boolean }) {
+  return (
+    <ul className="klo-acciones" data-tachadas={tachadas || undefined}>
+      {chips.map((c, n) => {
+        const { verbo, detalle, Icono } = partir(c)
+        return (
+          <li key={n} style={{ '--d': `${desde + n * 70}ms` } as CSSProperties}>
+            <span className="klo-icono" aria-hidden>
+              <Icono size={14} strokeWidth={2.2} />
+            </span>
+            <span className="klo-accion">
+              <b>{verbo}</b>
+              {detalle && <span>{detalle}</span>}
+            </span>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+/** La respuesta aparece palabra por palabra (solo al llegar: después ya está montada). */
+function Escrito({ texto }: { texto: string }) {
+  const palabras = texto.split(/(\s+)/)
+  let i = 0
+  return (
+    <p className="klo-escrito">
+      {palabras.map((p, n) => (/^\s+$/.test(p) ? p : <span key={n} style={{ '--i': i++ } as CSSProperties}>{p}</span>))}
+    </p>
+  )
+}
+
+function Orbe({ grande, vivo }: { grande?: boolean; vivo?: boolean }) {
+  return (
+    <span className="klo-orbe" data-grande={grande || undefined} data-vivo={vivo || undefined} aria-hidden>
+      <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={grande ? 30 : 16} height={grande ? 35 : 19} unoptimized />
+    </span>
+  )
+}
+
+export function PanelKlo({ abierto, cerrar, nombre }: { abierto: boolean; cerrar: () => void; nombre?: string | null }) {
   const router = useRouter()
   const [sesion] = useState(() => crypto.randomUUID())
   const [mensajes, setMensajes] = useState<Mensaje[]>([])
@@ -42,6 +138,7 @@ export function PanelKlo({ abierto, cerrar }: { abierto: boolean; cerrar: () => 
   const [falla, setFalla] = useState<string | null>(null)
   const campo = useRef<HTMLTextAreaElement>(null)
   const lista = useRef<HTMLDivElement>(null)
+  const primerNombre = nombre?.trim().split(/\s+/)[0]
 
   useEffect(() => {
     if (!abierto) return
@@ -109,69 +206,88 @@ export function PanelKlo({ abierto, cerrar }: { abierto: boolean; cerrar: () => 
   return (
     <div className="klo-capa" data-abierto={abierto || undefined} aria-hidden={!abierto}>
       <button type="button" className="klo-velo" aria-label="Close Klo" tabIndex={-1} onClick={cerrar} />
-      <section className="klo-panel" role="dialog" aria-modal="true" aria-label="Klo">
+      <section className="klo-panel" role="dialog" aria-modal="true" aria-label="Klo" data-pensando={pensando || undefined}>
         <header className="klo-cabeza">
-          <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={22} height={26} unoptimized />
-          <b>Klo</b>
-          <small>{pensando ? 'thinking…' : 'your partner'}</small>
+          <Orbe vivo={pensando} />
+          <div className="klo-quien">
+            <b>Klo</b>
+            <small aria-live="polite">
+              <i className="klo-punto" aria-hidden />
+              {pensando ? <span className="klo-brillo">Working on it</span> : 'Ready'}
+            </small>
+          </div>
           <button type="button" className="klo-cerrar" onClick={cerrar} aria-label="Close">
-            esc
+            <kbd>esc</kbd>
           </button>
         </header>
 
         <div className="klo-lista" ref={lista}>
           {!mensajes.length && (
             <div className="klo-vacio">
-              <p>Tell me what you need. Just write it — add, move or check off tasks, set up routines and projects, reminders, or ask what’s coming.</p>
+              <Orbe grande vivo={pensando} />
+              <h2>{primerNombre ? `Hey ${primerNombre}, what are we moving forward?` : 'What are we moving forward?'}</h2>
+              <p>Write it the way you’d say it — tasks, routines, projects, reminders, or a question about your week. I’ll handle the rest.</p>
             </div>
           )}
-          {mensajes.map((m, i) =>
-            m.tipo === 'tu' ? (
-              <p key={i} className="klo-tu">
-                {m.texto}
-              </p>
-            ) : (
-              <div key={i} className="klo-dice" data-deshecho={m.deshecho || undefined}>
-                <p>{m.texto}</p>
-                {m.acciones.length > 0 && (
-                  <ul className="klo-chips">
-                    {m.acciones.map((a, n) => (
-                      <li key={n}>{a}</li>
-                    ))}
-                  </ul>
-                )}
-                {m.pendientes.length > 0 && !m.resuelto && m.id && (
-                  <div className="klo-espera">
-                    <small>Needs your OK</small>
-                    <ul className="klo-chips">
-                      {m.pendientes.map((p, n) => (
-                        <li key={n}>{p}</li>
-                      ))}
-                    </ul>
-                    <div>
-                      <button type="button" className="v-boton" onClick={() => confirmar(i, m.id!, true)}>
-                        Confirm
-                      </button>
-                      <button type="button" className="klo-texto" onClick={() => confirmar(i, m.id!, false)}>
-                        Cancel
-                      </button>
+          {mensajes.map((m, i) => {
+            if (m.tipo === 'tu')
+              return (
+                <p key={i} className="klo-tu">
+                  {m.texto}
+                </p>
+              )
+            const tras = retraso(m.texto.split(/\s+/).length) + 120
+            return (
+              <div key={i} className="klo-dice">
+                <Orbe />
+                <div className="klo-cuerpo">
+                  <Escrito texto={m.texto} />
+                  {m.acciones.length > 0 && <Acciones chips={m.acciones} desde={m.resuelto ? 0 : tras} tachadas={m.deshecho} />}
+                  {m.pendientes.length > 0 && !m.resuelto && m.id && (
+                    <div className="klo-espera" style={{ '--d': `${tras + m.acciones.length * 70}ms` } as CSSProperties}>
+                      <small>
+                        <i className="klo-punto" aria-hidden />
+                        Needs your OK
+                      </small>
+                      <Acciones chips={m.pendientes} desde={0} />
+                      <div className="klo-botones">
+                        <button type="button" className="klo-si" onClick={() => confirmar(i, m.id!, true)}>
+                          <Check size={14} strokeWidth={2.5} aria-hidden />
+                          Confirm
+                        </button>
+                        <button type="button" className="klo-no" onClick={() => confirmar(i, m.id!, false)}>
+                          <X size={14} strokeWidth={2.5} aria-hidden />
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-                {m.resuelto === 'no' && <small className="klo-nota">Cancelled.</small>}
-                {m.acciones.length > 0 && m.id && (
-                  <button type="button" className="klo-texto" disabled={m.deshecho} onClick={() => deshacer(i, m.id!)}>
-                    {m.deshecho ? 'Undone' : 'Undo'}
-                  </button>
-                )}
+                  )}
+                  {m.resuelto === 'no' && <small className="klo-nota">Cancelled — nothing changed.</small>}
+                  {m.acciones.length > 0 && m.id && (
+                    <button
+                      type="button"
+                      className="klo-deshacer"
+                      style={{ '--d': `${tras + m.acciones.length * 70}ms` } as CSSProperties}
+                      disabled={m.deshecho}
+                      onClick={() => deshacer(i, m.id!)}
+                    >
+                      <Undo2 size={13} aria-hidden />
+                      {m.deshecho ? 'Undone' : 'Undo'}
+                    </button>
+                  )}
+                </div>
               </div>
-            ),
-          )}
+            )
+          })}
           {pensando && (
             <div className="klo-pensando" aria-label="Klo is thinking">
-              <i />
-              <i />
-              <i />
+              <Orbe vivo />
+              <span className="klo-brillo">Thinking</span>
+              <span className="klo-puntos" aria-hidden>
+                <i />
+                <i />
+                <i />
+              </span>
             </div>
           )}
         </div>
@@ -188,12 +304,11 @@ export function PanelKlo({ abierto, cerrar }: { abierto: boolean; cerrar: () => 
             enviar()
           }}
         >
-          <span className="v-orbe" aria-hidden />
           <textarea
             ref={campo}
             rows={1}
             value={texto}
-            placeholder="Tell Klo…"
+            placeholder="Tell Klo anything…"
             aria-label="Message for Klo"
             enterKeyHint="send"
             // El borrador guardado regresa al enfocar (abrir el panel enfoca el campo).
@@ -209,9 +324,14 @@ export function PanelKlo({ abierto, cerrar }: { abierto: boolean; cerrar: () => 
               }
             }}
           />
-          <button type="submit" className="klo-enviar" disabled={!texto.trim() || pensando} aria-label="Send">
-            ↑
-          </button>
+          <div className="klo-pie">
+            <small>
+              <kbd>↵</kbd> send <kbd>⇧↵</kbd> new line
+            </small>
+            <button type="submit" className="klo-enviar" disabled={!texto.trim() || pensando} aria-label="Send">
+              <ArrowUp size={17} strokeWidth={2.5} aria-hidden />
+            </button>
+          </div>
         </form>
       </section>
     </div>

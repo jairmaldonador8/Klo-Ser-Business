@@ -867,51 +867,174 @@ button.v-klo-campo:focus-visible{outline:2px solid var(--brasa);outline-offset:2
 .klo-boton{all:unset;cursor:pointer;display:flex;gap:inherit;align-items:center}
 .klo-boton:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:var(--r-caja)}
 
-.klo-capa{position:fixed;inset:0;z-index:80;pointer-events:none}
+/* ── Klo · centro de mando (brasa) ───────────────────────────────────────────────
+   Un panel que se siente vivo: orbe que respira, halo de brasa que gira mientras trabaja,
+   la respuesta se escribe palabra por palabra y las acciones entran en cascada. */
+@property --klo-giro{syntax:"<angle>";inherits:false;initial-value:0deg}
+.klo-capa{position:fixed;inset:0;z-index:80;pointer-events:none;--klo-ease:cubic-bezier(.16,1,.3,1)}
 .klo-capa[data-abierto]{pointer-events:auto}
-.klo-velo{position:absolute;inset:0;border:0;padding:0;background:rgba(0,0,0,.45);opacity:0;transition:opacity .2s}
+.klo-velo{position:absolute;inset:0;border:0;padding:0;background:radial-gradient(120% 80% at 50% 0%,rgba(255,90,42,.10),transparent 60%),rgba(0,0,0,.55);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .25s}
 .klo-capa[data-abierto] .klo-velo{opacity:1}
-.klo-panel{position:absolute;top:72px;left:50%;width:min(600px,calc(100vw - 32px));max-height:min(640px,calc(100dvh - 96px));display:flex;flex-direction:column;
-  background:#141211;color:var(--tinta);border-radius:var(--r-tarjeta-p);box-shadow:var(--v-elevado),0 40px 80px -30px #000;
-  opacity:0;transform:translate(-50%,-8px) scale(.98);transition:opacity .18s,transform .22s var(--ease)}
-.klo-capa[data-abierto] .klo-panel{opacity:1;transform:translate(-50%,0) scale(1)}
-.klo-cabeza{display:flex;align-items:center;gap:8px;padding:12px 14px;box-shadow:inset 0 -1px 0 var(--v-borde)}
-.klo-cabeza b{font-weight:600}
-.klo-cabeza small{color:var(--tinta-3);font-family:var(--mono);font-size:11px}
-.klo-cerrar{margin-left:auto;background:none;border:0;color:var(--tinta-3);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:var(--r-chip);box-shadow:inset 0 0 0 1px var(--v-borde);cursor:pointer}
-.klo-lista{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
-.klo-vacio p{color:var(--tinta-2);font-size:14px;line-height:1.5;margin:0 0 10px}
-.klo-tu{align-self:flex-end;max-width:85%;margin:0;padding:9px 12px;border-radius:var(--r-caja);background:var(--carbon-2);font-size:14px;line-height:1.45;white-space:pre-wrap}
-.klo-dice{align-self:flex-start;max-width:92%;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-.klo-dice>p{margin:0;font-size:14.5px;line-height:1.5;white-space:pre-wrap}
-.klo-dice[data-deshecho] .klo-chips li{text-decoration:line-through;opacity:.5}
-.klo-chips{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
-.klo-chips li{font-family:var(--mono);font-size:12px;color:var(--tinta-2);padding:5px 9px;border-radius:var(--r-chip);background:#1d1a19;display:flex;gap:8px;align-items:center}
-.klo-chips li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brasa);flex:none}
-.klo-espera{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:var(--r-caja);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--brasa) 45%,transparent)}
-.klo-espera small{font-family:var(--mono);font-size:11px;color:var(--v-durazno)}
-.klo-espera>div{display:flex;gap:8px;align-items:center}
-.klo-texto{background:none;border:0;padding:2px 0;color:var(--tinta-3);font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.klo-texto:disabled{text-decoration:none;cursor:default}
-.klo-nota{color:var(--tinta-3);font-size:12px}
-.klo-pensando{display:flex;gap:4px;padding:6px 2px}
-.klo-pensando i{width:6px;height:6px;border-radius:50%;background:var(--v-p-azul);animation:klo-latir 1s infinite ease-in-out}
-.klo-pensando i:nth-child(2){animation-delay:.15s}
-.klo-pensando i:nth-child(3){animation-delay:.3s}
-@keyframes klo-latir{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
-.klo-falla{margin:0 14px 8px;font-size:13px;color:var(--v-durazno)}
-.klo-escribir{display:flex;align-items:flex-end;gap:10px;margin:0 10px 10px;padding:10px 10px 10px 14px;border-radius:var(--r-caja);background:#1b1a19;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-.klo-escribir:focus-within{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
-.klo-escribir .v-orbe{align-self:center}
-.klo-escribir textarea{flex:1;min-width:0;resize:none;background:none;border:0;outline:0;color:var(--tinta);font:inherit;font-size:16px;line-height:1.4;max-height:120px;field-sizing:content}
+
+.klo-panel{position:absolute;top:64px;left:50%;width:min(680px,calc(100vw - 32px));max-height:min(720px,calc(100dvh - 88px));display:flex;flex-direction:column;
+  color:var(--tinta);border-radius:20px;isolation:isolate;
+  background:linear-gradient(180deg,#1c1816 0%,#0e0c0b 38%,#0a0909 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 0 0 1px rgba(255,255,255,.06),0 40px 120px -20px rgba(0,0,0,.85),0 0 80px -30px rgba(255,90,42,.35);
+  backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);
+  opacity:0;transform:translate(-50%,-14px) scale(.965);filter:blur(6px);
+  transition:opacity .28s var(--klo-ease),transform .45s var(--klo-ease),filter .35s var(--klo-ease)}
+.klo-capa[data-abierto] .klo-panel{opacity:1;transform:translate(-50%,0) scale(1);filter:none}
+.klo-capa:not([data-abierto]) .klo-panel{visibility:hidden;transition:opacity .18s,transform .22s var(--klo-ease),filter .2s,visibility 0s .22s}
+/* Halo: un borde de brasa que apenas se ve en reposo y gira mientras Klo trabaja. */
+.klo-panel::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:-1;
+  background:conic-gradient(from var(--klo-giro),transparent 0deg,rgba(255,90,42,.0) 40deg,rgba(255,122,74,.9) 90deg,rgba(255,201,51,.6) 120deg,transparent 170deg,transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  opacity:.35;transition:opacity .4s}
+.klo-panel[data-pensando]::before{opacity:1;animation:klo-girar 1.6s linear infinite}
+/* Brillo de ambiente arriba del panel. */
+.klo-panel::after{content:"";position:absolute;inset:0 0 auto;height:180px;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:radial-gradient(60% 100% at 18% 0%,rgba(255,90,42,.16),transparent 70%),radial-gradient(50% 90% at 90% 0%,rgba(28,54,238,.14),transparent 70%)}
+@keyframes klo-girar{to{--klo-giro:360deg}}
+
+/* Entrada escalonada al abrir. */
+.klo-capa[data-abierto] :is(.klo-cabeza,.klo-lista,.klo-escribir){animation:klo-subir .5s var(--klo-ease) both}
+.klo-capa[data-abierto] .klo-lista{animation-delay:.05s}
+.klo-capa[data-abierto] .klo-escribir{animation-delay:.1s}
+@keyframes klo-subir{from{opacity:0;transform:translateY(8px)}}
+
+/* Cabeza */
+.klo-cabeza{display:flex;align-items:center;gap:12px;padding:16px 18px 12px}
+.klo-quien{display:flex;flex-direction:column;gap:2px;line-height:1.1}
+.klo-quien b{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.klo-quien small{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-3)}
+.klo-punto{width:6px;height:6px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 0 rgba(61,220,132,.6);animation:klo-latido 2.4s ease-out infinite;flex:none}
+.klo-panel[data-pensando] .klo-quien .klo-punto{background:var(--brasa);animation:klo-latido-brasa 1s ease-out infinite}
+@keyframes klo-latido{0%{box-shadow:0 0 0 0 rgba(61,220,132,.55)}70%,100%{box-shadow:0 0 0 7px rgba(61,220,132,0)}}
+.klo-cerrar{margin-left:auto;padding:0;border:0;background:none;cursor:pointer}
+.klo-cerrar kbd,.klo-pie kbd{font-family:var(--mono);font-size:10.5px;color:var(--tinta-3);padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:color .15s,background .15s}
+.klo-cerrar:hover kbd{color:var(--tinta);background:rgba(255,255,255,.08)}
+
+/* Orbe de Klo: el gallo dentro de un círculo que respira; con anillo de brasa cuando trabaja. */
+.klo-orbe{position:relative;width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 35% 28%,#2a2420,#121010 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.07),0 6px 18px -6px rgba(255,90,42,.45);
+  animation:klo-respirar 4s ease-in-out infinite}
+.klo-orbe img{width:auto;height:58%;filter:drop-shadow(0 2px 4px rgba(28,54,238,.4))}
+.klo-orbe::after{content:"";position:absolute;inset:-3px;border-radius:50%;padding:1.5px;opacity:0;transition:opacity .3s;
+  background:conic-gradient(from var(--klo-giro),transparent 0 30%,var(--brasa) 60%,#ffc933 80%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.klo-orbe[data-vivo]::after{opacity:1;animation:klo-girar 1s linear infinite}
+.klo-orbe[data-grande]{width:64px;height:64px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.08),0 18px 50px -10px rgba(255,90,42,.55),0 0 0 8px rgba(255,90,42,.04)}
+@keyframes klo-respirar{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+
+/* Lista */
+.klo-lista{flex:1;overflow-y:auto;padding:6px 18px 18px;display:flex;flex-direction:column;gap:18px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;
+  -webkit-mask:linear-gradient(transparent,#000 14px,#000 calc(100% - 10px),transparent);mask:linear-gradient(transparent,#000 14px,#000 calc(100% - 10px),transparent)}
+.klo-vacio{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:22px 4px 10px}
+.klo-vacio h2{font-size:clamp(22px,3.4vw,28px);font-weight:700;letter-spacing:-.025em;line-height:1.15;max-width:22ch;
+  background:linear-gradient(100deg,#fff 0%,#fff 45%,#ffb38a 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.klo-vacio p{color:var(--tinta-2);font-size:14.5px;line-height:1.6;max-width:48ch;margin:0}
+.klo-capa[data-abierto] .klo-vacio>*{animation:klo-subir .6s var(--klo-ease) both}
+.klo-capa[data-abierto] .klo-vacio>:nth-child(2){animation-delay:.08s}
+.klo-capa[data-abierto] .klo-vacio>:nth-child(3){animation-delay:.16s}
+
+/* Tú */
+.klo-tu{align-self:flex-end;max-width:80%;margin:0;padding:10px 14px;border-radius:16px 16px 4px 16px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;
+  background:linear-gradient(135deg,#2b211d,#201a17);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 0 1px rgba(255,138,92,.14);
+  animation:klo-desde-derecha .4s var(--klo-ease) both}
+@keyframes klo-desde-derecha{from{opacity:0;transform:translate(10px,4px) scale(.98)}}
+
+/* Klo */
+.klo-dice{display:flex;gap:12px;align-items:flex-start;max-width:100%;animation:klo-subir .4s var(--klo-ease) both}
+.klo-dice>.klo-orbe{width:28px;height:28px;margin-top:-2px;animation:none}
+.klo-cuerpo{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.klo-escrito{margin:0;font-size:15px;line-height:1.6;white-space:pre-wrap;color:var(--tinta)}
+.klo-escrito span{display:inline-block;animation:klo-palabra .38s var(--klo-ease) both;animation-delay:min(calc(var(--i) * 22ms),1600ms)}
+@keyframes klo-palabra{from{opacity:0;transform:translateY(4px);filter:blur(3px)}}
+
+/* Acciones: tarjetas con ícono que entran en cascada cuando termina la respuesta. */
+.klo-acciones{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;width:100%}
+.klo-acciones li{display:flex;align-items:center;gap:10px;padding:8px 12px 8px 8px;border-radius:12px;
+  background:linear-gradient(90deg,rgba(255,90,42,.07),rgba(255,255,255,.02) 55%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  animation:klo-tarjeta .45s var(--klo-ease) both;animation-delay:var(--d,0ms);transition:opacity .3s,filter .3s}
+.klo-icono{width:28px;height:28px;flex:none;display:grid;place-items:center;border-radius:9px;color:#fff;
+  background:linear-gradient(140deg,#ff7a4a,#e2461c);box-shadow:0 4px 14px -4px rgba(255,90,42,.7),inset 0 1px 0 rgba(255,255,255,.3)}
+.klo-acciones li .klo-icono{animation:klo-pop .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--d,0ms) + 120ms)}
+.klo-accion{display:flex;flex-direction:column;min-width:0;gap:1px}
+.klo-accion b{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--v-durazno,#ff9a6b)}
+.klo-accion span{font-size:13.5px;color:var(--tinta);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.klo-acciones[data-tachadas] li{opacity:.45;filter:grayscale(1)}
+.klo-acciones[data-tachadas] .klo-accion span{text-decoration:line-through}
+@keyframes klo-tarjeta{from{opacity:0;transform:translateY(8px) scale(.98)}}
+@keyframes klo-pop{from{transform:scale(.4) rotate(-20deg);opacity:0}}
+
+/* Espera tu OK */
+.klo-espera{width:100%;display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,90,42,.09),rgba(255,90,42,.03));box-shadow:inset 0 0 0 1px rgba(255,90,42,.35),0 10px 30px -14px rgba(255,90,42,.5);
+  animation:klo-tarjeta .45s var(--klo-ease) both;animation-delay:var(--d,0ms)}
+.klo-espera small{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--v-durazno,#ff9a6b)}
+.klo-espera small .klo-punto{background:var(--brasa);animation:klo-latido-brasa 1.4s ease-out infinite}
+@keyframes klo-latido-brasa{0%{box-shadow:0 0 0 0 rgba(255,90,42,.6)}70%,100%{box-shadow:0 0 0 7px rgba(255,90,42,0)}}
+.klo-espera .klo-acciones li{background:rgba(0,0,0,.25)}
+.klo-botones{display:flex;gap:8px}
+.klo-si,.klo-no{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:10px;border:0;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;transition:transform .15s var(--klo-ease),filter .15s,background .15s}
+.klo-si{color:#fff;background:linear-gradient(140deg,#ff7a4a,#e2461c);box-shadow:0 8px 20px -8px rgba(255,90,42,.8),inset 0 1px 0 rgba(255,255,255,.3)}
+.klo-si:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.klo-no{color:var(--tinta-2);background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.klo-no:hover{color:var(--tinta);background:rgba(255,255,255,.09)}
+.klo-si:active,.klo-no:active{transform:scale(.97)}
+.klo-nota{color:var(--tinta-3);font-size:12.5px}
+.klo-deshacer{display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border:0;border-radius:8px;background:none;color:var(--tinta-3);font-family:var(--mono);font-size:11px;letter-spacing:.04em;cursor:pointer;
+  animation:klo-subir .4s var(--klo-ease) both;animation-delay:var(--d,0ms);transition:color .15s,background .15s}
+.klo-deshacer:hover:not(:disabled){color:var(--tinta);background:rgba(255,255,255,.06)}
+.klo-deshacer:disabled{cursor:default;opacity:.6}
+
+/* Pensando */
+.klo-pensando{display:flex;align-items:center;gap:12px;animation:klo-subir .3s var(--klo-ease) both}
+.klo-pensando>.klo-orbe{width:28px;height:28px}
+.klo-brillo{font-size:14px;font-weight:600;background:linear-gradient(90deg,var(--tinta-3) 0%,#fff 45%,#ffb38a 55%,var(--tinta-3) 100%);background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:klo-brillar 1.8s linear infinite}
+.klo-quien .klo-brillo{font-size:inherit;font-weight:inherit}
+@keyframes klo-brillar{from{background-position:120% 0}to{background-position:-120% 0}}
+.klo-puntos{display:flex;gap:4px}
+.klo-puntos i{width:5px;height:5px;border-radius:50%;background:var(--brasa);animation:klo-saltar 1s infinite ease-in-out}
+.klo-puntos i:nth-child(2){animation-delay:.15s}
+.klo-puntos i:nth-child(3){animation-delay:.3s}
+@keyframes klo-saltar{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+
+.klo-falla{margin:0 18px 8px;padding:8px 12px;border-radius:10px;font-size:13px;color:var(--v-durazno,#ff9a6b);background:rgba(255,90,42,.08);animation:klo-subir .3s var(--klo-ease) both}
+
+/* Escribir */
+.klo-escribir{display:flex;flex-direction:column;gap:6px;margin:0 12px 12px;padding:12px 12px 10px 16px;border-radius:16px;
+  background:rgba(8,7,7,.85);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.04);transition:box-shadow .25s var(--klo-ease)}
+.klo-escribir:focus-within{box-shadow:inset 0 0 0 1px rgba(255,122,74,.55),0 0 0 4px rgba(255,90,42,.10),0 12px 40px -12px rgba(255,90,42,.45)}
+.klo-escribir textarea{width:100%;resize:none;background:none;border:0;outline:0;color:var(--tinta);font:inherit;font-size:16px;line-height:1.45;max-height:160px;field-sizing:content;min-height:24px}
 .klo-escribir textarea::placeholder{color:var(--tinta-3)}
-.klo-enviar{width:30px;height:30px;flex:none;border-radius:var(--r-control);border:0;background:#fff;color:#000;font-size:16px;font-weight:700;cursor:pointer}
-.klo-enviar:disabled{background:var(--carbon-2);color:var(--tinta-3);cursor:default}
+.klo-pie{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.klo-pie small{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;color:var(--tinta-3)}
+.klo-pie small kbd{padding:1px 5px;font-size:10px}
+.klo-enviar{width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:12px;border:0;cursor:pointer;color:#fff;
+  background:linear-gradient(140deg,#ff7a4a,#e2461c);box-shadow:0 8px 22px -8px rgba(255,90,42,.9),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),filter .15s,background .2s,box-shadow .2s}
+.klo-enviar:hover:not(:disabled){transform:translateY(-1px) scale(1.05);filter:brightness(1.1)}
+.klo-enviar:active:not(:disabled){transform:scale(.94)}
+.klo-enviar:disabled{background:rgba(255,255,255,.06);color:var(--tinta-3);box-shadow:none;cursor:default}
+.klo-panel :focus-visible{outline:2px solid var(--brasa);outline-offset:2px}
+.klo-escribir textarea:focus-visible{outline:0}
+
 @media (max-width:700px){
-  .klo-panel{top:auto;bottom:0;left:0;width:100%;max-height:88dvh;border-radius:16px 16px 0 0;transform:translateY(24px);padding-bottom:env(safe-area-inset-bottom)}
+  .klo-panel{top:auto;bottom:0;left:0;width:100%;max-height:90dvh;border-radius:22px 22px 0 0;transform:translateY(40px);padding-bottom:env(safe-area-inset-bottom)}
   .klo-capa[data-abierto] .klo-panel{transform:none}
+  .klo-cabeza{padding-top:22px}
+  .klo-cabeza::before{content:"";position:absolute;top:8px;left:50%;width:38px;height:4px;margin-left:-19px;border-radius:4px;background:rgba(255,255,255,.18)}
+  .klo-pie small{display:none}
+  .klo-pie{justify-content:flex-end}
+  .klo-tu{max-width:88%}
 }
-@media (prefers-reduced-motion:reduce){.klo-panel,.klo-velo{transition:none}.klo-pensando i{animation:none;opacity:.6}}
+@media (prefers-reduced-motion:reduce){
+  .klo-panel,.klo-velo{transition:none;filter:none}
+  .klo-capa *,.klo-panel::before,.klo-panel::after{animation:none!important}
+}
 .klo-memoria{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .klo-memoria li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--tinta-2);padding:6px 8px;border-radius:var(--r-chip);background:#1d1a19}
 .klo-memoria span{flex:1}
@@ -921,5 +1044,3 @@ button.v-klo-campo:focus-visible{outline:2px solid var(--brasa);outline-offset:2
 .klo-uso dd{margin:0;color:var(--tinta-2);text-align:right}
 .klo-uso strong{color:var(--tinta)}
 .klo-memoria button{background:none;border:0;color:var(--tinta-3);cursor:pointer;font-size:15px;line-height:1}
-/* Cerrado: fuera del foco del teclado y de los lectores (visibility espera a que termine el desvanecido). */
-.klo-capa:not([data-abierto]) .klo-panel{visibility:hidden;transition:opacity .18s,transform .22s var(--ease),visibility 0s .22s}

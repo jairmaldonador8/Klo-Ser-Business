@@ -23,17 +23,22 @@ test('Klo responde, muestra lo que hizo y deja deshacer', async ({ page }, info)
   await page.getByRole('button', { name: 'Tell Klo' }).click()
   const panel = page.getByRole('dialog', { name: 'Klo' })
   await expect(panel).toBeVisible()
+  await expect(panel.getByRole('heading', { name: /moving forward/ })).toBeVisible()
+  await page.waitForTimeout(700)
+  await page.screenshot({ path: `test-results/capturas/klo-vacio-${info.project.name}.png` })
 
   await panel.getByRole('textbox', { name: 'Message for Klo' }).fill('move the Ana call to thursday at 4 and delete the old draft')
   await panel.getByRole('textbox', { name: 'Message for Klo' }).press('Enter')
 
   await expect(panel.getByText('Moved it to Thursday at 4.', { exact: false })).toBeVisible()
-  await expect(panel.getByText('Moved · Ana call')).toBeVisible()
+  await expect(panel.getByRole('listitem').filter({ hasText: /Moved\s*Ana call/ })).toBeVisible()
   await expect(panel.getByText('Needs your OK')).toBeVisible()
+  // Espera a que termine la animación de entrada antes de la captura.
+  await page.waitForTimeout(1500)
   await page.screenshot({ path: `test-results/capturas/klo-${info.project.name}.png` })
 
   await panel.getByRole('button', { name: 'Confirm' }).click()
-  await expect(panel.getByText('Deleted · Old draft')).toBeVisible()
+  await expect(panel.getByRole('listitem').filter({ hasText: /Deleted\s*Old draft/ })).toBeVisible()
 
   await panel.getByRole('button', { name: 'Undo' }).click()
   await expect(panel.getByRole('button', { name: 'Undone' })).toBeDisabled()
