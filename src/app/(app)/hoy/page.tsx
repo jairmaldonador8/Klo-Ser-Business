@@ -1,8 +1,9 @@
 import Image from 'next/image'
+import { HechasVivas, MedidorVivo } from '@/components/hoy/contadores'
 import { AgregarTareaHoy, MicroWins } from '@/components/hoy/micro-wins'
 import { RenglonTarea } from '@/components/tareas/renglon-tarea'
 import { EditorHoy, type ItemHoy } from '@/components/vidrio/editor-hoy'
-import { MosaicoKlo, MosaicoLista, MosaicoMedidor, MosaicoProyectos, MosaicoSimple, MosaicoTareas } from '@/components/vidrio/mosaicos'
+import { MosaicoKlo, MosaicoLista, MosaicoProyectos, MosaicoSimple, MosaicoTareas } from '@/components/vidrio/mosaicos'
 import { contextoAhora, leerMisTareas, leerProyectos } from '@/lib/datos'
 import { etiquetaDia } from '@/lib/fechas'
 import { esColor, frenteAbierto, type FrenteVista } from '@/lib/frentes'
@@ -82,12 +83,15 @@ export default async function Hoy({ searchParams }: Props) {
     lista.slice(0, TOPE).map((t) => <RenglonTarea key={t.id} tarea={t} frente={frente ? undefined : frenteDe.get(t.espacio_id)} {...props(t)} />)
   const mas = (lista: Tarea[]) => Math.max(0, lista.length - TOPE)
 
+  // Lo que cuentan el medidor y «N of M done»: así se mueven al palomear, antes de que conteste el servidor.
+  const universo = hoyCalc.tareasHoy.map((t) => ({ id: t.id, hecha: t.completada_en !== null }))
+
   const proyectosVista = frente ? proyectos.filter((p) => p.espacio_id === frente.id) : proyectos.slice(0, 2)
 
   const nodo = (id: IdMosaico, i: number): React.ReactNode => {
     switch (id) {
       case 'medidor':
-        return <MosaicoMedidor key={id} hechas={hoyCalc.hechas} pendientes={hoyCalc.pendientes} siguiente={hoyCalc.siguiente?.titulo ?? null} i={i} />
+        return <MedidorVivo key={id} hechas={hoyCalc.hechas} pendientes={hoyCalc.pendientes} siguiente={hoyCalc.siguiente?.titulo ?? null} i={i} universo={universo} />
       case 'klo':
         return <MosaicoKlo key={id} frase={fraseKlo(hoyCalc.pendientes, hoyCalc.siguiente?.titulo ?? null)} i={i} />
       case 'en_riesgo':
@@ -104,7 +108,7 @@ export default async function Hoy({ searchParams }: Props) {
         return (
           <MosaicoTareas
             key={id}
-            hechas={lista.filter((t) => t.completada_en).length}
+            hechas={<HechasVivas hechas={lista.filter((t) => t.completada_en).length} universo={universo} />}
             total={lista.length}
             microWins={<MicroWins inicial={(microWins ?? []).map((m) => ({ ...m, hecho: palomeados.has(m.id) }))} />}
             accion={<AgregarTareaHoy espacioId={frente?.id} />}

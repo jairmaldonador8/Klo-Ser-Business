@@ -1,9 +1,10 @@
 'use client'
 
-import { startTransition, useOptimistic } from 'react'
+import { startTransition } from 'react'
 import { completarTarea } from '@/app/(app)/tareas/acciones'
 import { useHoja, useHojaViva } from '@/components/hoja/hoja-provider'
 import type { FrenteVista } from '@/lib/frentes'
+import { marcar, soltar, useHecha } from '@/lib/tareas/marcas'
 import type { Tarea } from '@/lib/tareas/esquema'
 import { useToast } from './toast'
 
@@ -23,23 +24,31 @@ export function RenglonTarea({ tarea, frente, detalle, vencida, ahora }: Props) 
   const abrir = useHoja()
   const seleccionada = useHojaViva().vivo.id === tarea.id
   const avisar = useToast()
-  const [hecha, setHecha] = useOptimistic(tarea.completada_en !== null)
+  // Compartida: si la misma task sale en la agenda y en Tasks, palomearla en una la palomea en las dos al momento.
+  const hecha = useHecha(tarea.id, tarea.completada_en !== null)
 
   function palomear() {
     const nueva = !hecha
+    marcar(tarea.id, nueva)
     startTransition(async () => {
-      setHecha(nueva)
       const r = await completarTarea(tarea.id, nueva)
-      if (!r.ok) avisar(r.mensaje)
+      if (!r.ok) {
+        soltar(tarea.id)
+        avisar(r.mensaje)
+      }
       // El renglón puede desaparecer al marcarse (De un toque solo lista pendientes): el Deshacer no depende de él.
       else if (nueva)
-        avisar('Done', () =>
+        avisar('Done', () => {
+          marcar(tarea.id, false)
           // Si el Deshacer falla, te lo decimos: antes se perdía en silencio.
           startTransition(async () => {
             const d = await completarTarea(tarea.id, false)
-            if (!d.ok) avisar(d.mensaje)
-          }),
-        )
+            if (!d.ok) {
+              soltar(tarea.id)
+              avisar(d.mensaje)
+            }
+          })
+        })
     })
   }
 

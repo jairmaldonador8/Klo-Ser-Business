@@ -3,6 +3,7 @@
 import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { guardarActividades } from '@/app/(app)/ajustes/acciones'
 import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
+import { marcar, soltar } from '@/lib/tareas/marcas'
 import { borrarDesdeAqui, borrarTodas, cambiarDesdeAqui, cambiarFin, cambiarTodas, crearEnVariosDias, crearRepetida, leerSerie, soloEsta } from '@/app/(app)/tareas/repetir'
 import { mismaRegla } from '@/lib/repetir'
 import { sumarDias } from '@/lib/fechas'
@@ -422,7 +423,17 @@ export function HojaTarea({
           </button>
           {tarea && (
             <>
-              <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => completarTarea(tarea.id, !tarea.completada_en))}>
+              <button type="button" className="v-boton" disabled={ocupada} onClick={() => {
+                  // Al momento en todos los renglones de esta task; si el servidor falla, regresa.
+                  const nueva = !tarea.completada_en
+                  marcar(tarea.id, nueva)
+                  correr(async () => {
+                    const r = await completarTarea(tarea.id, nueva)
+                    if (!r.ok) soltar(tarea.id)
+                    return r
+                  })
+                }}
+              >
                 {tarea.completada_en ? 'Reopen' : 'Complete'}
               </button>
               <button

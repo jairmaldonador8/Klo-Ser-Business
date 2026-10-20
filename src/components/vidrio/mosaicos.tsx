@@ -185,7 +185,7 @@ export function MosaicoProyectos({ proyectos, hoy, frente, i }: Proyectos) {
   )
 }
 
-type Tareas = { hechas: number; total: number; microWins: React.ReactNode; accion: React.ReactNode; mas?: number; i: number; children?: React.ReactNode[] }
+type Tareas = { hechas: React.ReactNode; total: number; microWins: React.ReactNode; accion: React.ReactNode; mas?: number; i: number; children?: React.ReactNode[] }
 
 /** Tu lista de trabajo del día: micro wins arriba y tus tasks abajo; lo hecho se queda tachado hasta mañana. */
 export function MosaicoTareas({ hechas, total, microWins, accion, mas = 0, i, children = [] }: Tareas) {
