@@ -24,14 +24,14 @@ export function Riel({ secciones, frentes }: { secciones: Seccion[]; frentes: Fr
   const atajo = useSearchParams().get('frente')
   const abierto = frenteAbierto(frentes, atajo)
 
-  // Al tocar otro space sale su logo con el anillo de carga; se va cuando ya llegó, tras un instante mínimo
+  // Al tocar otro space sale su apertura (logo, nombre y línea de carga); se va cuando ya llegó, tras un instante mínimo
   // para que no parpadee. Si algo se atora, a los 8 s se quita solo.
   const [abriendo, setAbriendo] = useState<Abriendo | null>(null)
   const desde = useRef(0)
   const llego = abriendo !== null && (abierto?.id ?? null) === (abriendo.frente?.id ?? null)
   useEffect(() => {
     if (!abriendo) return
-    const espera = llego ? Math.max(0, 750 - (Date.now() - desde.current)) : 8000
+    const espera = llego ? Math.max(0, 950 - (Date.now() - desde.current)) : 8000
     const reloj = setTimeout(() => setAbriendo(null), espera)
     return () => clearTimeout(reloj)
   }, [abriendo, llego])

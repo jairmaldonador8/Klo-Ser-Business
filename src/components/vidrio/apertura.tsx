@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import type { CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import type { FrenteVista } from '@/lib/frentes'
 import { MarcaEspacio } from './marca-espacio'
@@ -8,14 +9,10 @@ import { MarcaEspacio } from './marca-espacio'
 /** Lo que se está abriendo: un space, o «All» (sin space). */
 export type Abriendo = { frente: FrenteVista | null }
 
-/** El logo del space al centro, con un anillo fino de carga girando alrededor. */
+/** El logo del space (plano, con un destello que lo cruza) y una línea de carga en su color. */
 export function MarcaCargando({ frente }: { frente: FrenteVista | null }) {
   return (
     <div className="v-marca-carga">
-      <svg viewBox="0 0 100 100" aria-hidden>
-        <circle className="pista" cx="50" cy="50" r="46" />
-        <circle className="arco" cx="50" cy="50" r="46" pathLength="100" />
-      </svg>
       {frente ? (
         <b className={frente.logo ? 'con-logo' : undefined}>
           <MarcaEspacio frente={frente} />
@@ -23,6 +20,9 @@ export function MarcaCargando({ frente }: { frente: FrenteVista | null }) {
       ) : (
         <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={40} height={48} unoptimized priority />
       )}
+      <span className="v-carga-linea" aria-hidden>
+        <i />
+      </span>
     </div>
   )
 }
@@ -30,10 +30,25 @@ export function MarcaCargando({ frente }: { frente: FrenteVista | null }) {
 /** Velo de apertura de un space: va al body (el riel tiene backdrop-filter y atraparía el position:fixed). */
 export function Apertura({ abriendo }: { abriendo: Abriendo }) {
   const { frente } = abriendo
+  const nombre = frente?.nombre ?? 'All spaces'
   return createPortal(
-    <div className="v-apertura" data-color={frente?.color} role="status" aria-label={`Opening ${frente?.nombre ?? 'All'}`}>
+    <div className="v-apertura" data-color={frente?.color} role="status" aria-label={`Opening ${nombre}`}>
+      <div className="v-aurora" aria-hidden>
+        <i />
+        <i />
+      </div>
       <MarcaCargando frente={frente} />
-      <small>{frente?.nombre ?? 'All spaces'}</small>
+      <div className="v-apertura-texto" aria-hidden>
+        <small>Opening</small>
+        {/* El nombre aparece letra por letra. */}
+        <strong>
+          {[...nombre].map((letra, i) => (
+            <span key={i} style={{ '--i': i } as CSSProperties}>
+              {letra === ' ' ? ' ' : letra}
+            </span>
+          ))}
+        </strong>
+      </div>
     </div>,
     document.body,
   )
