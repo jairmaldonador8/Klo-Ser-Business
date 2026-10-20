@@ -43,6 +43,8 @@ export type Tarea = {
   color: string | null
   proyecto_id: string | null
   completada_en: string | null
+  /** Minutos antes de la hora para el aviso push; null = sin aviso (la base pone 10). */
+  aviso_min?: number | null
 }
 
 const vacioANulo = (v: unknown) => (v === '' || v === undefined ? null : v)
@@ -63,6 +65,8 @@ export const esquemaTarea = z
       .optional()
       .transform((v) => v ?? null),
     proyecto_id: z.preprocess(vacioANulo, z.uuid().nullable()),
+    // Sin el campo, no se toca (la base pone 10 al crear); null = sin aviso.
+    aviso_min: z.preprocess((v) => (v === '' ? null : v), z.coerce.number().int().min(0).max(1440).nullable()).optional(),
   })
   .refine((t) => !t.hora || t.fecha, { message: 'To set a time, set a date.', path: ['hora'] })
   .refine((t) => !t.fecha_fin || (t.fecha && t.fecha_fin > t.fecha), { message: 'The end date must be after the start date.', path: ['fecha_fin'] })

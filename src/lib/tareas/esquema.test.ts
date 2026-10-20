@@ -64,3 +64,17 @@ describe('actividades', () => {
     expect(limpiarActividades(['  Amozurrutia ', 'amozurrutia', '', 'Meeting', 'junta', 'Pádel  semanal'])).toEqual(['Amozurrutia', 'Pádel semanal'])
   })
 })
+
+describe('aviso_min', () => {
+  const base = { id: '', espacio_id: '6f9619ff-8b86-4011-b42d-00c04fc964ff', titulo: 'Junta', clase: 'tarea', fecha: '2026-10-20', hora: '16:00', hora_fin: '', proyecto_id: '' }
+  it('es opcional: sin el campo no se manda', () => {
+    expect('aviso_min' in esquemaTarea.parse(base)).toBe(false)
+  })
+  it('acepta minutos y null (sin aviso)', () => {
+    expect(esquemaTarea.parse({ ...base, aviso_min: '30' }).aviso_min).toBe(30)
+    expect(esquemaTarea.parse({ ...base, aviso_min: null }).aviso_min).toBeNull()
+  })
+  it('no pasa de un día', () => {
+    expect(esquemaTarea.safeParse({ ...base, aviso_min: 2000 }).success).toBe(false)
+  })
+})

@@ -4,7 +4,7 @@ import type { Clase, Tarea } from '@/lib/tareas/esquema'
 
 // Solo servidor: usa el cliente de Supabase con las cookies de la sesión.
 
-const COLUMNAS = 'id, espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, serie_id, color, proyecto_id, completada_en'
+const COLUMNAS = 'id, espacio_id, titulo, clase, fecha, hora, hora_fin, fecha_fin, serie_id, color, proyecto_id, completada_en, aviso_min'
 
 /** Días hacia adelante que leen Today y Week: más allá solo hay repeticiones generadas por adelantado. */
 const VENTANA_LISTAS = 120

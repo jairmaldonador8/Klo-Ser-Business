@@ -35,3 +35,20 @@ export function nombreDia(fecha: string): string {
 }
 
 export { diferencia as diasEntre }
+
+/** Cuánto le lleva esa zona a UTC (ms) en ese instante. */
+function desfase(instante: Date, zona: string): number {
+  const partes = new Intl.DateTimeFormat('en-US', {
+    timeZone: zonaValida(zona), hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+  }).formatToParts(instante)
+  const n = (t: string) => Number(partes.find((p) => p.type === t)?.value)
+  return Date.UTC(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'), n('second')) - instante.getTime()
+}
+
+/** «2026-10-20» + «16:00» leídos en la zona del usuario → el instante real (para avisos). */
+export function instanteEn(fecha: string, hora: string, zona: string): Date {
+  const comoUtc = Date.parse(`${fecha}T${hora.slice(0, 5)}:00Z`)
+  // Dos pasadas: la segunda corrige si el desfase cambia entre la suposición y la hora real (horario de verano).
+  const primero = comoUtc - desfase(new Date(comoUtc), zona)
+  return new Date(comoUtc - desfase(new Date(primero), zona))
+}

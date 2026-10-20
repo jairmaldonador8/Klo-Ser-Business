@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { etiquetaDia, fechaEn, horaMinEn, nombreDia, sumarDias } from './fechas'
+import { etiquetaDia, fechaEn, horaMinEn, instanteEn, nombreDia, sumarDias } from './fechas'
 
 const zona = 'America/Monterrey' // UTC-6 en octubre
 
@@ -27,5 +27,15 @@ describe('nombreDia', () => {
   it('nombra el día para la agenda', () => {
     expect(nombreDia('2026-10-20')).toBe('Tuesday, Oct 20')
     expect(nombreDia('2026-12-31')).toBe('Thursday, Dec 31')
+  })
+})
+
+describe('instanteEn', () => {
+  it('lee fecha y hora en la zona del usuario', () => {
+    expect(instanteEn('2026-10-20', '16:00', zona).toISOString()).toBe('2026-10-20T22:00:00.000Z')
+    expect(instanteEn('2026-07-01', '09:30:00', 'America/New_York').toISOString()).toBe('2026-07-01T13:30:00.000Z')
+  })
+  it('cruza el cambio de horario', () => {
+    expect(instanteEn('2026-11-02', '09:00', 'America/New_York').toISOString()).toBe('2026-11-02T14:00:00.000Z')
   })
 })
