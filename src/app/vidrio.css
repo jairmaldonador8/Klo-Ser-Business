@@ -1283,11 +1283,17 @@ button.klo-campo{gap:10px;padding:6px 8px 6px 6px;transition:box-shadow .25s cub
 .v-apertura-texto strong span{display:inline-block;animation:v-letra .55s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(120ms + var(--i) * 28ms)}
 @keyframes v-letra{from{opacity:0;transform:translateY(14px) rotate(4deg);filter:blur(5px)}}
 
+/* El logo completo del space en lugar del nombre: se revela de izquierda a derecha. */
+.v-apertura-logo{display:flex;flex-direction:column;align-items:center;gap:8px;animation:v-revela .8s cubic-bezier(.16,1,.3,1) .12s both}
+.v-apertura-logo img{display:block;width:auto;height:clamp(40px,6vw,58px);max-width:min(340px,80vw);object-fit:contain;filter:drop-shadow(0 10px 30px color-mix(in oklch,var(--ac) 45%,transparent))}
+.v-apertura-lockup em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.5em;padding-left:.5em;text-transform:uppercase;color:color-mix(in oklch,var(--ac-texto) 70%,#fff)}
+@keyframes v-revela{from{opacity:0;clip-path:inset(-60% 100% -60% -60%);transform:translateY(6px)}to{opacity:1;clip-path:inset(-60% -60% -60% -60%)}}
+
 /* Cargando una sección: logo un poco más chico con su línea. */
 .v-cargando .v-marca-carga > b{width:60px;height:60px;font-size:26px;border-radius:17px}
 
 @media (prefers-reduced-motion:reduce){
-  .v-marca-carga > b,.v-marca-carga > img,.v-apertura-texto strong span,.v-aurora i{animation:none}
+  .v-marca-carga > b,.v-marca-carga > img,.v-apertura-texto strong span,.v-apertura-logo,.v-aurora i{animation:none}
   .v-marca-carga > b::after{animation:none;display:none}
   .v-carga-linea i{animation-duration:2.4s}
 }

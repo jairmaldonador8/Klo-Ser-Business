@@ -40,14 +40,26 @@ export function Apertura({ abriendo }: { abriendo: Abriendo }) {
       <MarcaCargando frente={frente} />
       <div className="v-apertura-texto" aria-hidden>
         <small>Opening</small>
-        {/* El nombre aparece letra por letra. */}
-        <strong>
-          {[...nombre].map((letra, i) => (
-            <span key={i} style={{ '--i': i } as CSSProperties}>
-              {letra === ' ' ? ' ' : letra}
-            </span>
-          ))}
-        </strong>
+        {/* El logo completo del space se revela de izquierda a derecha; «All» es el lockup de Klo-Ser Business.
+            Si el space no tiene logo completo, su nombre aparece letra por letra. */}
+        {!frente ? (
+          <span className="v-apertura-logo v-apertura-lockup">
+            <Image src="/marca/blanco/03-wordmark.svg" alt="" width={220} height={55} unoptimized priority />
+            <em>Business</em>
+          </span>
+        ) : frente.logo_ancho ? (
+          <span className="v-apertura-logo">
+            <Image src={frente.logo_ancho} alt="" width={260} height={64} unoptimized priority />
+          </span>
+        ) : (
+          <strong>
+            {[...nombre].map((letra, i) => (
+              <span key={i} style={{ '--i': i } as CSSProperties}>
+                {letra === ' ' ? '\u00a0' : letra}
+              </span>
+            ))}
+          </strong>
+        )}
       </div>
     </div>,
     document.body,
