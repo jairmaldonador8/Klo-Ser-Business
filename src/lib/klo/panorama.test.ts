@@ -42,6 +42,13 @@ describe('armarPanorama', () => {
     expect(lineas[1]).toContain('Thu Oct 22 16:00–17:00 · Meeting')
   })
 
+  it('lista las notas marcadas como «Maybe task», cortas y con su id', () => {
+    const p = armarPanorama({ ...datos([]), notasPosibles: [{ id: 'n1', espacio_id: 'e2', texto: 'Podcast con clientes\nidea larga' }] })
+    expect(p).toContain('Notes flagged as maybe tasks')
+    expect(p).toContain('- note [n1] Podcast con clientes idea larga · Top Digital')
+    expect(armarPanorama(datos([]))).not.toContain('flagged')
+  })
+
   it('tiene tope de 80 tasks', () => {
     const muchas = Array.from({ length: 100 }, (_, i) => t(`x${i}`, { fecha: '2026-10-21' }))
     expect(armarPanorama(datos(muchas)).split('\n').filter((l) => l.startsWith('- [')).length).toBe(80)

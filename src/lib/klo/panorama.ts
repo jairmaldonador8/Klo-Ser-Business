@@ -12,10 +12,13 @@ export type DatosPanorama = {
   proyectos: { id: string; nombre: string; espacio_id: string; fecha_meta: string | null }[]
   actividades: string[]
   tareas: Tarea[]
+  /** Notas marcadas «Maybe task»: Klo puede sugerir cuándo hacerlas o volverlas task. */
+  notasPosibles?: { id: string; espacio_id: string; texto: string }[]
 }
 
 const DIAS_ADELANTE = 14
 const TOPE_TAREAS = 80
+const TOPE_NOTAS = 15
 
 const diaCorto = (f: string) =>
   new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(`${f}T12:00:00Z`)).replace(',', '')
@@ -60,5 +63,14 @@ export function armarPanorama(d: DatosPanorama): string {
     '',
     `Open tasks (overdue + next ${DIAS_ADELANTE} days + undated; use buscar for anything else):`,
     ...(tareas.length ? tareas.map(renglon) : ['(none)']),
+    ...(d.notasPosibles?.length
+      ? [
+          '',
+          'Notes flagged as maybe tasks (to turn one into a task: crear_task with de_nota_id):',
+          ...d.notasPosibles
+            .slice(0, TOPE_NOTAS)
+            .map((n) => `- note [${n.id}] ${n.texto.replace(/\s+/g, ' ').trim().slice(0, 120)} · ${espacio.get(n.espacio_id) ?? '?'}`),
+        ]
+      : []),
   ].join('\n')
 }

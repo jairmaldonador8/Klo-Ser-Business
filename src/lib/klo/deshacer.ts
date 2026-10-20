@@ -7,7 +7,11 @@ async function revertir(sb: Cliente, d: Deshacer): Promise<Resultado[]> {
   const ahora = new Date().toISOString()
   switch (d.tipo) {
     case 'borrar_tarea':
-      return [await sb.from('tareas').update({ borrado_en: ahora }).eq('id', d.id)]
+      return [
+        await sb.from('tareas').update({ borrado_en: ahora }).eq('id', d.id),
+        // Si venía de una nota, la nota regresa a su lista.
+        d.nota ? await sb.from('notas').update({ convertida_en_tarea_id: null }).eq('id', d.nota) : { error: null },
+      ]
     case 'restaurar_tarea':
       return [await sb.from('tareas').update(d.campos).eq('id', d.id)]
     case 'borrar_nota':

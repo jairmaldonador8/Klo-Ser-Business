@@ -285,6 +285,7 @@ export type Database = {
           creado_por: string
           espacio_id: string
           id: string
+          posible_tarea: boolean
           texto: string
         }
         Insert: {
@@ -295,6 +296,7 @@ export type Database = {
           creado_por?: string
           espacio_id: string
           id?: string
+          posible_tarea?: boolean
           texto: string
         }
         Update: {
@@ -305,6 +307,7 @@ export type Database = {
           creado_por?: string
           espacio_id?: string
           id?: string
+          posible_tarea?: boolean
           texto?: string
         }
         Relationships: [

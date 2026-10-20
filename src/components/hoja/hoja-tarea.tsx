@@ -1,8 +1,9 @@
 'use client'
 
-import { Bell, CalendarDays, CalendarRange, Clock, Folder, Layers, Palette, Repeat, Shapes, type LucideIcon } from 'lucide-react'
+import { Bell, CalendarDays, CalendarRange, ChevronDown, Clock, Flag, Folder, Layers, Palette, Repeat, Shapes, type LucideIcon } from 'lucide-react'
 import { startTransition, useEffect, useRef, useState, useTransition } from 'react'
 import { guardarActividades } from '@/app/(app)/ajustes/acciones'
+import { crearNota } from '@/app/(app)/notas/acciones'
 import { borrarTarea, completarTarea, guardarTarea, type Resultado } from '@/app/(app)/tareas/acciones'
 import { marcar, soltar } from '@/lib/tareas/marcas'
 import { borrarDesdeAqui, borrarTodas, cambiarDesdeAqui, cambiarFin, cambiarTodas, crearEnVariosDias, crearRepetida, leerSerie, soloEsta } from '@/app/(app)/tareas/repetir'
@@ -40,6 +41,25 @@ const AVISOS = [
   ['30', '30 min before'],
   ['60', '1 hour before'],
 ] as const
+
+// El + captura tasks o notas y recuerda cuál usaste la última vez.
+const MODO = 'klo-captura'
+const leerModo = () => {
+  try {
+    return localStorage.getItem(MODO)
+  } catch {
+    return null
+  }
+}
+const guardarModo = (modo: string) => {
+  try {
+    localStorage.setItem(MODO, modo)
+  } catch {
+    // Sin almacenamiento (modo privado): solo no se recuerda.
+  }
+}
+/** ¿Trae algo de lo que vive en «More options»? Entonces se abre ya desplegado. */
+const conExtras = (f: Formulario) => f.clase !== 'tarea' || !!f.color || !!f.proyecto_id || !!f.fecha_fin || f.aviso_min !== '10'
 
 /** Una propiedad de la task: ícono y nombre a la izquierda, el control a la derecha. */
 function Prop({ icono: Icono, etq, htmlFor, children }: { icono: LucideIcon; etq: string; htmlFor?: string; children: React.ReactNode }) {
@@ -122,6 +142,21 @@ export function HojaTarea({
   const [nueva, setNueva] = useState<string | null>(null)
   // Las de siempre, las tuyas y, si la tarea trae una que ya quitaste, también esa.
   const opciones = [...CLASES, ...propias, ...(CLASES.includes(form.clase as never) || propias.includes(form.clase) ? [] : [form.clase])]
+  // Task o nota. Editar, varios días o desde una nota: siempre task.
+  const puedeNota = !tarea && !dias && !notaId
+  const [modo, setModo] = useState<'tarea' | 'nota'>(() => (puedeNota && leerModo() === 'nota' ? 'nota' : 'tarea'))
+  const [textoNota, setTextoNota] = useState('')
+  const [posibleNota, setPosibleNota] = useState(false)
+  // Rápido por defecto: título, cuándo y space a la vista; lo demás tras «More options».
+  const [mas, setMas] = useState(() => !!tarea || !!dias || conExtras(inicial(apertura, frentes, hoy)))
+
+  /** Cambiar de pestaña se lleva lo escrito: el título pasa a la nota y la nota (su primer renglón) al título. */
+  function cambiarModo(m: 'tarea' | 'nota') {
+    setModo(m)
+    guardarModo(m)
+    if (m === 'nota' && !textoNota.trim()) setTextoNota(form.titulo)
+    if (m === 'tarea' && !form.titulo.trim()) poner('titulo', textoNota.trim().split('\n')[0].slice(0, 200))
+  }
 
   function agregarActividad() {
     const nombre = (nueva ?? '').trim().replace(/\s+/g, ' ')
@@ -185,8 +220,13 @@ export function HojaTarea({
   function salir() {
     if (ocupada) return
     if (alcance) return setAlcance(null)
+    if (modo === 'nota') return textoNota.trim() ? guardarNota() : dialogo.current?.close()
     if (!cambio || (!tarea && !form.titulo.trim())) return dialogo.current?.close()
     guardar()
+  }
+
+  function guardarNota() {
+    correr(() => crearNota(form.espacio_id, textoNota, posibleNota), () => avisar('Note saved'))
   }
 
   function guardar() {
@@ -222,11 +262,32 @@ export function HojaTarea({
         ),
     )
 
+  const grupoEspacios = (
+    <div className="grupo" role="radiogroup" aria-label="Space">
+      {frentes.map((f) => (
+        <button
+          key={f.id}
+          type="button"
+          role="radio"
+          className="v-boton chico"
+          aria-checked={form.espacio_id === f.id}
+          // Al cambiar de frente se limpia el proyecto: era de otro frente.
+          onClick={() => setForm((x) => (x.espacio_id === f.id ? x : { ...x, espacio_id: f.id, proyecto_id: '' }))}
+        >
+          <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 5 }}>
+            {f.inicial}
+          </span>
+          {f.nombre}
+        </button>
+      ))}
+    </div>
+  )
+
   return (
     <dialog
       ref={dialogo}
       className={`v-hoja${tarea ? '' : ' nueva'}`}
-      aria-label={tarea ? 'Edit task' : 'New task'}
+      aria-label={tarea ? 'Edit task' : modo === 'nota' ? 'New note' : 'New task'}
       onClose={cerrar}
       // Esc o tocar el fondo: salir guardando (ver `salir`).
       onCancel={(e) => {
@@ -239,17 +300,65 @@ export function HojaTarea({
         className="cuerpo"
         onSubmit={(e) => {
           e.preventDefault()
-          guardar()
+          if (modo === 'nota') guardarNota()
+          else guardar()
         }}
       >
         <header className="hoja-cabeza">
           <span className="hoja-punto" aria-hidden />
-          <h3>{tarea ? 'Task' : dias ? `New task · ${dias.length} days` : 'New task'}</h3>
+          {puedeNota ? (
+            <div className="hoja-modos" role="tablist" aria-label="Capture">
+              <button type="button" role="tab" aria-selected={modo === 'tarea'} onClick={() => cambiarModo('tarea')}>
+                Task
+              </button>
+              <button type="button" role="tab" aria-selected={modo === 'nota'} onClick={() => cambiarModo('nota')}>
+                Note
+              </button>
+            </div>
+          ) : (
+            <h3>{tarea ? 'Task' : dias ? `New task · ${dias.length} days` : 'New task'}</h3>
+          )}
           <button type="button" className="hoja-esc" onClick={salir} aria-label="Close">
             <kbd>esc</kbd>
           </button>
         </header>
 
+        {modo === 'nota' ? (
+          <>
+            <textarea
+              className="hoja-nota"
+              autoFocus
+              rows={4}
+              maxLength={4000}
+              placeholder="What’s on your mind?"
+              aria-label="Note"
+              value={textoNota}
+              onChange={(e) => setTextoNota(e.target.value)}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                  e.preventDefault()
+                  guardarNota()
+                }
+              }}
+            />
+            <div className="props">
+              {frentes.length > 1 && (
+                <Prop icono={Layers} etq="Space">
+                  {grupoEspacios}
+                </Prop>
+              )}
+              <Prop icono={Flag} etq="Maybe task">
+                <div className="grupo">
+                  <button type="button" className="v-boton chico" aria-pressed={posibleNota} onClick={() => setPosibleNota((v) => !v)}>
+                    <Flag size={13} aria-hidden />
+                    {posibleNota ? 'Flagged — might become a task' : 'Flag it'}
+                  </button>
+                </div>
+              </Prop>
+            </div>
+          </>
+        ) : (
+          <>
         {/* Enter en el título envía el formulario. */}
         <input
           className="v-campo hoja-titulo"
@@ -262,64 +371,10 @@ export function HojaTarea({
         />
 
         <div className="props">
-        <Prop icono={Shapes} etq="Activity">
-        <div className="grupo" aria-label="Activity">
-          {opciones.map((c) => (
-            <button key={c} type="button" className="v-boton chico" aria-pressed={form.clase === c} onClick={() => poner('clase', c)}>
-              {nombreClase(c)}
-            </button>
-          ))}
-          {nueva === null ? (
-            <button type="button" className="v-boton chico" aria-label="New activity" onClick={() => setNueva('')}>
-              ＋
-            </button>
-          ) : (
-            <input
-              className="v-campo chico"
-              autoFocus
-              maxLength={MAX_ACTIVIDAD}
-              placeholder="New activity"
-              aria-label="New activity name"
-              value={nueva}
-              onChange={(e) => setNueva(e.target.value)}
-              onBlur={agregarActividad}
-              onKeyDown={(e) => {
-                // Enter agrega la actividad, no envía el formulario.
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  e.currentTarget.blur()
-                }
-                if (e.key === 'Escape') {
-                  e.preventDefault()
-                  setNueva(null)
-                }
-              }}
-            />
-          )}
-        </div>
-        </Prop>
-
         {/* Desde una nota, el frente es el de la nota: la tarea y la nota van juntas. */}
         {frentes.length > 1 && !notaId && (
           <Prop icono={Layers} etq="Space">
-            <div className="grupo" role="radiogroup" aria-label="Space">
-              {frentes.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  role="radio"
-                  className="v-boton chico"
-                  aria-checked={form.espacio_id === f.id}
-                  // Al cambiar de frente se limpia el proyecto: era de otro frente.
-                  onClick={() => setForm((x) => (x.espacio_id === f.id ? x : { ...x, espacio_id: f.id, proyecto_id: '' }))}
-                >
-                  <span className={`v-foto v-color-${f.color}`} style={{ width: 20, height: 20, fontSize: 11, borderRadius: 5 }}>
-                    {f.inicial}
-                  </span>
-                  {f.nombre}
-                </button>
-              ))}
-            </div>
+            {grupoEspacios}
           </Prop>
         )}
 
@@ -361,6 +416,45 @@ export function HojaTarea({
         <div className="grupo">
           <input type="time" className="v-campo" aria-label="Start time" value={form.hora} onChange={(e) => poner('hora', e.target.value)} />
           <input type="time" className="v-campo" aria-label="End time" value={form.hora_fin} onChange={(e) => poner('hora_fin', e.target.value)} />
+        </div>
+        </Prop>
+
+        {mas ? (
+          <>
+        <Prop icono={Shapes} etq="Activity">
+        <div className="grupo" aria-label="Activity">
+          {opciones.map((c) => (
+            <button key={c} type="button" className="v-boton chico" aria-pressed={form.clase === c} onClick={() => poner('clase', c)}>
+              {nombreClase(c)}
+            </button>
+          ))}
+          {nueva === null ? (
+            <button type="button" className="v-boton chico" aria-label="New activity" onClick={() => setNueva('')}>
+              ＋
+            </button>
+          ) : (
+            <input
+              className="v-campo chico"
+              autoFocus
+              maxLength={MAX_ACTIVIDAD}
+              placeholder="New activity"
+              aria-label="New activity name"
+              value={nueva}
+              onChange={(e) => setNueva(e.target.value)}
+              onBlur={agregarActividad}
+              onKeyDown={(e) => {
+                // Enter agrega la actividad, no envía el formulario.
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  e.currentTarget.blur()
+                }
+                if (e.key === 'Escape') {
+                  e.preventDefault()
+                  setNueva(null)
+                }
+              }}
+            />
+          )}
         </div>
         </Prop>
 
@@ -432,7 +526,17 @@ export function HojaTarea({
             {cargandoSerie ? <p className="v-sub">Loading…</p> : <SelectorRepetir fecha={form.fecha} valor={repetir} cambiar={setRepetir} />}
           </Prop>
         )}
+          </>
+        ) : (
+          <button type="button" className="hoja-mas" onClick={() => setMas(true)}>
+            <ChevronDown size={14} aria-hidden />
+            More options
+            <small>Activity, alert, color, project, repeat</small>
+          </button>
+        )}
         </div>
+          </>
+        )}
 
         <p className="v-aviso" role="status">
           {aviso}
@@ -440,7 +544,7 @@ export function HojaTarea({
 
         <div className="pie">
           <small className="hoja-pista" aria-hidden>
-            Enter to save · Esc to close
+            {modo === 'nota' ? 'Ctrl + Enter to save' : 'Enter to save'} · Esc to close
           </small>
           {tarea && (
             <>
@@ -475,7 +579,7 @@ export function HojaTarea({
             Cancel
           </button>
           <button type="submit" className="v-boton primario" disabled={ocupada}>
-            {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : !tarea && repetir ? 'Save repeating' : 'Save'}
+            {ocupada ? 'Saving…' : modo === 'nota' ? 'Save note' : dias ? `Save ${dias.length} tasks` : !tarea && repetir ? 'Save repeating' : 'Save'}
           </button>
         </div>
 

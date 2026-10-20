@@ -65,6 +65,7 @@ const ICONOS: Record<string, LucideIcon> = {
   Deleted: Trash2,
   Delete: Trash2,
   Note: StickyNote,
+  'Maybe task': StickyNote,
   Reminder: Bell,
   Remembered: Brain,
   'New project': FolderPlus,

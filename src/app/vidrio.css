@@ -1155,3 +1155,96 @@ button.klo-campo{gap:10px;padding:6px 8px 6px 6px;transition:box-shadow .25s cub
 }
 @keyframes hoja-desde-abajo{from{opacity:0;transform:translateY(40px)}}
 @media (prefers-reduced-motion:reduce){.v-hoja,.v-hoja *{animation:none!important}}
+
+/* ── Notes como bitácora: captura arriba, una página por día, «Maybe task» en brasa ── */
+.notas{grid-column:1/-1;width:100%;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.notas-captura{display:flex;flex-direction:column;gap:10px;padding:16px 16px 12px 18px;border-radius:18px;
+  background:radial-gradient(80% 140px at 10% 0%,rgba(255,90,42,.10),transparent 70%),linear-gradient(180deg,#161413,#0e0c0b);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 1px 0 rgba(255,255,255,.05);transition:box-shadow .25s cubic-bezier(.16,1,.3,1)}
+.notas-captura:focus-within{box-shadow:inset 0 0 0 1px rgba(255,122,74,.55),0 0 0 4px rgba(255,90,42,.08),0 14px 40px -16px rgba(255,90,42,.45)}
+.notas-captura textarea{width:100%;resize:none;background:none;border:0;outline:0;color:var(--tinta);font:inherit;font-size:17px;line-height:1.5;field-sizing:content;min-height:52px;max-height:320px;caret-color:var(--brasa)}
+.notas-captura textarea::placeholder{color:var(--tinta-3)}
+.notas-captura-pie{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.notas-captura-pie select.v-campo{flex:0 1 220px;height:32px;padding:0 30px 0 10px;font-size:13px;border-radius:9px;appearance:none;-webkit-appearance:none;color-scheme:dark;color:var(--tinta-2);
+  background:rgba(255,255,255,.04) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a8a29e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.notas-atajo{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--tinta-3)}
+.notas-guardar{height:34px;padding:0 16px;border:0;border-radius:10px;cursor:pointer;color:#fff;font:inherit;font-size:13.5px;font-weight:600;
+  background:linear-gradient(140deg,#ff7a4a,#e2461c);box-shadow:0 8px 22px -10px rgba(255,90,42,.9),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .2s cubic-bezier(.34,1.56,.64,1),filter .15s}
+.notas-guardar:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+.notas-guardar:disabled{background:rgba(255,255,255,.06);color:var(--tinta-3);box-shadow:none;cursor:default}
+
+/* Bandera «Maybe task»: apagada en gris, encendida en brasa. */
+.nota-bandera{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;border:0;border-radius:9px;cursor:pointer;font:inherit;font-size:13px;
+  color:var(--tinta-3);background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:color .15s,background .15s,box-shadow .15s,transform .15s}
+.nota-bandera:hover{color:var(--tinta)}
+.nota-bandera[aria-pressed=true]{color:#fff;background:linear-gradient(140deg,rgba(255,122,74,.3),rgba(226,70,28,.22));box-shadow:inset 0 0 0 1px rgba(255,122,74,.65)}
+.nota-bandera[aria-pressed=true] svg{fill:currentColor}
+.nota-bandera:active{transform:scale(.95)}
+
+/* Filtros */
+.notas-filtros{display:flex;gap:6px}
+.notas-filtros button{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px;border:0;border-radius:99px;cursor:pointer;font:inherit;font-size:13px;color:var(--tinta-2);background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .15s,color .15s}
+.notas-filtros button span{font-family:var(--mono);font-size:11px;color:var(--tinta-3)}
+.notas-filtros button[aria-pressed=true]{color:#fff;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.notas-filtros button[aria-pressed=true] span{color:var(--tinta-2)}
+.notas-nada{color:var(--tinta-3);font-size:14px}
+
+/* Un día */
+.notas-dia{display:flex;flex-direction:column;gap:10px;animation:hoja-subir .45s cubic-bezier(.16,1,.3,1) both}
+.notas-dia header{position:sticky;top:0;z-index:2;display:flex;align-items:baseline;gap:10px;padding:8px 0;background:linear-gradient(180deg,#000 70%,transparent)}
+.notas-dia h3{font-size:20px;font-weight:700;letter-spacing:-.015em}
+.notas-dia header small{font-family:var(--mono);font-size:11px;color:var(--tinta-3)}
+
+/* Línea de tiempo del día */
+.notas-linea{list-style:none;margin:0;padding:0 0 0 22px;display:flex;flex-direction:column;gap:10px;position:relative}
+.notas-linea::before{content:"";position:absolute;left:6px;top:10px;bottom:10px;width:1px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.03))}
+.nota{position:relative;display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.025);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);transition:background .2s,box-shadow .2s}
+.nota::before{content:"";position:absolute;left:-20px;top:17px;width:9px;height:9px;border-radius:50%;background:#2a2624;box-shadow:0 0 0 3px #000}
+.nota:hover{background:rgba(255,255,255,.04)}
+.nota[data-posible]{background:linear-gradient(90deg,rgba(255,90,42,.09),rgba(255,255,255,.02) 60%);box-shadow:inset 0 0 0 1px rgba(255,122,74,.3),inset 3px 0 0 var(--brasa)}
+.nota[data-posible]::before{background:var(--brasa);box-shadow:0 0 0 3px #000,0 0 10px rgba(255,90,42,.8)}
+.nota[data-tarea]{opacity:.6}
+.nota[data-tarea]::before{background:#3ddc84}
+.nota[data-tarea] p{text-decoration:line-through;text-decoration-color:rgba(255,255,255,.3)}
+.nota-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--tinta-3)}
+.nota-meta time{font-family:var(--mono);font-size:11px}
+.nota-espacio{display:inline-flex;align-items:center;gap:6px}
+.nota-pildora{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:99px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--v-durazno,#ff9a6b);background:rgba(255,90,42,.12)}
+.nota-pildora svg{fill:currentColor}
+.nota-pildora.hecha{color:#3ddc84;background:rgba(61,220,132,.1)}
+.nota-pildora.hecha svg{fill:none}
+.nota p{white-space:pre-wrap;font-size:15px;line-height:1.55;overflow-wrap:anywhere;color:var(--tinta)}
+.nota .v-campo{width:100%}
+.nota-acciones{display:flex;align-items:center;gap:4px;opacity:.55;transition:opacity .2s}
+.nota:hover .nota-acciones,.nota:focus-within .nota-acciones{opacity:1}
+.nota-acciones button{display:inline-flex;align-items:center;gap:6px;height:28px;min-width:28px;justify-content:center;padding:0 8px;border:0;border-radius:8px;cursor:pointer;font:inherit;font-size:12.5px;color:var(--tinta-3);background:none;transition:background .15s,color .15s}
+.nota-acciones button:hover{color:var(--tinta);background:rgba(255,255,255,.07)}
+.nota-acciones .nota-bandera{height:28px;padding:0 8px;background:none;box-shadow:none}
+.nota-acciones .nota-bandera[aria-pressed=true]{color:var(--brasa);background:rgba(255,90,42,.12);box-shadow:none}
+.nota-acciones .nota-hacer{color:var(--v-durazno,#ff9a6b)}
+.nota-acciones .nota-hacer:hover{color:#fff;background:rgba(255,90,42,.16)}
+@media (hover:none){.nota-acciones{opacity:1}}
+@media (max-width:700px){
+  .notas{gap:18px}
+  .notas-atajo{display:none}
+  .notas-guardar{margin-left:auto}
+  .notas-linea{padding-left:18px}
+  .nota::before{left:-17px}
+  .notas-linea::before{left:4px}
+}
+
+/* ── El + captura: pestañas Task | Note, «More options» y el campo de la nota ── */
+.hoja-modos{display:inline-flex;gap:2px;padding:3px;border-radius:11px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.hoja-modos button{height:28px;padding:0 14px;border:0;border-radius:8px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;color:var(--tinta-3);background:none;transition:color .2s,background .25s cubic-bezier(.16,1,.3,1),box-shadow .25s}
+.hoja-modos button:hover{color:var(--tinta)}
+.hoja-modos button[aria-selected=true]{color:#fff;background:linear-gradient(140deg,rgba(255,122,74,.32),rgba(226,70,28,.24));box-shadow:inset 0 0 0 1px rgba(255,122,74,.6),0 6px 14px -8px rgba(255,90,42,.8)}
+.hoja-mas{display:flex;align-items:center;gap:8px;width:100%;margin-top:2px;padding:10px;border:0;border-radius:12px;cursor:pointer;font:inherit;font-size:13px;font-weight:500;color:var(--tinta-2);background:none;text-align:left;transition:background .2s,color .2s}
+.hoja-mas:hover{background:rgba(255,255,255,.035);color:var(--tinta)}
+.hoja-mas small{margin-left:4px;font-size:12px;color:var(--tinta-3);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hoja-mas svg{color:var(--brasa);flex:none}
+.v-hoja .hoja-nota{width:100%;resize:none;background:none;border:0;outline:0;color:var(--tinta);font:inherit;font-size:clamp(18px,2.1vw,21px);line-height:1.5;
+  min-height:120px;max-height:46dvh;field-sizing:content;caret-color:var(--brasa);padding:4px 2px 10px;border-bottom:1px solid rgba(255,255,255,.07);transition:border-color .25s}
+.v-hoja .hoja-nota:focus{border-bottom-color:rgba(255,122,74,.6)}
+.v-hoja .hoja-nota::placeholder{color:var(--tinta-3)}
+.v-hoja .grupo button[aria-pressed=true] svg.lucide-flag{fill:currentColor}
+.v-hoja.nueva[open] .hoja-nota{animation:hoja-subir .4s cubic-bezier(.16,1,.3,1) both}

@@ -38,7 +38,7 @@ export async function describirPendientes(sb: Cliente, pendientes: Pendiente[]):
       case 'completar_task':
         return `Done · ${de}`
       case 'crear_nota':
-        return `Note · ${(i.texto ?? '').slice(0, 50)}`
+        return `${(input as { posible_tarea?: boolean }).posible_tarea ? 'Maybe task' : 'Note'} · ${(i.texto ?? '').slice(0, 50)}`
       case 'crear_proyecto':
         return `New project · ${i.nombre ?? ''}`
       case 'cambiar_proyecto':

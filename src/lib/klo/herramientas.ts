@@ -35,6 +35,7 @@ export const ESQUEMAS = {
       .describe('Makes it repeat starting on fecha (fecha is required). Omit for a one-time task.'),
     repetir_hasta: fecha.optional().describe('Last date it can repeat; omit to repeat with no end'),
     repetir_veces: z.number().int().min(1).max(1000).optional().describe('Or: stop after N occurrences'),
+    de_nota_id: id.optional().describe('When this task comes from a flagged note: that note id (it is marked as done)'),
   }),
   cambiar_task: z.object({
     id,
@@ -53,7 +54,11 @@ export const ESQUEMAS = {
     id,
     toda_la_serie: z.boolean().optional().describe('Repeating task only: true deletes this and every following pending occurrence, so it stops repeating'),
   }),
-  crear_nota: z.object({ texto: z.string().min(1).max(4000), espacio_id: id.optional() }),
+  crear_nota: z.object({
+    texto: z.string().min(1).max(4000),
+    espacio_id: id.optional(),
+    posible_tarea: z.boolean().optional().describe('true when it sounds like something they might do later ("maybe", "someday", "I should…")'),
+  }),
   programar_aviso: z.object({
     texto: z.string().min(1).max(200).describe('What the push will say'),
     fecha,
@@ -85,7 +90,7 @@ const DESCRIPCIONES: Record<NombreHerramienta, string> = {
   cambiar_task: 'Move or edit a task: send only the fields that change. For a repeating task, changes only this occurrence.',
   completar_task: 'Check a task off (or un-check it).',
   borrar_task: 'Delete a task (or, with toda_la_serie, stop a repeating one from that day on). Always needs the user’s confirmation; the server holds it until they confirm.',
-  crear_nota: 'Save a note (an idea or information that is not a task).',
+  crear_nota: 'Save a note (an idea or information that is not a task). Flag it with posible_tarea when it might become a task later.',
   programar_aviso: 'Schedule a push notification to the user’s phone at a date and time ("remind me…").',
   crear_proyecto: 'Create a project (progress is tracked by its tasks). Use the returned id as proyecto_id to add tasks to it.',
   cambiar_proyecto: 'Rename a project, change its goal or target date, or pause, archive or reactivate it.',

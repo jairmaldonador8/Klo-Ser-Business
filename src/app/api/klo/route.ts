@@ -27,11 +27,12 @@ export async function POST(req: Request) {
   if (!claims?.claims) return NextResponse.json({ mensaje: 'Sign in again.' }, { status: 401 })
   const userId = claims.claims.sub
 
-  const [{ ctx, perfil, espacios }, { data: proyectos }, tareas, { data: memoria }, { data: previos }] = await Promise.all([
+  const [{ ctx, perfil, espacios }, { data: proyectos }, tareas, { data: memoria }, { data: notasPosibles }, { data: previos }] = await Promise.all([
     leerCtx(sb, userId),
     sb.from('proyectos').select('id, nombre, espacio_id, fecha_meta').eq('estado', 'activo').order('nombre'),
     leerMisTareas(),
     sb.from('klo_memoria').select('texto').order('creado_en'),
+    sb.from('notas').select('id, espacio_id, texto').eq('posible_tarea', true).is('borrado_en', null).is('convertida_en_tarea_id', null).order('creado_en', { ascending: false }).limit(15),
     sb.from('klo_mensajes').select('rol, texto').eq('sesion', sesion).order('creado_en', { ascending: false }).limit(HISTORIA),
   ])
 
@@ -62,6 +63,7 @@ export async function POST(req: Request) {
         proyectos: proyectos ?? [],
         actividades: perfil?.actividades ?? [],
         tareas,
+        notasPosibles: notasPosibles ?? [],
       }),
       historia,
       texto,

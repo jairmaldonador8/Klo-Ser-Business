@@ -17,11 +17,16 @@ function listo(id?: string): Resultado {
   return { ok: true, id }
 }
 
-export async function crearNota(espacioId: string, texto: string): Promise<Resultado> {
+/** `posibleTarea`: nace marcada como «Maybe task». */
+export async function crearNota(espacioId: string, texto: string, posibleTarea = false): Promise<Resultado> {
   const leido = esquemaTexto.safeParse(texto)
   if (!leido.success) return { ok: false, mensaje: leido.error.issues[0]?.message ?? 'Check the note.' }
   const supabase = await crearClienteServidor()
-  const { data, error } = await supabase.from('notas').insert({ espacio_id: espacioId, texto: leido.data }).select('id').single()
+  const { data, error } = await supabase
+    .from('notas')
+    .insert({ espacio_id: espacioId, texto: leido.data, posible_tarea: posibleTarea === true })
+    .select('id')
+    .single()
   if (error || !data) {
     console.error('crearNota', error)
     return { ok: false, mensaje: 'Couldn’t save the note, try again.' }
@@ -43,5 +48,14 @@ export async function borrarNota(id: string, borrar = true): Promise<Resultado> 
   const supabase = await crearClienteServidor()
   const { error } = await supabase.from('notas').update({ borrado_en: borrar ? new Date().toISOString() : null }).eq('id', id)
   if (error) return { ok: false, mensaje: borrar ? 'Couldn’t delete it, try again.' : 'Couldn’t undo it, try again.' }
+  return listo()
+}
+
+/** Marca (o quita) «Maybe task». */
+export async function marcarPosible(id: string, posible: boolean): Promise<Resultado> {
+  if (!z.uuid().safeParse(id).success) return { ok: false, mensaje: 'Couldn’t find that note.' }
+  const supabase = await crearClienteServidor()
+  const { error } = await supabase.from('notas').update({ posible_tarea: posible === true }).eq('id', id)
+  if (error) return { ok: false, mensaje: 'Couldn’t mark it, try again.' }
   return listo()
 }

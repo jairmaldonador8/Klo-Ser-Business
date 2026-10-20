@@ -15,7 +15,7 @@ type CambiosSerie = Database['public']['Tables']['series']['Update']
 export type Ctx = { usuario: string; espacios: Set<string>; predeterminado: string | null; zona: string }
 
 export type Deshacer =
-  | { tipo: 'borrar_tarea'; id: string }
+  | { tipo: 'borrar_tarea'; id: string; nota?: string }
   | { tipo: 'restaurar_tarea'; id: string; campos: CambiosTarea }
   | { tipo: 'borrar_nota'; id: string }
   | { tipo: 'borrar_aviso'; id: string }
@@ -57,7 +57,7 @@ export async function ejecutar(sb: Cliente, ctx: Ctx, nombre: NombreHerramienta,
       return buscar(sb, input as { texto?: string; desde?: string; hasta?: string; incluir_hechas?: boolean })
 
     case 'crear_task': {
-      const { repetir, repetir_hasta, repetir_veces, ...resto } = input
+      const { repetir, repetir_hasta, repetir_veces, de_nota_id, ...resto } = input
       const espacio_id = espacioValido(ctx, resto.espacio_id as string | undefined)
       if (!espacio_id) return falla('The user has no spaces.')
       const datos = esquemaTarea.safeParse({ id: null, clase: 'tarea', proyecto_id: null, hora_fin: null, ...resto, espacio_id })
@@ -67,10 +67,12 @@ export async function ejecutar(sb: Cliente, ctx: Ctx, nombre: NombreHerramienta,
       if (repetir) return crearSerie(sb, ctx, campos, repetir, (repetir_hasta as string | undefined) ?? null, (repetir_veces as number | undefined) ?? null)
       const { data, error } = await sb.from('tareas').insert({ ...campos, origen: 'klo' }).select('id').single()
       if (error || !data) return falla(`Could not create it (${error?.message ?? 'unknown'}).`)
+      // Viene de una nota marcada: la nota queda como «Became a task» (y el Undo la regresa).
+      const nota = de_nota_id ? (await sb.from('notas').update({ convertida_en_tarea_id: data.id }).eq('id', de_nota_id as string).select('id')).data?.[0]?.id : undefined
       return {
-        texto: `Created task ${data.id}.`,
+        texto: `Created task ${data.id}${nota ? ' from the note' : ''}.`,
         resumen: `Added · ${campos.titulo} · ${cuando(campos.fecha, campos.hora)}`,
-        deshacer: { tipo: 'borrar_tarea', id: data.id },
+        deshacer: { tipo: 'borrar_tarea', id: data.id, nota },
       }
     }
 
@@ -128,9 +130,10 @@ export async function ejecutar(sb: Cliente, ctx: Ctx, nombre: NombreHerramienta,
       const espacio_id = espacioValido(ctx, input.espacio_id as string | undefined)
       if (!espacio_id) return falla('The user has no spaces.')
       const texto = String(input.texto).trim()
-      const { data, error } = await sb.from('notas').insert({ espacio_id, texto }).select('id').single()
+      const posible_tarea = input.posible_tarea === true
+      const { data, error } = await sb.from('notas').insert({ espacio_id, texto, posible_tarea }).select('id').single()
       if (error || !data) return falla(`Could not save the note (${error?.message ?? 'unknown'}).`)
-      return { texto: `Saved note ${data.id}.`, resumen: `Note · ${texto.slice(0, 60)}`, deshacer: { tipo: 'borrar_nota', id: data.id } }
+      return { texto: `Saved note ${data.id}.`, resumen: `${posible_tarea ? 'Maybe task' : 'Note'} · ${texto.slice(0, 60)}`, deshacer: { tipo: 'borrar_nota', id: data.id } }
     }
 
     case 'programar_aviso': {

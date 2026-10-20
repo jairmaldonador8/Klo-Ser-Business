@@ -127,6 +127,8 @@ test('repeat: una task semanal aparece la semana siguiente y se borra con «This
 
   const hoja = page.getByRole('dialog', { name: 'New task' })
   await hoja.getByLabel('Title').fill(titulo)
+  // Repeat vive en «More options» (el + abre en modo rápido).
+  await hoja.getByRole('button', { name: /More options/ }).click()
   await hoja.getByRole('button', { name: 'Repeat', exact: true }).click()
   await hoja.getByRole('option', { name: /^Every week on/ }).click()
   await expect(hoja.getByRole('button', { name: 'Repeat', exact: true })).toContainText('Every week on')
