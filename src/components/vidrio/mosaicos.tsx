@@ -1,3 +1,4 @@
+import { ArrowUp } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AbrirKlo } from '@/components/klo/campo-klo'
@@ -12,18 +13,20 @@ const retraso = (i: number) => ({ animationDelay: `${i * 55}ms` })
 export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: number; pendientes: number; siguiente: string | null; i: number }) {
   const total = hechas + pendientes
   const avance = total ? hechas / total : 0
-  const largo = Math.PI * 130
+  const largo = Math.round(Math.PI * 130 * 100) / 100
   const angulo = Math.PI + avance * Math.PI
+  // Redondeado: el medidor también se pinta en el navegador y sus decimales deben coincidir con los del servidor.
+  const r2 = (x: number) => Math.round(x * 100) / 100
   const marcas = Array.from({ length: 31 }, (_, n) => {
     const a = Math.PI + (n * Math.PI) / 30
-    const [r1, r2] = [148, n % 5 ? 154 : 160]
+    const [radio1, radio2] = [148, n % 5 ? 154 : 160]
     return (
       <line
         key={n}
-        x1={170 + r1 * Math.cos(a)}
-        y1={170 + r1 * Math.sin(a)}
-        x2={170 + r2 * Math.cos(a)}
-        y2={170 + r2 * Math.sin(a)}
+        x1={r2(170 + radio1 * Math.cos(a))}
+        y1={r2(170 + radio1 * Math.sin(a))}
+        x2={r2(170 + radio2 * Math.cos(a))}
+        y2={r2(170 + radio2 * Math.sin(a))}
         stroke={`rgba(255,255,255,${n % 5 ? 0.18 : 0.4})`}
         strokeWidth={2}
         strokeLinecap="round"
@@ -58,10 +61,10 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
               strokeWidth={16}
               strokeLinecap="round"
               strokeDasharray={largo}
-              style={{ '--largo': largo, '--fin': largo * (1 - avance) } as React.CSSProperties}
+              style={{ '--largo': largo, '--fin': r2(largo * (1 - avance)) } as React.CSSProperties}
             />
           )}
-          <circle cx={170 + 130 * Math.cos(angulo)} cy={170 + 130 * Math.sin(angulo)} r={10} fill="#fff" stroke="#000" strokeWidth={4} />
+          <circle cx={r2(170 + 130 * Math.cos(angulo))} cy={r2(170 + 130 * Math.sin(angulo))} r={10} fill="#fff" stroke="#000" strokeWidth={4} />
         </svg>
         <div className="centro">
           <small>to do today</small>
@@ -88,19 +91,24 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
 export function MosaicoKlo({ frase, i }: { frase: string; i: number }) {
   return (
     <section className="v-t c2" style={retraso(i)} aria-label="Klo">
-      <AbrirKlo className="v-klo klo-boton">
-        <div className="v-disco">
-          <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={56} height={66} unoptimized />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
-          <span className="v-sub">Klo says</span>
+      <AbrirKlo className="v-klo klo-boton klo-tarjeta">
+        <span className="klo-orbe" data-grande aria-hidden>
+          <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={30} height={35} unoptimized />
+        </span>
+        <span className="klo-tarjeta-cuerpo">
+          <span className="klo-tarjeta-quien">
+            <b>Klo</b>
+            <i className="klo-punto" aria-hidden />
+            Ready
+          </span>
           <h3>“{frase}”</h3>
-          <div className="v-ondas" aria-hidden>
-            {Array.from({ length: 14 }, (_, n) => (
-              <i key={n} style={{ animationDelay: `${n * 80}ms` }} />
-            ))}
-          </div>
-        </div>
+          <span className="klo-tarjeta-campo">
+            Tell Klo anything…
+            <span className="klo-enviar" aria-hidden>
+              <ArrowUp size={16} strokeWidth={2.5} />
+            </span>
+          </span>
+        </span>
       </AbrirKlo>
     </section>
   )

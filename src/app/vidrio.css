@@ -919,7 +919,7 @@ button.v-klo-campo:focus-visible{outline:2px solid var(--brasa);outline-offset:2
 .klo-orbe{position:relative;width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:50%;
   background:radial-gradient(circle at 35% 28%,#2a2420,#121010 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.07),0 6px 18px -6px rgba(255,90,42,.45);
   animation:klo-respirar 4s ease-in-out infinite}
-.klo-orbe img{width:auto;height:58%;filter:drop-shadow(0 2px 4px rgba(28,54,238,.4))}
+.klo-orbe img{width:50%;height:auto;filter:drop-shadow(0 2px 4px rgba(28,54,238,.4))}
 .klo-orbe::after{content:"";position:absolute;inset:-3px;border-radius:50%;padding:1.5px;opacity:0;transition:opacity .3s;
   background:conic-gradient(from var(--klo-giro),transparent 0 30%,var(--brasa) 60%,#ffc933 80%,transparent 100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
@@ -1044,3 +1044,28 @@ button.v-klo-campo:focus-visible{outline:2px solid var(--brasa);outline-offset:2
 .klo-uso dd{margin:0;color:var(--tinta-2);text-align:right}
 .klo-uso strong{color:var(--tinta)}
 .klo-memoria button{background:none;border:0;color:var(--tinta-3);cursor:pointer;font-size:15px;line-height:1}
+
+/* ── Klo fuera del panel: la barra de arriba y la tarjeta de Today, con el mismo lenguaje del chat ── */
+button.klo-campo{gap:10px;padding:6px 8px 6px 6px;transition:box-shadow .25s cubic-bezier(.16,1,.3,1),background .2s}
+.klo-campo .klo-orbe{width:28px;height:28px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 4px 12px -4px rgba(255,90,42,.5)}
+.klo-campo .klo-sugerencia{font-family:var(--poppins);font-size:14px;color:var(--tinta-3)}
+.klo-campo:hover{box-shadow:inset 0 0 0 1px rgba(255,122,74,.45),0 0 0 4px rgba(255,90,42,.08)}
+.klo-campo:hover .klo-sugerencia{color:var(--tinta-2)}
+.klo-campo:hover .klo-orbe::after{opacity:1;animation:klo-girar 1.4s linear infinite}
+
+.klo-tarjeta{grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center;width:100%;height:100%}
+.klo-tarjeta-cuerpo{display:flex;flex-direction:column;gap:10px;min-width:0}
+.klo-tarjeta-quien{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-2)}
+.klo-tarjeta-quien b{font-family:var(--poppins);font-size:13px;letter-spacing:0;text-transform:none;color:var(--tinta);font-weight:700;margin-right:2px}
+.klo-tarjeta h3{font-size:clamp(18px,2vw,22px);line-height:1.3;letter-spacing:-.015em}
+.klo-tarjeta-campo{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:420px;margin-top:4px;padding:6px 6px 6px 14px;border-radius:14px;
+  background:rgba(8,7,7,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);color:var(--tinta-3);font-size:14px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:box-shadow .25s cubic-bezier(.16,1,.3,1),color .2s}
+.klo-tarjeta-campo .klo-enviar{width:32px;height:32px;border-radius:10px}
+.klo-tarjeta:hover .klo-tarjeta-campo{color:var(--tinta-2);box-shadow:inset 0 0 0 1px rgba(255,122,74,.55),0 0 0 4px rgba(255,90,42,.1)}
+.klo-tarjeta:hover .klo-enviar{transform:translateY(-1px) scale(1.05)}
+.klo-tarjeta:hover .klo-orbe::after{opacity:1;animation:klo-girar 1.4s linear infinite}
+@media (max-width:700px){
+  .klo-tarjeta{gap:14px}
+  .klo-tarjeta .klo-orbe[data-grande]{width:52px;height:52px}
+}

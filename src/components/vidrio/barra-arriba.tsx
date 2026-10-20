@@ -26,7 +26,7 @@ export function BarraArriba({ nombre, zona, frentes, ahora: ahoraIso }: Props) {
         </div>
       ) : (
         <div className="v-foto sol-klo">
-          <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={28} height={34} unoptimized />
+          <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={28} height={33} unoptimized />
         </div>
       )}
       <div>
