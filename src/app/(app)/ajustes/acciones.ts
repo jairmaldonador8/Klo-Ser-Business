@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { esColor } from '@/lib/frentes'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
+import { MAX_BRIEF } from '@/lib/klo/sistema'
 import { limpiarActividades } from '@/lib/tareas/esquema'
 import { MOSAICOS, SECCIONES } from '@/lib/vista/registro'
 import { esquemaVista, leerVista, resolverLista } from '@/lib/vista/resolver'
@@ -88,5 +89,30 @@ export async function guardarActividades(lista: unknown): Promise<Resultado> {
     return { ok: false, mensaje: 'Couldn’t save, try again.' }
   }
   revalidatePath('/', 'layout')
+  return { ok: true }
+}
+
+/** Klo's brief: lo que Jair le cuenta a Klo de sí mismo (va en cada conversación). */
+export async function guardarBrief(texto: string): Promise<Resultado> {
+  if (typeof texto !== 'string' || texto.length > MAX_BRIEF) return { ok: false, mensaje: `Keep it under ${MAX_BRIEF} characters.` }
+  const supabase = await crearClienteServidor()
+  const { data } = await supabase.auth.getClaims()
+  if (!data?.claims) return { ok: false, mensaje: 'Your session ended; sign in again.' }
+  const { error } = await supabase.from('perfiles').update({ klo_brief: texto.trim() || null }).eq('user_id', data.claims.sub)
+  if (error) {
+    console.error('guardarBrief', error)
+    return { ok: false, mensaje: 'Couldn’t save, try again.' }
+  }
+  return { ok: true }
+}
+
+/** Olvidar algo que Klo recordó. */
+export async function borrarMemoria(id: string): Promise<Resultado> {
+  const supabase = await crearClienteServidor()
+  const { error } = await supabase.from('klo_memoria').delete().eq('id', id)
+  if (error) {
+    console.error('borrarMemoria', error)
+    return { ok: false, mensaje: 'Couldn’t forget it, try again.' }
+  }
   return { ok: true }
 }

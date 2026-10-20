@@ -915,3 +915,7 @@ button.v-klo-campo:focus-visible{outline:2px solid var(--brasa);outline-offset:2
   .klo-capa[data-abierto] .klo-panel{transform:none}
 }
 @media (prefers-reduced-motion:reduce){.klo-panel,.klo-velo{transition:none}.klo-pensando i{animation:none;opacity:.6}}
+.klo-memoria{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.klo-memoria li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--tinta-2);padding:6px 8px;border-radius:var(--r-chip);background:#1d1a19}
+.klo-memoria span{flex:1}
+.klo-memoria button{background:none;border:0;color:var(--tinta-3);cursor:pointer;font-size:15px;line-height:1}

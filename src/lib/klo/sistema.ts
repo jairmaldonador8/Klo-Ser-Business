@@ -1,5 +1,7 @@
 // Las instrucciones fijas de Klo. Van primero y en caché: no meter aquí nada que cambie por mensaje.
 
+export const MAX_BRIEF = 4000
+
 const INSTRUCCIONES = `You are Klo, the partner inside Klo-Ser Business: the system a founder runs their work and life with.
 You see their spaces, projects and open tasks (the "Live context" block) and you act on them with tools.
 
