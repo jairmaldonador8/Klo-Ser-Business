@@ -359,3 +359,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 
 - Lo que se pone con ⇧/⌘ es una calendarización (serie «Every day · until <último día>»), no copias. Al abrir cualquiera, **Repeat** lo dice y **Ends (Never / On date / After N)** está siempre a la vista. Cambiar solo el final aplica a toda la serie sin preguntar (`cambiarFin`): alarga generando las que faltan o acorta quitando pendientes; las palomeadas se respetan.
 - Cambiar la regla desde una task del medio ya no duplica las palomeadas posteriores: se respetan y pasan a la serie nueva.
+
+## 34. A cuáles aplicar: ventana al centro (2026-10-19)
+
+- La pregunta de una task que se repite ya no va abajo en la hoja: sale una ventana al centro («Edit repeating task» / «Delete repeating task») con tres opciones grandes —This task · This and following tasks · All tasks— y Cancel. Tocar fuera o Esc regresa a la hoja.

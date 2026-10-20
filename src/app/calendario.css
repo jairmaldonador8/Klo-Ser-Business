@@ -309,8 +309,6 @@
 .v-hoja .v-repetir-custom .grupo select.v-campo.chico{width:auto;min-width:110px}
 .v-repetir-dias button{width:34px;height:34px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--tinta-2);background:#1b1a19;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
 .v-repetir-dias button[aria-pressed="true"]{background:#fff;color:#000;box-shadow:none}
-.v-alcance{flex-wrap:wrap;align-items:center}
-.v-alcance .v-sub{flex-basis:100%;margin-bottom:2px}
 /* En el calendario: ↻ en lo que se repite. */
 .cal-rep{display:inline-block;width:10px;height:10px;margin-left:5px;vertical-align:-1px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
 }
@@ -348,4 +346,19 @@ html.hoja-abierta .v-renglon.seleccionada{box-shadow:inset 0 0 0 1.5px rgba(255,
 
 @layer components {
 .v-repetir-fin{display:flex;flex-direction:column;gap:8px}
+}
+
+/* ── A cuáles aplicar: ventana al centro (DISENO §34) ─────────────────── */
+@layer components {
+.v-alcance-velo{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.55);animation:v-aparece .18s ease-out}
+.v-alcance-modal{width:min(360px,100%);display:flex;flex-direction:column;gap:8px;padding:22px;border-radius:14px;text-align:left;
+  background:#161514;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 0 1px rgba(255,255,255,.06),0 40px 80px -24px #000;animation:v-entra-marca .25s var(--ease) both}
+.v-alcance-modal h4{font-weight:600;font-size:17px;letter-spacing:-.01em}
+.v-alcance-modal p{margin:0 0 8px;font-size:13px;line-height:1.45;color:var(--tinta-2)}
+.v-alcance-opcion{height:42px;padding:0 14px;border-radius:8px;text-align:left;font-size:14px;font-weight:500;color:var(--tinta);
+  background:#201f1e;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 0 1px rgba(255,255,255,.05);transition:background .15s}
+.v-alcance-opcion:hover,.v-alcance-opcion:focus-visible{background:#2b2a29;outline:none;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+.v-alcance-opcion:disabled{opacity:.6}
+.v-alcance-cancelar{align-self:center;margin-top:6px;padding:6px 12px;font-size:13px;color:var(--tinta-2);border-radius:8px}
+.v-alcance-cancelar:hover{color:var(--tinta);background:rgba(255,255,255,.05)}
 }

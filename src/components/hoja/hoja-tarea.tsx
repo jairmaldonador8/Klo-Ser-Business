@@ -406,62 +406,67 @@ export function HojaTarea({
           {aviso}
         </p>
 
-        {tarea && alcance ? (
-          <div className="pie v-alcance" role="group" aria-label="Apply to">
-            <span className="v-sub">This task is part of a group. {alcance === 'borrar' ? 'Delete' : 'Apply changes to'}:</span>
-            <button
-              type="button"
-              className="v-boton"
-              disabled={ocupada}
-              onClick={() => (alcance === 'borrar' ? borrarSoloEsta(tarea) : correr(() => soloEsta(tarea.id, form)))}
-            >
-              Only this
-            </button>
-            <button
-              type="button"
-              className="v-boton primario"
-              disabled={ocupada}
-              onClick={() =>
-                correr(() => (alcance === 'borrar' ? borrarDesdeAqui(tarea.id) : cambiarDesdeAqui(tarea.id, form, repetirAntes?.regla ?? null, repetirAntes?.fin ?? null)))
-              }
-            >
-              This and following
-            </button>
-            <button
-              type="button"
-              className="v-boton"
-              disabled={ocupada}
-              onClick={() => correr(() => (alcance === 'borrar' ? borrarTodas(tarea.id) : cambiarTodas(tarea.id, form)))}
-            >
-              All
-            </button>
-            <button type="button" className="v-boton" onClick={() => setAlcance(null)}>
-              Back
-            </button>
-          </div>
-        ) : (
-          <div className="pie">
-            <button type="submit" className="v-boton primario" disabled={ocupada}>
-              {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : !tarea && repetir ? 'Save repeating' : 'Save'}
-            </button>
-            {tarea && (
-              <>
-                <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => completarTarea(tarea.id, !tarea.completada_en))}>
-                  {tarea.completada_en ? 'Reopen' : 'Complete'}
-                </button>
-                <button
-                  type="button"
-                  className="v-boton"
-                  disabled={ocupada}
-                  onClick={() => (tarea.serie_id ? setAlcance('borrar') : borrarSoloEsta(tarea))}
-                >
-                  Delete
-                </button>
-              </>
-            )}
-            <button type="button" className="v-boton" onClick={() => dialogo.current?.close()}>
-              Cancel
-            </button>
+        <div className="pie">
+          <button type="submit" className="v-boton primario" disabled={ocupada}>
+            {ocupada ? 'Saving…' : dias ? `Save ${dias.length} tasks` : !tarea && repetir ? 'Save repeating' : 'Save'}
+          </button>
+          {tarea && (
+            <>
+              <button type="button" className="v-boton" disabled={ocupada} onClick={() => correr(() => completarTarea(tarea.id, !tarea.completada_en))}>
+                {tarea.completada_en ? 'Reopen' : 'Complete'}
+              </button>
+              <button
+                type="button"
+                className="v-boton"
+                disabled={ocupada}
+                onClick={() => (tarea.serie_id ? setAlcance('borrar') : borrarSoloEsta(tarea))}
+              >
+                Delete
+              </button>
+            </>
+          )}
+          <button type="button" className="v-boton" onClick={() => dialogo.current?.close()}>
+            Cancel
+          </button>
+        </div>
+
+        {/* A cuáles aplicar: una ventana al centro de la pantalla, como en Notion. */}
+        {tarea && alcance && (
+          <div className="v-alcance-velo" onClick={(e) => e.target === e.currentTarget && setAlcance(null)}>
+            <div className="v-alcance-modal" role="alertdialog" aria-modal="true" aria-labelledby="alcance-titulo">
+              <h4 id="alcance-titulo">{alcance === 'borrar' ? 'Delete repeating task' : 'Edit repeating task'}</h4>
+              <p>{alcance === 'borrar' ? 'This task is part of a series. Which ones do you want to delete?' : 'This task is part of a series. Apply your changes to:'}</p>
+              <button
+                type="button"
+                className="v-alcance-opcion"
+                autoFocus
+                disabled={ocupada}
+                onClick={() => (alcance === 'borrar' ? borrarSoloEsta(tarea) : correr(() => soloEsta(tarea.id, form)))}
+              >
+                This task
+              </button>
+              <button
+                type="button"
+                className="v-alcance-opcion"
+                disabled={ocupada}
+                onClick={() =>
+                  correr(() => (alcance === 'borrar' ? borrarDesdeAqui(tarea.id) : cambiarDesdeAqui(tarea.id, form, repetirAntes?.regla ?? null, repetirAntes?.fin ?? null)))
+                }
+              >
+                This and following tasks
+              </button>
+              <button
+                type="button"
+                className="v-alcance-opcion"
+                disabled={ocupada}
+                onClick={() => correr(() => (alcance === 'borrar' ? borrarTodas(tarea.id) : cambiarTodas(tarea.id, form)))}
+              >
+                All tasks
+              </button>
+              <button type="button" className="v-alcance-cancelar" onClick={() => setAlcance(null)}>
+                Cancel
+              </button>
+            </div>
           </div>
         )}
       </form>
