@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { frenteAbierto, type FrenteVista } from '@/lib/frentes'
 import { conFrente } from '@/lib/rutas'
+import { CampoKlo } from '@/components/klo/campo-klo'
 import { MarcaEspacio } from './marca-espacio'
 import { fechaLarga, horaEn, saludoPorHora } from '@/lib/saludo'
 
@@ -35,13 +36,7 @@ export function BarraArriba({ nombre, zona, frentes, ahora: ahoraIso }: Props) {
           {frente ? ' · space' : ''}
         </small>
       </div>
-      {/* La captura de Klo se enciende en la Parte 3. */}
-      <label className="v-klo-campo">
-        <span className="v-orbe" />
-        {/* Las extensiones del navegador le inyectan atributos al input. */}
-        <input suppressHydrationWarning placeholder="Tell Klo: “deliver the carousels tomorrow at 5”" disabled aria-label="Tell Klo" />
-        <kbd>⌘ K</kbd>
-      </label>
+      <CampoKlo />
       <Link href={conFrente('/ajustes', frente?.atajo)} className="v-yo" aria-label="Settings">
         <i>{inicial}</i>
         <span>

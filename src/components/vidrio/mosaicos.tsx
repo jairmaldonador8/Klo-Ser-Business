@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { AbrirKlo } from '@/components/klo/campo-klo'
 import type { ProyectoLista } from '@/lib/datos'
 import type { FrenteVista } from '@/lib/frentes'
 import { avance, porcentaje, textoFaltan } from '@/lib/proyectos/avance'
@@ -87,7 +88,7 @@ export function MosaicoMedidor({ hechas, pendientes, siguiente, i }: { hechas: n
 export function MosaicoKlo({ frase, i }: { frase: string; i: number }) {
   return (
     <section className="v-t c2" style={retraso(i)} aria-label="Klo">
-      <div className="v-klo">
+      <AbrirKlo className="v-klo klo-boton">
         <div className="v-disco">
           <Image src="/marca/azul/02-gallo-completo.svg" alt="" width={56} height={66} unoptimized />
         </div>
@@ -100,7 +101,7 @@ export function MosaicoKlo({ frase, i }: { frase: string; i: number }) {
             ))}
           </div>
         </div>
-      </div>
+      </AbrirKlo>
     </section>
   )
 }

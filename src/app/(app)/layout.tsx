@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { HojaProvider } from '@/components/hoja/hoja-provider'
+import { KloProvider } from '@/components/klo/klo-provider'
 import { BarraArriba } from '@/components/vidrio/barra-arriba'
 import { Pildoras } from '@/components/vidrio/pildoras'
 import { Riel } from '@/components/vidrio/riel'
@@ -41,6 +42,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
       </div>
       {/* La hoja de edición se abre desde cualquier parte (el +, un renglón, una nota). */}
       <HojaProvider frentes={frentes} proyectos={proyectos ?? []} actividades={perfil?.actividades ?? []} hoy={fechaEn(ahora, zona)}>
+        <KloProvider>
         <div className="v-escena">
           <Suspense>
             <Riel secciones={secciones} frentes={frentes} />
@@ -52,6 +54,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
             <Pildoras frentes={frentes} />
           </Suspense>
         </div>
+        </KloProvider>
       </HojaProvider>
     </>
   )
