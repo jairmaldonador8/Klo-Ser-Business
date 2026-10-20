@@ -122,16 +122,7 @@ export function PanelKlo({ abierto, cerrar }: { abierto: boolean; cerrar: () => 
         <div className="klo-lista" ref={lista}>
           {!mensajes.length && (
             <div className="klo-vacio">
-              <p>Tell me what you need. I can add, move and check off tasks, set reminders and tell you what’s coming.</p>
-              <ul>
-                {['What do I have tomorrow?', 'Move my 4 pm call to Thursday', 'Remind me to call Ana at 3'].map((s) => (
-                  <li key={s}>
-                    <button type="button" onClick={() => (setTexto(s), campo.current?.focus())}>
-                      {s}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <p>Tell me what you need. Just write it — add, move or check off tasks, set up routines and projects, reminders, or ask what’s coming.</p>
             </div>
           )}
           {mensajes.map((m, i) =>
