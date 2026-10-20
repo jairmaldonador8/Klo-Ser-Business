@@ -363,3 +363,7 @@ trabajar, cerrar deals y hacer dinero. Se monta sobre el vidrio (§9) cambiando 
 ## 34. A cuáles aplicar: ventana al centro (2026-10-19)
 
 - La pregunta de una task que se repite ya no va abajo en la hoja: sale una ventana al centro («Edit repeating task» / «Delete repeating task») con tres opciones grandes —This task · This and following tasks · All tasks— y Cancel. Tocar fuera o Esc regresa a la hoja.
+
+## 35. More colors (2026-10-19)
+
+- Junto a la paleta base, «More colors» despliega (altura animada) una gama curada para el negro: Vivid, Soft y Deep (10 matices cada una) y Neutral (Ivory, Sand, Stone), más **Custom** con selector libre. Los tonos de la gama y los libres se guardan en hex (migración 0012 acepta `#rrggbb`); `colorCss()` resuelve clave o hex.

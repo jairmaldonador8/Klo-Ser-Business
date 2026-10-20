@@ -3,12 +3,13 @@
 import { useRouter } from 'next/navigation'
 import { useHoja, useHojaViva } from '@/components/hoja/hoja-provider'
 import { horaCorta } from '@/lib/calendario/fechas'
+import { colorCss } from '@/lib/tareas/colores'
 import { absoluto, etiquetaRango, extremos, type Tramo } from '@/lib/calendario/tramos'
 import { porcentaje } from '@/lib/proyectos/avance'
 import { esClaseBase, hhmm, nombreClase, type Tarea } from '@/lib/tareas/esquema'
 import type { ColorDe, Empezar, Meta } from './tipos'
 
-export const colorVar = (color: string) => ({ '--c': `var(--v-p-${color})` }) as React.CSSProperties
+export const colorVar = (color: string) => ({ '--c': colorCss(color) }) as React.CSSProperties
 
 /** Minuto del día bajo el puntero, dentro de la columna de horas que lo contiene. */
 export function minutoEn(e: React.PointerEvent): number {

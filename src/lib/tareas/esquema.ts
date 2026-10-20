@@ -58,7 +58,10 @@ export const esquemaTarea = z
     hora,
     hora_fin: hora,
     fecha_fin: z.preprocess(vacioANulo, z.iso.date().nullable()).optional().transform((v) => v ?? null),
-    color: z.preprocess(vacioANulo, z.enum(COLORES_TAREA).nullable()).optional().transform((v) => v ?? null),
+    color: z
+      .preprocess((v) => (typeof v === 'string' ? v.toLowerCase() : v), z.preprocess(vacioANulo, z.union([z.enum(COLORES_TAREA), z.string().regex(/^#[0-9a-f]{6}$/)]).nullable()))
+      .optional()
+      .transform((v) => v ?? null),
     proyecto_id: z.preprocess(vacioANulo, z.uuid().nullable()),
   })
   .refine((t) => !t.hora || t.fecha, { message: 'To set a time, set a date.', path: ['hora'] })

@@ -22,6 +22,7 @@ import {
 import { absoluto, campos, deAbsoluto, etiquetaRango, extremos, tramos } from '@/lib/calendario/tramos'
 import { diasEntre, fechaEn, horaMinEn, sumarDias } from '@/lib/fechas'
 import type { FrenteVista } from '@/lib/frentes'
+import { colorCss } from '@/lib/tareas/colores'
 import { hhmm, type Tarea } from '@/lib/tareas/esquema'
 import { Calendarios, Flecha, Metas, MiniMes, PorCalendarizar } from './lado'
 import type { Destino, Empezar, Meta, Origen, Previa } from './tipos'
@@ -521,7 +522,7 @@ export function Calendario({ tareas, sinFecha, metas, frentes, frente, rango, fe
           <div
             ref={flotante}
             className={`cal-flotante${tamFlotante.chip ? ' chip' : ''}`}
-            style={{ width: tamFlotante.w, height: tamFlotante.chip ? undefined : tamFlotante.h, '--c': `var(--v-p-${previa.color})` } as React.CSSProperties}
+            style={{ width: tamFlotante.w, height: tamFlotante.chip ? undefined : tamFlotante.h, '--c': colorCss(previa.color) } as React.CSSProperties}
             aria-hidden
           >
             <b>{previa.titulo}</b>

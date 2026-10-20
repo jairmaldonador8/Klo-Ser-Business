@@ -8,9 +8,9 @@ import { mismaRegla } from '@/lib/repetir'
 import { sumarDias } from '@/lib/fechas'
 import { useToast } from '@/components/tareas/toast'
 import type { FrenteVista } from '@/lib/frentes'
-import { COLORES_TAREA, NOMBRE_COLOR_TAREA } from '@/lib/tareas/colores'
 import { CLASES, hhmm, MAX_ACTIVIDAD, nombreClase, type Clase } from '@/lib/tareas/esquema'
 import { useHojaViva, type Apertura, type ProyectoOpcion } from './hoja-provider'
+import { SelectorColor } from './selector-color'
 import { SelectorRepetir, type Repetir } from './selector-repetir'
 
 type Formulario = {
@@ -353,31 +353,11 @@ export function HojaTarea({
         )}
 
         <span className="etq">Color</span>
-        <div className="v-colores" role="radiogroup" aria-label="Color">
-          {/* Sin color propio: el de su space. */}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={form.color === ''}
-            aria-label="Space color"
-            title="Space color"
-            className="auto"
-            style={{ '--c': `var(--v-p-${frentes.find((f) => f.id === form.espacio_id)?.color ?? 'azul'})` } as React.CSSProperties}
-            onClick={() => poner('color', '')}
-          />
-          {COLORES_TAREA.map((c) => (
-            <button
-              key={c}
-              type="button"
-              role="radio"
-              aria-checked={form.color === c}
-              aria-label={NOMBRE_COLOR_TAREA[c]}
-              title={NOMBRE_COLOR_TAREA[c]}
-              style={{ '--c': `var(--v-p-${c})` } as React.CSSProperties}
-              onClick={() => poner('color', c)}
-            />
-          ))}
-        </div>
+        <SelectorColor
+          valor={form.color}
+          colorEspacio={frentes.find((f) => f.id === form.espacio_id)?.color ?? 'azul'}
+          cambiar={(c) => poner('color', c)}
+        />
 
         {delFrente.length > 0 && (
           <>
